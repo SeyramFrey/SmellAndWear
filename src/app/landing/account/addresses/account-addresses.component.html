@@ -1,0 +1,88 @@
+<div class="account-section">
+  <div class="section-header">
+    <a routerLink="/account" class="back-link">
+      <i class="ri-arrow-left-line"></i> Back to Account
+    </a>
+    <h2>My Addresses</h2>
+    <p class="text-muted">Manage your shipping and billing addresses</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Addresses Grid -->
+  <div *ngIf="!loading" class="addresses-grid">
+    <!-- Add New Address Card -->
+    <div class="add-address-card" (click)="openAddModal(addressModal)">
+      <i class="ri-add-line"></i>
+      <span>Add New Address</span>
+    </div>
+
+    <!-- Existing Addresses -->
+    <div *ngFor="let address of addresses" 
+         class="address-card" 
+         [class.default]="isDefaultAddress(address.id)">
+      <span *ngIf="isDefaultAddress(address.id)" class="default-badge">Default</span>
+      <h5>{{ address.ville }}</h5>
+      <p>
+        {{ address.ligne1 }}<br>
+        <span *ngIf="address.ligne2">{{ address.ligne2 }}<br></span>
+        {{ address.code_postal }} {{ address.ville }}
+      </p>
+      <div class="address-actions">
+        <button class="btn btn-outline-primary btn-sm" (click)="openEditModal(addressModal, address)">
+          Edit
+        </button>
+        <button *ngIf="!isDefaultAddress(address.id)" 
+                class="btn btn-outline-secondary btn-sm" 
+                (click)="setAsDefault(address.id)">
+          Set as Default
+        </button>
+        <button class="btn btn-outline-danger btn-sm" (click)="deleteAddress(address.id)">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Address Modal -->
+<ng-template #addressModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editingAddressId ? 'Edit Address' : 'Add New Address' }}</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="addressForm">
+      <div class="mb-3">
+        <label class="form-label">Address Line 1 *</label>
+        <input type="text" class="form-control" formControlName="ligne1" placeholder="Street address">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Address Line 2</label>
+        <input type="text" class="form-control" formControlName="ligne2" placeholder="Apartment, suite, etc.">
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">City *</label>
+          <input type="text" class="form-control" formControlName="ville">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Postal Code *</label>
+          <input type="text" class="form-control" formControlName="code_postal">
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="saveAddress()" [disabled]="addressForm.invalid">
+      {{ editingAddressId ? 'Save Changes' : 'Add Address' }}
+    </button>
+  </div>
+</ng-template>
+

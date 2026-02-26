@@ -1,0 +1,698 @@
+<!-- Start Breadcrumbs -->
+<app-breadcrumbs title="Product Variants" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<!-- End Breadcrumbs -->
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h5 class="card-title flex-grow-1 mb-0">{{ produit?.nom || 'Product Variants' }}</h5>
+                    <div class="flex-shrink-0" *ngIf="produit">
+                        <button class="btn btn-success btn-sm" (click)="openAddVariantModal()">
+                            <i class="ri-add-line align-middle me-1"></i> Ajouter Variant
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Loading State -->
+                <div *ngIf="loading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading variants...</p>
+                </div>
+
+                <!-- Error State -->
+                <div *ngIf="error && !loading" class="alert alert-danger" role="alert">
+                    <i class="ri-error-warning-line me-2"></i>{{ error }}
+                </div>
+
+                <!-- Variants Table -->
+                <div *ngIf="!loading && !error" class="table-card">
+                    <table class="table align-middle table-borderless mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th scope="col">Détails</th>
+                                <th scope="col">Prix</th>
+                                <th scope="col">Stock</th>
+                                <th scope="col">Rang</th>
+                                <th scope="col">Color</th>
+                                <th scope="col">Total généré</th>
+                                <th scope="col" class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- No variants message -->
+                            <tr *ngIf="variants.length === 0">
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    <i class="ri-inbox-line fs-24 d-block mb-2"></i>
+                                    No variants found for this product
+                                </td>
+                            </tr>
+
+                            <!-- Variants rows -->
+                            <tr *ngFor="let variant of variants; trackBy: trackByVariantId">
+                                <td>
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 avatar-md bg-light rounded p-1">
+                                            <img [src]="getVariantImageUrl(variant)" 
+                                                 [alt]="getVariantName(variant)" 
+                                                 class="img-fluid w-100 h-100 object-fit-contain d-block"
+                                                 loading="lazy"
+                                                 decoding="async">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h5 class="fs-15">
+                                                <a [routerLink]="['/ecommerce/product-detail', produitId, variant.id]" 
+                                                   class="link-primary">{{ getVariantName(variant) }}</a>
+                                            </h5>
+                                            <p class="text-muted mb-0">
+                                                Color: <span class="fw-medium">{{ variant.colors?.nom || 'N/A' }}</span>
+                                            </p>
+                                            <p class="text-muted mb-0">
+                                                Size: <span class="fw-medium">{{ variant.taille?.libelle || 'N/A' }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ getPrice() }}</td>
+                                <td>{{ variant.stock || 0 }}</td>
+                                <td>
+                                    <div class="text-warning fs-15">
+                                        <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-half-fill"></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div *ngIf="variant.colors?.hex" 
+                                             class="rounded-circle me-2" 
+                                             [style.background-color]="variant.colors?.hex" 
+                                             [style.width.px]="20" 
+                                             [style.height.px]="20"
+                                             [title]="variant.colors?.nom || 'Color'"></div>
+                                        <span class="fw-medium">{{ variant.colors?.nom || 'N/A' }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {{ calculateVariantTotal(variant) }}
+                                </td>
+                                <td class="fw-medium text-end">
+                                    <ul class="list-inline gap-2 mb-0">
+                                        <li class="list-inline-item"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-trigger="hover"
+                                            ngbTooltip="Voir"
+                                            placement="top">
+                                            <a [routerLink]="['/admin/ecommerce/product-detail', produitId, variant.id]"
+                                               class="text-primary d-inline-block">
+                                                <i class="ri-eye-fill fs-16"></i>
+                                            </a>
+                                        </li>
+                                        <li class="list-inline-item edit"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-trigger="hover"
+                                            ngbTooltip="Edit Variant"
+                                            placement="top">
+                                            <a href="javascript:void(0);"
+                                               class="text-primary d-inline-block edit-item-btn"
+                                               (click)="openEditVariantModal(variant)">
+                                                <i class="ri-pencil-fill fs-16"></i>
+                                            </a>
+                                        </li>
+                                        <li class="list-inline-item me-0"
+                                            ngbTooltip="Remove Variant"
+                                            placement="top"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-trigger="hover">
+                                            <a class="text-danger d-inline-block remove-item-btn"
+                                               href="javascript:void(0);"
+                                               (click)="deleteVariant(variant)">
+                                                <i class="ri-delete-bin-5-fill fs-16"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--end card-->
+    </div>
+    <!--end col-->
+</div>
+<!--end row-->
+
+<!-- Add Variant Modal -->
+<ng-template #addVariantModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-title">Ajouter une nouvelle variante</h4>
+        <button type="button" class="btn-close" aria-label="Close button" aria-describedby="modal-title" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="addVariantForm" (ngSubmit)="onSubmitVariant()">
+        <div class="modal-body">
+            <!-- Success Message -->
+            <div *ngIf="formSuccess" class="alert alert-success d-flex align-items-center" role="alert">
+                <i class="ri-check-circle-line me-2"></i>
+                Variante créée avec succès !
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="formError" class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="ri-error-warning-line me-2"></i>
+                {{ formError }}
+            </div>
+
+            <!-- Form Fields -->
+            <div class="row g-3">
+                <!-- Size Selection -->
+                <div class="col-md-6">
+                    <label for="taille_id" class="form-label">Taille <span class="text-danger">*</span></label>
+                    <select class="form-select" 
+                            id="taille_id" 
+                            formControlName="taille_id"
+                            [class.is-invalid]="isFieldInvalid('taille_id')">
+                        <option value="">Sélectionner une taille</option>
+                        <option *ngFor="let size of availableSizes" [value]="size.id">
+                            {{ size.libelle }}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('taille_id')">
+                        {{ getFieldError('taille_id') }}
+                    </div>
+                </div>
+
+                <!-- Color Selection -->
+                <div class="col-md-6">
+                    <label for="couleur_id" class="form-label">Couleur <span class="text-danger">*</span></label>
+                    <ng-select [items]="availableColors"
+                               bindLabel="nom"
+                               bindValue="id"
+                               formControlName="couleur_id"
+                               [searchable]="true">
+                        <ng-template ng-option-tmp let-item="item">
+                            <span class="d-inline-flex align-items-center">
+                              <span class="rounded-circle me-2 d-inline-block"
+                                    [style.backgroundColor]="item.hex"
+                                    [style.width.px]="14" [style.height.px]="14"
+                                    style="border:2px solid #dee2e6"></span>
+                                {{ item.nom }}
+                            </span>
+                        </ng-template>
+                    </ng-select>
+
+
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('couleur_id')">
+                        {{ getFieldError('couleur_id') }}
+                    </div>
+                    <!-- Color Preview -->
+                    <div *ngIf="getSelectedColor()" class="mt-2">
+                        <small class="text-muted">Aperçu:</small>
+                        <div class="d-flex align-items-center mt-1">
+                            <div class="rounded-circle me-2" 
+                                 [style.background-color]="getSelectedColor()?.hex"
+                                 [style.width.px]="24" 
+                                 [style.height.px]="24"
+                                 [style.border]="'2px solid #dee2e6'"></div>
+                            <span class="small">{{ getSelectedColor()?.nom }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock -->
+                <div class="col-md-6">
+                    <label for="stock" class="form-label">Stock <span class="text-danger">*</span></label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="stock" 
+                           formControlName="stock"
+                           min="0"
+                           [class.is-invalid]="isFieldInvalid('stock')"
+                           placeholder="Quantité en stock">
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('stock')">
+                        {{ getFieldError('stock') }}
+                    </div>
+                </div>
+
+                <!-- Is Primary -->
+                <div class="col-md-6">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               id="is_primary" 
+                               formControlName="is_primary">
+                        <label class="form-check-label" for="is_primary">
+                            Variante principale
+                        </label>
+                    </div>
+                    <small class="text-muted">Cochez si c'est la variante principale du produit</small>
+                </div>
+
+                <!-- Photos Section -->
+                <div class="col-12">
+                    <h5 class="border-bottom pb-2 mb-3">Photos de la variante</h5>
+                </div>
+
+                <!-- Main Photo -->
+                <div class="col-md-6">
+                    <label class="form-label">Photo principale <span class="text-danger">*</span></label>
+                    <div class="dropzone-container">
+                        <dropzone 
+                            [config]="mainPhotoConfig"
+                            [message]="'Cliquez ou glissez la photo principale ici'"
+                            (addedFile)="onMainPhotoAdded($event)"
+                            (removedFile)="onFileRemoved($event, 'main')"
+                            class="dropzone"
+                            id="main-photo-dropzone">
+                        </dropzone>
+                    </div>
+                    
+                    <!-- Main Photo Preview -->
+                    <div *ngIf="mainPhotoFiles.length > 0" class="mt-2">
+                        <div *ngFor="let file of mainPhotoFiles" class="upload-preview">
+                            <div class="d-flex align-items-center p-2 border rounded">
+                                <img [src]="file.preview" 
+                                     alt="Preview" 
+                                     class="img-thumbnail me-2"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium">{{ file.file.name }}</div>
+                                    <div class="text-muted small">{{ (file.file.size / 1024 / 1024).toFixed(2) }} MB</div>
+                                    
+                                    <!-- Progress bar -->
+                                    <div *ngIf="file.uploading" class="progress mt-1" style="height: 4px;">
+                                        <div class="progress-bar" 
+                                             [style.width.%]="file.progress"
+                                             role="progressbar"></div>
+                                    </div>
+                                    
+                                    <!-- Upload status -->
+                                    <div *ngIf="file.error" class="text-danger small">
+                                        <i class="ri-error-warning-line me-1"></i>{{ file.error }}
+                                    </div>
+                                    <div *ngIf="file.url && !file.uploading" class="text-success small">
+                                        <i class="ri-check-line me-1"></i>Uploadé avec succès
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="text-muted">Sélectionnez une seule image principale pour cette variante</small>
+                </div>
+
+                <!-- Other Photos -->
+                <div class="col-md-6">
+                    <label class="form-label">Autres photos</label>
+                    <div class="dropzone-container">
+                        <dropzone 
+                            [config]="otherPhotosConfig"
+                            [message]="'Cliquez ou glissez les autres photos ici'"
+                            (addedFile)="onOtherPhotoAdded($event)"
+                            (removedFile)="onFileRemoved($event, 'other')"
+                            class="dropzone"
+                            id="other-photos-dropzone">
+                        </dropzone>
+                    </div>
+                    
+                    <!-- Other Photos Preview -->
+                    <div *ngIf="otherPhotoFiles.length > 0" class="mt-2">
+                        <div *ngFor="let file of otherPhotoFiles; let i = index" class="upload-preview mb-2">
+                            <div class="d-flex align-items-center p-2 border rounded">
+                                <img [src]="file.preview" 
+                                     alt="Preview" 
+                                     class="img-thumbnail me-2"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium">{{ file.file.name }}</div>
+                                    <div class="text-muted small">{{ (file.file.size / 1024 / 1024).toFixed(2) }} MB</div>
+                                    
+                                    <!-- Progress bar -->
+                                    <div *ngIf="file.uploading" class="progress mt-1" style="height: 4px;">
+                                        <div class="progress-bar" 
+                                             [style.width.%]="file.progress"
+                                             role="progressbar"></div>
+                                    </div>
+                                    
+                                    <!-- Upload status -->
+                                    <div *ngIf="file.error" class="text-danger small">
+                                        <i class="ri-error-warning-line me-1"></i>{{ file.error }}
+                                    </div>
+                                    <div *ngIf="file.url && !file.uploading" class="text-success small">
+                                        <i class="ri-check-line me-1"></i>Uploadé avec succès
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="text-muted">Sélectionnez jusqu'à 5 images supplémentaires (optionnel)</small>
+                </div>
+            </div>
+
+            <!-- Upload Progress -->
+            <div *ngIf="isUploading()" class="mt-3">
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                        <span class="visually-hidden">Uploading...</span>
+                    </div>
+                    <span class="text-muted">Upload en cours... {{ getUploadProgress() }}%</span>
+                </div>
+                <div class="progress mt-2" style="height: 6px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         [style.width.%]="getUploadProgress()"
+                         role="progressbar"></div>
+                </div>
+            </div>
+
+            <!-- Upload Errors -->
+            <div *ngIf="hasUploadErrors()" class="mt-3">
+                <div class="alert alert-danger">
+                    <h6 class="alert-heading">
+                        <i class="ri-error-warning-line me-1"></i>
+                        Erreurs d'upload
+                    </h6>
+                    <ul class="mb-0">
+                        <li *ngFor="let error of getUploadErrors()">{{ error }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Legacy Upload Progress (for backward compatibility) -->
+            <div *ngIf="uploadingFiles && !isUploading()" class="mt-3">
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                        <span class="visually-hidden">Uploading...</span>
+                    </div>
+                    <span class="text-muted">Upload des images en cours...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" 
+                    class="btn btn-light" 
+                    (click)="closeModal()"
+                    [disabled]="formSubmitting">
+                Annuler
+            </button>
+            <button type="submit" 
+                    class="btn btn-success" 
+                    [disabled]="formSubmitting || addVariantForm.invalid || isUploading()">
+                <span *ngIf="formSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!formSubmitting" class="ri-add-line me-1"></i>
+                {{ formSubmitting ? 'Création...' : 'Créer la variante' }}
+            </button>
+        </div>
+    </form>
+</ng-template>
+
+<!-- Edit Variant Modal -->
+<ng-template #editVariantModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="edit-modal-title">Modifier la variante</h4>
+        <button type="button" class="btn-close" aria-label="Close button" aria-describedby="edit-modal-title" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="editVariantForm" (ngSubmit)="onSubmitEditVariant()">
+        <div class="modal-body">
+            <!-- Success Message -->
+            <div *ngIf="editFormSuccess" class="alert alert-success d-flex align-items-center" role="alert">
+                <i class="ri-check-circle-line me-2"></i>
+                Variante modifiée avec succès !
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="editFormError" class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="ri-error-warning-line me-2"></i>
+                {{ editFormError }}
+            </div>
+
+            <!-- Form Fields -->
+            <div class="row g-3">
+                <!-- Size Selection -->
+                <div class="col-md-6">
+                    <label for="edit_taille_id" class="form-label">Taille <span class="text-danger">*</span></label>
+                    <select class="form-select" 
+                            id="edit_taille_id" 
+                            formControlName="taille_id"
+                            [class.is-invalid]="isEditFieldInvalid('taille_id')">
+                        <option value="">Sélectionner une taille</option>
+                        <option *ngFor="let size of availableSizes" [value]="size.id">
+                            {{ size.libelle }}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="isEditFieldInvalid('taille_id')">
+                        {{ getEditFieldError('taille_id') }}
+                    </div>
+                </div>
+
+                <!-- Color Selection -->
+                <div class="col-md-6">
+                    <label for="edit_couleur_id" class="form-label">Couleur <span class="text-danger">*</span></label>
+                    <ng-select [items]="availableColors"
+                               bindLabel="nom"
+                               bindValue="id"
+                               formControlName="couleur_id"
+                               [searchable]="true"
+                               [class.is-invalid]="isEditFieldInvalid('couleur_id')">
+                        <ng-template ng-option-tmp let-item="item">
+                            <span class="d-inline-flex align-items-center">
+                              <span class="rounded-circle me-2 d-inline-block"
+                                    [style.backgroundColor]="item.hex"
+                                    [style.width.px]="14" [style.height.px]="14"
+                                    style="border:2px solid #dee2e6"></span>
+                                {{ item.nom }}
+                            </span>
+                        </ng-template>
+                    </ng-select>
+                    <div class="invalid-feedback" *ngIf="isEditFieldInvalid('couleur_id')">
+                        {{ getEditFieldError('couleur_id') }}
+                    </div>
+                    <!-- Color Preview -->
+                    <div *ngIf="getSelectedEditColor()" class="mt-2">
+                        <small class="text-muted">Aperçu:</small>
+                        <div class="d-flex align-items-center mt-1">
+                            <div class="rounded-circle me-2" 
+                                 [style.background-color]="getSelectedEditColor()?.hex"
+                                 [style.width.px]="24" 
+                                 [style.height.px]="24"
+                                 [style.border]="'2px solid #dee2e6'"></div>
+                            <span class="small">{{ getSelectedEditColor()?.nom }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock -->
+                <div class="col-md-4">
+                    <label for="edit_stock" class="form-label">Stock <span class="text-danger">*</span></label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="edit_stock" 
+                           formControlName="stock"
+                           min="0"
+                           [class.is-invalid]="isEditFieldInvalid('stock')"
+                           placeholder="Quantité en stock">
+                    <div class="invalid-feedback" *ngIf="isEditFieldInvalid('stock')">
+                        {{ getEditFieldError('stock') }}
+                    </div>
+                </div>
+
+                <!-- Is Primary -->
+                <div class="col-md-4">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               id="edit_is_primary" 
+                               formControlName="is_primary">
+                        <label class="form-check-label" for="edit_is_primary">
+                            Variante principale
+                        </label>
+                    </div>
+                    <small class="text-muted">Cochez si c'est la variante principale du produit</small>
+                </div>
+
+                <!-- Photo Management Section -->
+                <div class="col-12">
+                    <hr class="my-4">
+                    <h6 class="mb-3">
+                        <i class="ri-image-line me-2"></i>Gestion des photos
+                    </h6>
+                    
+                    <!-- Current Photos Display -->
+                    <div class="row mb-3" *ngIf="editingVariant">
+                        <!-- Main Photo -->
+                        <div class="col-md-6">
+                            <label class="form-label">Photo principale actuelle</label>
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div *ngIf="getMainPhotoUrl(editingVariant); else noMainPhoto">
+                                    <img [src]="getMainPhotoUrl(editingVariant)" 
+                                         alt="Photo principale" 
+                                         class="img-fluid rounded"
+                                         style="max-height: 150px;"
+                                         loading="lazy"
+                                         decoding="async">
+                                    <div class="mt-2">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger"
+                                                (click)="removeCurrentMainPhoto()">
+                                            <i class="ri-delete-bin-line me-1"></i>Supprimer
+                                        </button>
+                                    </div>
+                                </div>
+                                <ng-template #noMainPhoto>
+                                    <i class="ri-image-line text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mb-0">Aucune photo principale</p>
+                                </ng-template>
+                            </div>
+                        </div>
+
+                        <!-- Other Photos -->
+                        <div class="col-md-6">
+                            <label class="form-label">Autres photos actuelles</label>
+                            <div class="border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
+                                <div *ngIf="getOtherPhotosUrls(editingVariant).length > 0; else noOtherPhotos">
+                                    <div class="row g-2">
+                                        <div class="col-6" *ngFor="let photoUrl of getOtherPhotosUrls(editingVariant); let i = index">
+                                            <div class="position-relative">
+                                                <img [src]="photoUrl" 
+                                                     alt="Photo {{i+1}}" 
+                                                     class="img-fluid rounded"
+                                                     style="height: 80px; width: 100%; object-fit: cover;">
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                        style="margin: 2px;"
+                                                        (click)="removeCurrentOtherPhoto(i)">
+                                                    <i class="ri-close-line"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ng-template #noOtherPhotos>
+                                    <div class="text-center">
+                                        <i class="ri-image-line text-muted" style="font-size: 2rem;"></i>
+                                        <p class="text-muted mb-0">Aucune autre photo</p>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Photos Upload -->
+                    <div class="row">
+                        <!-- New Main Photo Upload -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nouvelle photo principale</label>
+                            <div class="upload-section">
+                                <input type="file" 
+                                       id="editMainPhoto" 
+                                       class="d-none" 
+                                       accept="image/*"
+                                       (change)="onEditMainPhotoSelected($event)">
+                                <div class="border border-dashed rounded p-3 text-center" 
+                                     style="cursor: pointer;"
+                                     (click)="triggerEditMainPhotoInput()">
+                                    <div *ngIf="editMainPhotoFiles.length === 0">
+                                        <i class="ri-upload-cloud-2-line text-primary" style="font-size: 2rem;"></i>
+                                        <p class="mb-1">Cliquez pour sélectionner</p>
+                                        <small class="text-muted">ou glissez-déposez une image</small>
+                                    </div>
+                                    <div *ngFor="let file of editMainPhotoFiles" class="upload-preview">
+                                        <div class="position-relative d-inline-block">
+                                            <img [src]="file.preview" 
+                                                 alt="Aperçu" 
+                                                 class="img-thumbnail"
+                                                 style="max-height: 100px;">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                    (click)="removeEditMainPhoto($event)">
+                                                <i class="ri-close-line"></i>
+                                            </button>
+                                        </div>
+                                        <div class="mt-2" *ngIf="file.uploading">
+                                            <div class="progress" style="height: 5px;">
+                                                <div class="progress-bar" 
+                                                     [style.width.%]="file.progress">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger small mt-1" *ngIf="file.error">
+                                            {{ file.error }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- New Other Photos Upload -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nouvelles autres photos</label>
+                            <div class="upload-section">
+                                <input type="file" 
+                                       id="editOtherPhotos" 
+                                       class="d-none" 
+                                       accept="image/*"
+                                       multiple
+                                       (change)="onEditOtherPhotosSelected($event)">
+                                <div class="border border-dashed rounded p-3 text-center" 
+                                     style="cursor: pointer;"
+                                     (click)="triggerEditOtherPhotosInput()">
+                                    <div *ngIf="editOtherPhotoFiles.length === 0">
+                                        <i class="ri-upload-cloud-2-line text-primary" style="font-size: 2rem;"></i>
+                                        <p class="mb-1">Cliquez pour sélectionner</p>
+                                        <small class="text-muted">ou glissez-déposez des images</small>
+                                    </div>
+                                    <div *ngIf="editOtherPhotoFiles.length > 0" class="row g-2">
+                                        <div class="col-6" *ngFor="let file of editOtherPhotoFiles; let i = index">
+                                            <div class="upload-preview">
+                                                <div class="position-relative">
+                                                    <img [src]="file.preview" 
+                                                         alt="Aperçu {{i+1}}" 
+                                                         class="img-thumbnail"
+                                                         style="height: 80px; width: 100%; object-fit: cover;">
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                            style="margin: 2px;"
+                                                            (click)="removeEditOtherPhoto($event, i)">
+                                                        <i class="ri-close-line"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="mt-1" *ngIf="file.uploading">
+                                                    <div class="progress" style="height: 3px;">
+                                                        <div class="progress-bar" 
+                                                             [style.width.%]="file.progress">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-danger small mt-1" *ngIf="file.error">
+                                                    {{ file.error }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" 
+                    class="btn btn-light" 
+                    (click)="closeModal()"
+                    [disabled]="editFormSubmitting">
+                Annuler
+            </button>
+            <button type="submit" 
+                    class="btn btn-primary" 
+                    [disabled]="editFormSubmitting || editVariantForm.invalid">
+                <span *ngIf="editFormSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!editFormSubmitting" class="ri-pencil-line me-1"></i>
+                {{ editFormSubmitting ? 'Modification...' : 'Modifier la variante' }}
+            </button>
+        </div>
+    </form>
+</ng-template>

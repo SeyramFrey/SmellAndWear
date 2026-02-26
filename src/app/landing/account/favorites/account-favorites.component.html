@@ -1,0 +1,78 @@
+<div class="favorites-page">
+  <!-- Header Section -->
+  <div class="favorites-header">
+    <button class="back-btn" (click)="goBack()" aria-label="Go back">
+      <i class="ri-arrow-left-line"></i>
+      <span>Back</span>
+    </button>
+    <div class="header-content">
+      <h1 class="page-title">My Favorites</h1>
+      <p class="page-subtitle" *ngIf="!loading && favorites.length > 0">
+        {{ favorites.length }} {{ favorites.length === 1 ? 'item' : 'items' }} saved
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading your favorites...</p>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && favorites.length === 0">
+    <div class="empty-content">
+      <div class="empty-icon">
+        <i class="ri-heart-3-line"></i>
+      </div>
+      <h2 class="empty-title">No favorites yet</h2>
+      <p class="empty-text">
+        Start building your wishlist by tapping the heart icon on products you love.
+      </p>
+      <a routerLink="/" class="browse-btn">
+        <i class="ri-shopping-bag-line"></i>
+        Browse Products
+      </a>
+    </div>
+  </div>
+
+  <!-- Favorites Grid -->
+  <div class="favorites-content" *ngIf="!loading && favorites.length > 0">
+    <div class="favorites-grid">
+      <div 
+        *ngFor="let item of favorites; trackBy: trackByProductId" 
+        class="favorite-item"
+        (click)="navigateToProduct(item.produit_id)"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="navigateToProduct(item.produit_id)">
+        
+        <!-- Product Image -->
+        <div class="item-image">
+          <img 
+            [src]="getImageUrl(item.product?.front_photo_path)" 
+            [alt]="item.product?.nom || 'Product'"
+            loading="lazy"
+            decoding="async">
+          
+          <!-- Remove Button -->
+          <button 
+            class="remove-btn"
+            (click)="removeFavorite($event, item.produit_id, item.product?.nom)"
+            aria-label="Remove from favorites"
+            title="Remove from favorites">
+            <i class="ri-heart-fill"></i>
+          </button>
+        </div>
+        
+        <!-- Product Info -->
+        <div class="item-info">
+          <h3 class="item-name">{{ item.product?.nom || 'Product' }}</h3>
+          <p class="item-price">{{ item.product?.prix | currency:'EUR':'symbol':'1.2-2' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

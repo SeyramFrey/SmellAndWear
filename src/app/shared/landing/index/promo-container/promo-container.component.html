@@ -1,0 +1,28 @@
+<div class="promo-wrapper" *ngIf="initialized">
+  
+  <!-- Topbar Promo - At the very top, pushes content down -->
+  <app-topbar-promo 
+    *ngIf="barPromo"
+    [promotion]="barPromo"
+    (dismissed)="onBarDismissed()">
+  </app-topbar-promo>
+
+  <!-- Top Position Banners - Below topbar, full width -->
+  <ng-container *ngFor="let banner of getBannersByPosition('top'); trackBy: trackByPromoId">
+    <app-banner-promo 
+      [promotion]="banner"
+      [position]="'top'"
+      (dismissed)="onBannerDismissed(banner)">
+    </app-banner-promo>
+  </ng-container>
+
+</div>
+
+<!-- Inline/Hero Banners - Use getBannersByPosition in parent components -->
+
+<!-- Popup Promo - Modal overlay (separate from document flow) -->
+<app-popup-promo 
+  *ngIf="popupPromo"
+  [promotion]="popupPromo"
+  (dismissed)="onPopupDismissed()">
+</app-popup-promo>

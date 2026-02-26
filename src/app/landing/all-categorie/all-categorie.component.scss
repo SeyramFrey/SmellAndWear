@@ -1,0 +1,168 @@
+.all-categorie-container {
+  min-height: 100vh;
+  background-color: var(--bs-light);
+}
+
+// Filter Section
+.filter-section {
+  background: white;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .category-info {
+    flex: 1;
+
+    .category-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--bs-dark);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .product-count {
+      font-size: 0.95rem;
+      color: var(--bs-secondary);
+      margin: 0.25rem 0 0 0;
+    }
+  }
+
+  .filter-btn {
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #ff0000 0%, #000000 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+
+    i {
+      font-size: 1.2rem;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+      background: linear-gradient(135deg, #000000 0%, #ff0000 100%);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Products Section
+.products-section {
+  padding: 3rem 0;
+  min-height: 50vh;
+
+  .products-grid {
+    .row {
+      margin: 0 -0.75rem;
+    }
+  }
+
+  .loading-container,
+  .error-container,
+  .empty-container {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 1rem;
+
+    i {
+      font-size: 4rem;
+      opacity: 0.5;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: var(--bs-secondary);
+    }
+  }
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3em;
+  }
+}
+
+// Responsive Design
+@media (max-width: 992px) {
+  .filter-section {
+    .category-info {
+      .category-title {
+        font-size: 1.75rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-section {
+    padding: 1rem 0;
+
+    .filter-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .category-info {
+      .category-title {
+        font-size: 1.5rem;
+      }
+
+      .product-count {
+        font-size: 0.875rem;
+      }
+    }
+
+    .filter-btn {
+      align-self: stretch;
+      justify-content: center;
+      padding: 0.65rem 1.5rem;
+      font-size: 0.95rem;
+    }
+  }
+
+  .products-section {
+    padding: 2rem 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .filter-section {
+    .category-info {
+      .category-title {
+        font-size: 1.3rem;
+      }
+    }
+  }
+
+  .products-section {
+    padding: 1.5rem 0;
+  }
+}
+

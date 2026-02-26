@@ -1,0 +1,151 @@
+<!-- Start footer -->
+<footer class="custom-footer py-5 position-relative">
+    <div class="perso_container">
+        <!-- Header - En voir plus -->
+
+        <div class="row">
+            <!-- Logo from the original footer -->
+            <div class="col-lg-12 mb-4 text-center">
+                <div class="mb-4">
+                    <img src="assets/images/logo/logo.svg" alt="logo light" height="100">
+                </div>
+            </div>
+
+            <!-- 1ère colonne - Aide -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="footer-section">
+                    <!-- Desktop: Regular heading and list -->
+                    <h5 class="fw-bold mb-3 footer-desktop-title" style="color: #333;">Aide</h5>
+                    <ul class="list-unstyled footer-desktop-list" style="color: #555;">
+                        <li class="mb-2"><a href="#" class="text-decoration-none" style="color: #555;">Questions fréquentes</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none" style="color: #555;">Traiter le retour</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none" style="color: #555;">Carte cadeau</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none" style="color: #555;">Services en magasin</a></li>
+                    </ul>
+
+                    <!-- Mobile/Tablet: Dropdown -->
+                    <div class="footer-mobile-dropdown">
+                        <button class="footer-dropdown-toggle" type="button" (click)="toggleDropdown('aide')">
+                            <span>Aide</span>
+                            <i class="ri-arrow-down-s-line" [class.rotated]="dropdowns.aide"></i>
+                        </button>
+                        <ul class="footer-dropdown-menu" [class.show]="dropdowns.aide">
+                            <li><a href="#" class="text-decoration-none">Questions fréquentes</a></li>
+                            <li><a href="#" class="text-decoration-none">Traiter le retour</a></li>
+                            <li><a href="#" class="text-decoration-none">Carte cadeau</a></li>
+                            <li><a href="#" class="text-decoration-none">Services en magasin</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2ème colonne - Entreprise -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="footer-section">
+                    <!-- Desktop: Regular heading and list -->
+                    <h5 class="fw-bold mb-3 footer-desktop-title" style="color: #333;">Entreprise</h5>
+                    <ul class="list-unstyled footer-desktop-list" style="color: #555;">
+                        <li class="mb-2"><a href="#" class="text-decoration-none" style="color: #555;">Qui sommes-nous ?</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none" style="color: #555;">Mentions légales</a></li>
+                    </ul>
+
+                    <!-- Mobile/Tablet: Dropdown -->
+                    <div class="footer-mobile-dropdown">
+                        <button class="footer-dropdown-toggle" type="button" (click)="toggleDropdown('entreprise')">
+                            <span>Entreprise</span>
+                            <i class="ri-arrow-down-s-line" [class.rotated]="dropdowns.entreprise"></i>
+                        </button>
+                        <ul class="footer-dropdown-menu" [class.show]="dropdowns.entreprise">
+                            <li><a href="#" class="text-decoration-none">Qui sommes-nous ?</a></li>
+                            <li><a href="#" class="text-decoration-none">Mentions légales</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3ème colonne - Notre appli et moyens de paiement -->
+            <div class="col-md-3 col-sm-6 mb-4">
+
+                <h5 class="fw-bold mb-3" style="color: #333;">Moyens de paiement</h5>
+                <div class="payment-methods">
+                    <div class="d-flex flex-wrap">
+                        <span class="payment-icon me-2 mb-2">
+                            <img src="assets/images/landing/payment/visa.svg" alt="Visa" height="25">
+                        </span>
+                        <span class="payment-icon me-2 mb-2">
+                            <img src="assets/images/landing/payment/mastercard.svg" alt="Mastercard" height="25">
+                        </span>
+                        <span class="payment-icon me-2 mb-2">
+                            <img src="assets/images/landing/payment/flooz.png" alt="Moov Money Flooz" height="25">
+                        </span>
+                        <span class="payment-icon me-2 mb-2">
+                            <img src="assets/images/landing/payment/orange.jpg" alt="Orange Pay" height="25">
+                        </span>
+                        <span class="payment-icon me-2 mb-2">
+                            <img src="assets/images/landing/payment/logo_wave.webp" alt="Wave Pay" height="25">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4ème colonne - Suivez-nous -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <h5 class="fw-bold mb-3" style="color: #333;">Suivez-nous !</h5>
+                <div class="social-icons d-flex flex-wrap">
+                    <a href="#" class="social-icon me-2 mb-2" style="text-decoration: none;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #f5f5f5;">
+                            <i class="ri-tiktok-fill" style="color: #333;"></i>
+                        </div>
+                    </a>
+                    <a href="https://www.instagram.com/smellandwear?igsh=MWg1bW5yamt4MW9xOQ%3D%3D&utm_source=qr" class="social-icon me-2 mb-2" style="text-decoration: none;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #f5f5f5;">
+                            <i class="ri-instagram-line" style="color: #333;"></i>
+                        </div>
+                    </a>
+                    <a href="#" class="social-icon me-2 mb-2" style="text-decoration: none;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #f5f5f5;">
+                            <i class="ri-facebook-fill" style="color: #333;"></i>
+                        </div>
+                    </a>
+                    <a href="#" class="social-icon me-2 mb-2" style="text-decoration: none;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #f5f5f5;">
+                            <i class="ri-twitter-x-line" style="color: #333;"></i>
+                        </div>
+                    </a>
+                    <a href="#" class="social-icon me-2 mb-2" style="text-decoration: none;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #f5f5f5;">
+                            <i class="ri-youtube-fill" style="color: #333;"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bandeau légal -->
+        <div class="row border-top pt-4 mt-3">
+            <div class="col-md-8">
+                <div class="legal-links d-flex flex-wrap" style="color: #555; font-size: 14px;">
+                    <a href="#" class="text-decoration-none mx-3 mb-2" style="color: #555;">Politique de confidentialité</a> |
+                    <a href="#" class="text-decoration-none mx-3 mb-2" style="color: #555;">Conditions d'achat</a> |
+                    <a href="#" class="text-decoration-none mx-3 mb-2" style="color: #555;">Gestion de la vie privée</a> |
+                    <a href="#" class="text-decoration-none mx-3 mb-2" style="color: #555;">Politique en matière de cookies</a> |
+                </div>
+            </div>
+            <div class="col-md-4 d-flex justify-content-md-end mt-3 mt-md-0">
+                <div class="d-flex align-items-center" style="color: #555; font-size: 14px;">
+                    <span class="me-3"><i class="ri-global-line me-1"></i> France</span>
+                    <span>Français</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row border-top mt-6">
+            <div class="col-12 text-center">
+                <p class="mb-0 mt-4" style="color: #555; font-size: 14px;">
+                    {{year}} © Smell&Wear - Tous droits réservés
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- end footer -->

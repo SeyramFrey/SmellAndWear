@@ -1,0 +1,115 @@
+<div class="wear-man">
+    <app-promo-container></app-promo-container>
+    <app-topbar-landing></app-topbar-landing>
+
+    <!-- Hero Section -->
+    <section class="hero" [ngStyle]="heroBackgroundStyle">
+        <div class="hero__content">
+            <app-button [content]="'Nouveautés'" (click)="scrollToNewArrivals()"></app-button>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories section">
+        <div class="container-fluid px-3 px-md-4 px-lg-5">
+            <app-section-title title="Categories"></app-section-title>
+
+            <!-- Mobile (<= md) : 2 colonnes -->
+            <div class="row g-1 mt-2 categories-list-mobile d-flex d-md-none">
+                <div class="col-4" *ngFor="let category of categories">
+                    <app-category-card
+                            [name]="category.name"
+                            [image]="category.image"
+                            [link]="category.link">
+                    </app-category-card>
+                </div>
+            </div>
+
+            <!-- Desktop (>= md) : tout sur une ligne, sans scroll -->
+            <div class="categories-list-desktop d-none d-md-flex mt-2">
+                <div class="category-item" *ngFor="let category of categories">
+                    <app-category-card
+                            [name]="category.name"
+                            [image]="category.image"
+                            [link]="category.link">
+                    </app-category-card>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section">
+        <app-video-hero [videoSrc]="videoSource"></app-video-hero>
+    </section>
+
+    <!-- New Arrivals Section -->
+    <section class="new-arrivals section" id="newArrivals">
+        <div class="container-fluid px-3 px-md-4 px-lg-5">
+            <app-section-title title="Nouveautés" subtitle="Découvrez nos dernières pièces (7 derniers jours)"></app-section-title>
+
+            <div *ngIf="loading" class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="mt-3">Chargement des nouveautés...</p>
+            </div>
+
+            <div *ngIf="error" class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+
+            <div *ngIf="!loading && !error && newProducts.length === 0" class="text-center p-5">
+                <p>Aucune nouveauté cette semaine. Consultez notre catalogue complet pour découvrir notre collection.</p>
+            </div>
+
+            <div *ngIf="!loading && !error && newProducts.length > 0" class="row g-3 g-md-4 mt-2">
+                <div class="col-6 col-sm-6 col-lg-4 col-xl-3" *ngFor="let product of newProducts; let i = index">
+                    <div class="product-card-wrapper" @fadeIn [style.animation-delay]="i * 100 + 'ms'">
+                        <app-product-card [produit]="product"></app-product-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Best Sellers Section -->
+    <section class="best-sellers section">
+        <div class="container-fluid px-3 px-md-4 px-lg-5">
+            <app-section-title title="Best-sellers" subtitle="Nos pièces les plus populaires"></app-section-title>
+
+            <div *ngIf="loading" class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="mt-3">Chargement des produits...</p>
+            </div>
+
+            <div *ngIf="error" class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+
+            <div *ngIf="!loading && !error && bestSellers.length === 0" class="text-center p-5">
+                <p>Aucun produit best-seller trouvé pour le moment.</p>
+            </div>
+
+            <div *ngIf="!loading && !error && bestSellers.length > 0" class="row g-3 g-md-4 mt-2">
+                <div class="col-6 col-sm-6 col-lg-4 col-xl-3" *ngFor="let product of bestSellers; let i = index">
+                    <div class="product-card-wrapper" @fadeIn [style.animation-delay]="i * 100 + 'ms'">
+                        <app-product-card
+                                [produit]="product"
+                                (addToCartSuccess)="onAddToCartSuccess($event)"
+                        ></app-product-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <app-footer></app-footer>
+
+    <!--start back-to-top-->
+    <button (click)="topFunction()" class="btn btn-danger btn-icon landing-back-top" id="back-to-top">
+        <i class="ri-arrow-up-line"></i>
+    </button>
+</div>

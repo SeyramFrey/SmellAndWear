@@ -1,0 +1,74 @@
+<div class="tshirts-men-container">
+    <!-- Topbar -->
+    <app-topbar-landing></app-topbar-landing>
+
+    <!-- Hero Video Section -->
+    <app-video-hero [videoSrc]="videoSource">
+    </app-video-hero>
+
+    <!-- View All Category Button -->
+    <div class="view-all-category-section">
+        <button class="view-all-btn" (click)="navigateToAllCategory()">
+            <span class="btn-text">Tous les {{ categoryName }}</span>
+            <span class="btn-icon">
+                <i class="ri-arrow-right-line"></i>
+            </span>
+        </button>
+    </div>
+
+    <!-- Subcategories Section -->
+    <section class="subcategories-section">
+        <div class="container-fluid">
+
+            <!-- Empty State -->
+            <div *ngIf="!loading && !error && subcategoriesWithProducts.length === 0" class="empty-container text-center py-5">
+                <p>Aucune sous-catégorie disponible pour le moment.</p>
+            </div>
+
+            <!-- Subcategories List -->
+            <div *ngIf="!loading && !error && subcategoriesWithProducts.length > 0">
+                <div *ngFor="let subcategoryData of subcategoriesWithProducts; trackBy: trackBySubcategory" 
+                     class="subcategory-section mb-5">
+                    
+                    <!-- Subcategory Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="subcategory-title">{{ subcategoryData.subcategory.nom }}</h2>
+                        <button 
+                            *ngIf="subcategoryData.products.length > 0"
+                            class="btn btn-outline-primary voir-plus-btn"
+                            (click)="navigateToSubcategoryProducts(subcategoryData.subcategory.id)">
+                            Voir plus
+                            <i class="ri-arrow-right-line ms-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Products Horizontal Scroll -->
+                    <div *ngIf="subcategoryData.products.length > 0" class="products-horizontal-scroll">
+                        <div class="row g-3">
+                            <div *ngFor="let produit of subcategoryData.products; trackBy: trackByProduct" 
+                                 class="col-6 col-lg-3 col-md-4 col-sm-6">
+                                <app-product-card
+                                    [produit]="produit"
+                                    (productClick)="onProductClick($event)"
+                                    (addToCartSuccess)="onAddToCartSuccess($event)"
+                                ></app-product-card>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- No Products Message -->
+                    <div *ngIf="subcategoryData.products.length === 0" class="no-products-message text-center py-4">
+                        <p class="text-muted">Aucun produit disponible dans cette catégorie pour le moment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <app-footer></app-footer>
+
+    <!--start back-to-top-->
+    <button (click)="topFunction()" class="btn btn-danger btn-icon landing-back-top" id="back-to-top">
+        <i class="ri-arrow-up-line"></i>
+    </button>
+</div>

@@ -1,0 +1,369 @@
+// Promo Bar Styles for Smell & Wear
+// Responsive, accessible, and animated promotional banner
+
+.promo-bar {
+  position: relative;
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  z-index: 1000;
+  overflow: hidden;
+  
+  // Default theme
+  background-color: #000000;
+  color: #ffffff;
+  
+  // Responsive design
+  @media (max-width: 768px) {
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  
+  @media (max-width: 480px) {
+    min-height: 56px;
+    padding: 8px 12px;
+    font-size: 12px;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+// Loading state
+.promo-bar__loading {
+  width: 100%;
+  height: 20px;
+  position: relative;
+  overflow: hidden;
+  
+  .loading-shimmer {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+// Main content container
+.promo-bar__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  gap: 16px;
+  
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+  }
+}
+
+// Promotion message
+.promo-bar__message {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0; // Allow text truncation
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.promo-bar__title {
+  font-weight: 600;
+  white-space: nowrap;
+  
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
+  
+  @media (max-width: 480px) {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+.promo-bar__text {
+  font-weight: 400;
+  opacity: 0.9;
+  
+  @media (max-width: 768px) {
+    display: none; // Hide on small screens to save space
+  }
+  
+  @media (max-width: 480px) {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+  }
+}
+
+// Countdown timer
+.promo-bar__countdown {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+  
+  .countdown-label {
+    font-weight: 400;
+    opacity: 0.8;
+    font-size: 12px;
+    
+    @media (max-width: 480px) {
+      display: none;
+    }
+  }
+  
+  .countdown-time {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    font-size: 13px;
+    
+    @media (max-width: 480px) {
+      font-size: 12px;
+      padding: 2px 4px;
+    }
+  }
+}
+
+// Call to action
+.promo-bar__cta {
+  flex-shrink: 0;
+}
+
+.promo-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  i {
+    font-size: 14px;
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover i {
+    transform: translateX(2px);
+  }
+  
+  @media (max-width: 480px) {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+}
+
+// Dismiss buttons
+.promo-bar__dismiss,
+.promo-bar__dismiss-all {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 2px;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  &:focus {
+    outline: 2px solid currentColor;
+    opacity: 1;
+  }
+  
+  i {
+    font-size: 16px;
+    display: block;
+  }
+}
+
+.promo-bar__dismiss-all {
+  margin-left: 8px;
+}
+
+// Progress indicator
+.promo-bar__progress {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  padding: 4px 8px;
+  
+  .progress-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    
+    &.active {
+      background: rgba(255, 255, 255, 0.8);
+      transform: scale(1.2);
+    }
+  }
+}
+
+// Animations
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+// Animation classes
+.promo-animation-slide {
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+.promo-animation-fade {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.promo-animation-marquee {
+  .promo-bar__message {
+    animation: marquee 15s linear infinite;
+  }
+}
+
+.promo-animation-none,
+.no-animation {
+  // No animation for reduced motion preference
+}
+
+// Accessibility improvements
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .promo-bar,
+  .promo-bar * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .promo-animation-marquee .promo-bar__message {
+    animation: none;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .promo-bar {
+    border-bottom: 2px solid currentColor;
+  }
+  
+  .promo-cta-button {
+    border-width: 2px;
+  }
+  
+  .promo-bar__dismiss,
+  .promo-bar__dismiss-all {
+    border: 1px solid currentColor;
+  }
+}
+
+// Focus management
+.promo-bar {
+  &:focus-within {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+  }
+}
+
+// Print styles
+@media print {
+  .promo-bar {
+    display: none;
+  }
+}

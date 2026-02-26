@@ -1,0 +1,99 @@
+<!-- Promo Bar - Only visible when there are active promotions and not dismissed -->
+<div 
+  *ngIf="isVisible && !isDismissed && currentPromotion"
+  class="promo-bar"
+  [ngStyle]="getThemeStyles()"
+  [ngClass]="getAnimationClass()"
+  role="banner"
+  aria-live="polite"
+  aria-label="Promotional banner"
+>
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="promo-bar__loading">
+    <div class="loading-shimmer"></div>
+  </div>
+
+  <!-- Active promotion content -->
+  <div *ngIf="!isLoading" class="promo-bar__content">
+    <!-- Promotion message -->
+    <div class="promo-bar__message">
+      <span class="promo-bar__title" [innerHTML]="currentPromotion.title"></span>
+      <span class="promo-bar__text" [innerHTML]="currentPromotion.message"></span>
+    </div>
+
+    <!-- Countdown timer -->
+    <div class="promo-bar__countdown" *ngIf="!countdown.isExpired">
+      <span class="countdown-label">Se termine dans:</span>
+      <span class="countdown-time" [attr.aria-label]="'Time remaining: ' + countdown.formatted">
+        {{ countdown.formatted }}
+      </span>
+    </div>
+
+    <!-- Call to action -->
+    <div class="promo-bar__cta" *ngIf="currentPromotion.url">
+      <a 
+        [href]="currentPromotion.url"
+        class="promo-cta-button"
+        (click)="onPromotionClick(currentPromotion)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Learn more about ' + currentPromotion.title"
+      >
+        Voir l'offre
+        <i class="ri-arrow-right-line" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    <!-- Dismiss button -->
+    <button
+      *ngIf="currentPromotion.is_dismissible"
+      type="button"
+      class="promo-bar__dismiss"
+      (click)="dismissCurrentPromotion()"
+      [attr.aria-label]="'Dismiss promotion: ' + currentPromotion.title"
+      title="Fermer cette promotion"
+    >
+      <i class="ri-close-line" aria-hidden="true"></i>
+    </button>
+
+    <!-- Dismiss entire bar -->
+    <button
+      type="button"
+      class="promo-bar__dismiss-all"
+      (click)="dismissEntireBar()"
+      aria-label="Dismiss all promotions"
+      title="Fermer toutes les promotions"
+    >
+      <i class="ri-close-circle-line" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- Progress indicator for multiple promotions -->
+  <div 
+    *ngIf="activePromotions.length > 1" 
+    class="promo-bar__progress"
+    role="progressbar"
+    [attr.aria-valuenow]="currentIndex + 1"
+    [attr.aria-valuemin]="1"
+    [attr.aria-valuemax]="activePromotions.length"
+    [attr.aria-label]="'Promotion ' + (currentIndex + 1) + ' of ' + activePromotions.length"
+  >
+    <div 
+      *ngFor="let promo of activePromotions; let i = index"
+      class="progress-dot"
+      [class.active]="i === currentIndex"
+      [attr.aria-label]="'Promotion ' + (i + 1)"
+    ></div>
+  </div>
+</div>
+
+<!-- Screen reader announcements -->
+<div 
+  aria-live="assertive" 
+  aria-atomic="true" 
+  class="sr-only"
+  *ngIf="announceChanges && currentPromotion"
+>
+  {{ currentPromotion.title }}: {{ currentPromotion.message }}
+  <span *ngIf="!countdown.isExpired">Se termine dans {{ countdown.formatted }}</span>
+</div>

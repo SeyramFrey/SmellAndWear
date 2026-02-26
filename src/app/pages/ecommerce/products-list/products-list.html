@@ -1,0 +1,924 @@
+<!-- Start Breadcrumbs -->
+<app-breadcrumbs [title]="subcategory?.nom || 'Produits'" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<!-- End Breadcrumbs -->
+<div class="row">
+    <div class="col-xxl-12">
+        <div class="row g-4 mb-3">
+            <div class="col-sm-auto">
+                <div>
+                    <button type="button" 
+                            class="btn btn-info" 
+                            (click)="openAddProductModal()"
+                            [disabled]="loading">
+                        <i class="ri-add-line align-bottom me-1"></i> Ajouter
+                    </button>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="d-flex justify-content-sm-end gap-2">
+                    <div class="search-box ms-2">
+                        <input type="text" class="form-control" placeholder="Search...">
+                        <i class="ri-search-line search-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div><!--end row-->
+        <!-- Error Message -->
+        <div *ngIf="error" class="alert alert-danger" role="alert">
+            <i class="ri-error-warning-line me-2"></i>
+            {{ error }}
+            <button type="button" class="btn btn-sm btn-outline-danger ms-3" (click)="refreshData()">
+                <i class="ri-refresh-line me-1"></i>Réessayer
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading && !error" class="row">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="mt-2 text-muted">Chargement des produits...</p>
+            </div>
+        </div>
+
+        <!-- Products List -->
+        <div class="row gx-4" *ngIf="!loading && !error">
+            <div class="col-xxl-4" *ngFor="let product of listview; trackBy: trackByProductId">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-xxl-3 col-lg-5">
+                                <img [src]="getProductImageUrl(product.front_photo_path)"
+                                     [alt]="product.nom" 
+                                     class="img-fluid rounded w-100 object-fit-contain"
+                                     style="height: 200px; object-fit: cover;"
+                                     loading="lazy"
+                                     decoding="async">
+                            </div><!--end col-->
+                            <div class="col-xxl-9 col-lg-7">
+                                <p class="mb-2 text-primary text-uppercase">Produit</p>
+                                <a [routerLink]="['/admin/ecommerce/product-detail', product.id]">
+                                    <h5 class="fs-15 fw-semibold">{{ product.nom }}</h5>
+                                </a>
+                                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                                    <span class="text-muted"><i class="ri-price-tag-line me-1"></i> {{ product.prix | currency:'EUR':'symbol':'1.2-2' }}</span> |
+                                    <span class="badge" [ngClass]="getProductVisibilityStatus(product).badge">
+                                        {{ getProductVisibilityStatus(product).label }}
+                                    </span>
+                                </div>
+
+                                <a [routerLink]="['/admin/ecommerce/variants-list/', product.id]" class="text-decoration-underline">
+                                    Voir détails <i class="ri-arrow-right-line"></i>
+                                </a>
+                                <div class="d-flex align-items-center gap-2 mt-3 flex-wrap">
+                                    <span class="badge text-info bg-info-subtle">#{{ product.nom.toLowerCase() }}</span>
+                                    <span *ngIf="$any(product).publish_at" class="badge text-muted">Pub: {{ formatDateParis($any(product).publish_at) }}</span>
+                                    <span *ngIf="$any(product).unpublish_at" class="badge text-muted">Fin: {{ formatDateParis($any(product).unpublish_at) }}</span>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="d-flex align-items-center gap-2 mt-3">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-primary"
+                                            (click)="editProduct(product)"
+                                            ngbTooltip="Modifier le produit"
+                                            placement="top">
+                                        <i class="ri-pencil-line"></i>
+                                    </button>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-danger"
+                                            (click)="deleteProduct(product)"
+                                            ngbTooltip="Supprimer le produit"
+                                            placement="top">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </div>
+                            </div><!--end col-->
+                        </div><!--end row-->
+                    </div><!--end card-body-->
+                </div><!--end card-->
+            </div><!--end col-->
+            
+            <!-- Empty State -->
+            <div *ngIf="listview.length === 0" class="col-12 text-center py-5">
+                <i class="ri-shopping-bag-line display-1 text-muted"></i>
+                <h5 class="mt-3">Aucun produit trouvé</h5>
+                <p class="text-muted">Cette catégorie ne contient aucun produit pour le moment.</p>
+                <a [routerLink]="['/admin/ecommerce/categories']" class="btn btn-primary">
+                    <i class="ri-arrow-left-line me-1"></i>Retour aux catégories
+                </a>
+            </div>
+        </div><!--end row-->
+        
+        <ngb-pagination *ngIf="allProducts.length > 0" 
+                        class="d-flex justify-content-end pt-2" 
+                        [collectionSize]="allProducts.length"
+                        [(page)]="service.page" 
+                        (pageChange)="changePage()" 
+                        [pageSize]="service.pageSize"
+                        aria-label="Custom pagination">
+            <ng-template ngbPaginationPrevious let-page let-pages="pages">
+                <i class="ci-arrow-left me-2"></i>
+                Prev
+            </ng-template>
+            <ng-template ngbPaginationNext>
+                Next
+                <i class="ci-arrow-right ms-2"></i>
+            </ng-template>
+        </ngb-pagination>
+    </div><!--end col-->
+</div><!--end row-->
+
+<!-- Add Product Modal -->
+<ng-template #addProductModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-title">Ajouter un nouveau produit</h4>
+        <button type="button" class="btn-close" aria-label="Close button" aria-describedby="modal-title" 
+                (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    
+    <form [formGroup]="addProductForm" (ngSubmit)="onSubmitProduct()">
+        <div class="modal-body">
+            <!-- Success Message -->
+            <div *ngIf="formSuccess" class="alert alert-success d-flex align-items-center" role="alert">
+                <i class="ri-check-circle-line me-2"></i>
+                Produit créé avec succès !
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="formError" class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="ri-error-warning-line me-2"></i>
+                {{ formError }}
+            </div>
+
+            <!-- Upload Errors -->
+            <div *ngIf="hasUploadErrors()" class="alert alert-warning" role="alert">
+                <h6><i class="ri-alert-line me-2"></i>Erreurs d'upload:</h6>
+                <ul class="mb-0">
+                    <li *ngFor="let error of getUploadErrors()">{{ error }}</li>
+                </ul>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="row g-3">
+                <!-- Product Name -->
+                <div class="col-12">
+                    <label for="nom" class="form-label">Nom du produit <span class="text-danger">*</span></label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="nom" 
+                           formControlName="nom"
+                           [class.is-invalid]="isFieldInvalid('nom')"
+                           placeholder="Nom du produit">
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('nom')">
+                        {{ getFieldError('nom') }}
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" 
+                              id="description" 
+                              formControlName="description"
+                              rows="3"
+                              [class.is-invalid]="isFieldInvalid('description')"
+                              placeholder="Description du produit (optionnel)"></textarea>
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('description')">
+                        {{ getFieldError('description') }}
+                    </div>
+                </div>
+
+                <!-- Price and Category -->
+                <div class="col-md-6">
+                    <label for="prix" class="form-label">Prix (Eur) <span class="text-danger">*</span></label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="prix" 
+                           formControlName="prix"
+                           min="0"
+                           step="0.01"
+                           [class.is-invalid]="isFieldInvalid('prix')"
+                           placeholder="0.00">
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('prix')">
+                        {{ getFieldError('prix') }}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="sous_categorie_id" class="form-label">Sous-catégorie <span class="text-danger">*</span></label>
+                    <select class="form-select" 
+                            id="sous_categorie_id" 
+                            formControlName="sous_categorie_id"
+                            [class.is-invalid]="isFieldInvalid('sous_categorie_id')">
+                        <option value="">Sélectionner une sous-catégorie</option>
+                        <option *ngFor="let category of availableCategories" [value]="category.id">
+                            {{ category.nom }}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('sous_categorie_id')">
+                        {{ getFieldError('sous_categorie_id') }}
+                    </div>
+                </div>
+
+                <!-- Visibility -->
+                <div class="col-12">
+                    <h5 class="border-bottom pb-2 mb-3">Visibilité</h5>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_hidden" formControlName="is_hidden">
+                        <label class="form-check-label" for="is_hidden">Masquer le produit maintenant</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Mode de publication</label>
+                    <select class="form-select" formControlName="visibility_mode">
+                        <option value="immediate">Visible immédiatement</option>
+                        <option value="schedule">Programmer la date de publication</option>
+                        <option value="range">Programmer une plage (publier → dépublier)</option>
+                    </select>
+                </div>
+                <div class="col-md-6" *ngIf="addProductForm.get('visibility_mode')?.value === 'schedule' || addProductForm.get('visibility_mode')?.value === 'range'">
+                    <label for="publish_at" class="form-label">Date/heure de publication</label>
+                    <input type="datetime-local" class="form-control" id="publish_at" formControlName="publish_at">
+                </div>
+                <div class="col-md-6" *ngIf="addProductForm.get('visibility_mode')?.value === 'range'">
+                    <label for="unpublish_at" class="form-label">Date/heure de dépublication</label>
+                    <input type="datetime-local" class="form-control" id="unpublish_at" formControlName="unpublish_at">
+                </div>
+
+                <!-- Product Photos Section -->
+                <div class="col-12">
+                    <h5 class="border-bottom pb-2 mb-3">Photos du produit</h5>
+                </div>
+
+                <!-- Front Photo -->
+                <div class="col-md-6">
+                    <label class="form-label">Photo de face</label>
+                    <div class="dropzone-container">
+                        <dropzone 
+                            [config]="frontPhotoConfig"
+                            [message]="'Cliquez ou glissez l\'image de face ici'"
+                            (addedFile)="onFrontPhotoAdded($event)"
+                            (removedFile)="onFileRemoved($event, 'front')"
+                            class="dropzone"
+                            id="front-photo-dropzone">
+                        </dropzone>
+                    </div>
+                    
+                    <!-- Front Photo Preview -->
+                    <div *ngIf="frontPhotoFiles.length > 0" class="mt-2">
+                        <div *ngFor="let file of frontPhotoFiles" class="upload-preview">
+                            <div class="d-flex align-items-center p-2 border rounded">
+                                <img [src]="file.preview" 
+                                     alt="Preview" 
+                                     class="img-thumbnail me-2"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium">{{ file.file.name }}</div>
+                                    <div class="text-muted small">{{ (file.file.size / 1024 / 1024).toFixed(2) }} MB</div>
+                                    
+                                    <!-- Progress bar -->
+                                    <div *ngIf="file.uploading" class="progress mt-1" style="height: 4px;">
+                                        <div class="progress-bar" 
+                                             [style.width.%]="file.progress"
+                                             role="progressbar"></div>
+                                    </div>
+                                    
+                                    <!-- Upload status -->
+                                    <div *ngIf="file.error" class="text-danger small">
+                                        <i class="ri-error-warning-line me-1"></i>{{ file.error }}
+                                    </div>
+                                    <div *ngIf="file.url && !file.uploading" class="text-success small">
+                                        <i class="ri-check-line me-1"></i>Uploadé avec succès
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Back Photo -->
+                <div class="col-md-6">
+                    <label class="form-label">Photo de dos</label>
+                    <div class="dropzone-container">
+                        <dropzone 
+                            [config]="backPhotoConfig"
+                            [message]="'Cliquez ou glissez l\'image de dos ici'"
+                            (addedFile)="onBackPhotoAdded($event)"
+                            (removedFile)="onFileRemoved($event, 'back')"
+                            class="dropzone"
+                            id="back-photo-dropzone">
+                        </dropzone>
+                    </div>
+                    
+                    <!-- Back Photo Preview -->
+                    <div *ngIf="backPhotoFiles.length > 0" class="mt-2">
+                        <div *ngFor="let file of backPhotoFiles" class="upload-preview">
+                            <div class="d-flex align-items-center p-2 border rounded">
+                                <img [src]="file.preview" 
+                                     alt="Preview" 
+                                     class="img-thumbnail me-2"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium">{{ file.file.name }}</div>
+                                    <div class="text-muted small">{{ (file.file.size / 1024 / 1024).toFixed(2) }} MB</div>
+                                    
+                                    <!-- Progress bar -->
+                                    <div *ngIf="file.uploading" class="progress mt-1" style="height: 4px;">
+                                        <div class="progress-bar" 
+                                             [style.width.%]="file.progress"
+                                             role="progressbar"></div>
+                                    </div>
+                                    
+                                    <!-- Upload status -->
+                                    <div *ngIf="file.error" class="text-danger small">
+                                        <i class="ri-error-warning-line me-1"></i>{{ file.error }}
+                                    </div>
+                                    <div *ngIf="file.url && !file.uploading" class="text-success small">
+                                        <i class="ri-check-line me-1"></i>Uploadé avec succès
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Variant Configuration Section -->
+                <div class="col-12 mt-4">
+                    <h5 class="border-bottom pb-2 mb-3">Configuration des variantes</h5>
+                </div>
+
+                <!-- Color Selection -->
+                <div class="col-12 mb-3">
+                    <label class="form-label">Couleurs disponibles <span class="text-danger">*</span></label>
+                    
+                    <!-- Color Search Field -->
+                    <div class="mb-3 color-search-section">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ri-search-line"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   placeholder="Rechercher une couleur par nom..."
+                                   [(ngModel)]="colorSearchTerm"
+                                   [ngModelOptions]="{standalone: true}"
+                                   (input)="onColorSearchChange()"
+                                   autocomplete="off">
+                            <button *ngIf="colorSearchTerm" 
+                                    class="btn btn-outline-secondary" 
+                                    type="button"
+                                    (click)="clearColorSearch()"
+                                    title="Effacer la recherche">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Search Results Info -->
+                        <div *ngIf="colorSearchTerm" class="small text-muted mt-1 search-results-info">
+                            {{ filteredColors.length }} couleur(s) trouvée(s) sur {{ availableColors.length }}
+                        </div>
+                    </div>
+                    
+                    <!-- Colors Grid -->
+                    <div class="row g-2">
+                        <div class="col-md-3 col-sm-6" *ngFor="let color of filteredColors; trackBy: trackByColorId">
+                            <div class="form-check p-0">
+                                <input type="checkbox" 
+                                       class="form-check-input d-none" 
+                                       [id]="'color_' + color.id"
+                                       [checked]="isColorSelected(color.id)"
+                                       (change)="onColorToggle(color.id)">
+                                <label [for]="'color_' + color.id" 
+                                       class="form-check-label w-100 p-2 border rounded d-flex align-items-center cursor-pointer"
+                                       [class.border-primary]="isColorSelected(color.id)"
+                                       [class.bg-light]="isColorSelected(color.id)">
+                                    <div class="color-preview me-2 rounded" 
+                                         [style.background-color]="color.hex" 
+                                         style="width: 20px; height: 20px; border: 1px solid #ddd;"></div>
+                                    <span class="text-truncate">{{ color.nom }}</span>
+                                    <i *ngIf="isColorSelected(color.id)" 
+                                       class="ri-check-line text-primary ms-auto"></i>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- No Colors Found Message -->
+                        <div *ngIf="filteredColors.length === 0 && colorSearchTerm" class="col-12 no-colors-found">
+                            <div class="alert alert-info text-center py-3">
+                                <i class="ri-search-line me-2"></i>
+                                Aucune couleur trouvée pour "{{ colorSearchTerm }}"
+                                <button class="btn btn-link p-0 ms-2" (click)="clearColorSearch()">
+                                    Effacer la recherche
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="invalid-feedback" [class.d-block]="isFieldInvalid('selectedColors')">
+                        Veuillez sélectionner au moins une couleur
+                    </div>
+                </div>
+
+                <!-- Size Selection -->
+                <div class="col-12 mb-3">
+                    <label class="form-label">Tailles disponibles <span class="text-danger">*</span></label>
+                    <div class="row g-2">
+                        <div class="col-auto" *ngFor="let size of availableSizes">
+                            <div class="form-check p-0">
+                                <input type="checkbox" 
+                                       class="form-check-input d-none" 
+                                       [id]="'size_' + size.id"
+                                       [checked]="isSizeSelected(size.id)"
+                                       (change)="onSizeToggle(size.id)">
+                                <label [for]="'size_' + size.id" 
+                                       class="form-check-label btn btn-outline-secondary"
+                                       [class.btn-primary]="isSizeSelected(size.id)"
+                                       [class.btn-outline-secondary]="!isSizeSelected(size.id)">
+                                    {{ size.libelle }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback" [class.d-block]="isFieldInvalid('selectedSizes')">
+                        Veuillez sélectionner au moins une taille
+                    </div>
+                </div>
+
+                <!-- Color Images Section -->
+                <div class="col-12" *ngIf="selectedColors.length > 0">
+                    <h5 class="border-bottom pb-2 mb-3">Images par couleur</h5>
+                    <div class="alert alert-info" role="alert">
+                        <i class="ri-information-line me-2"></i>
+                        Ajoutez une image principale et optionnellement des images de galerie pour chaque couleur sélectionnée.
+                    </div>
+                </div>
+
+                <!-- Color Image Sets -->
+                <div class="col-12" *ngFor="let colorSet of colorImageSets">
+                    <div class="card mb-3">
+                        <div class="card-header d-flex align-items-center">
+                            <div class="color-preview me-2 rounded" 
+                                 [style.background-color]="colorSet.colorHex" 
+                                 style="width: 24px; height: 24px; border: 1px solid #ddd;"></div>
+                            <h6 class="mb-0">{{ colorSet.colorName }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <!-- Primary Image -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Image principale <span class="text-danger">*</span></label>
+                                    <div class="border rounded p-3 text-center"
+                                         style="min-height: 120px; cursor: pointer;"
+                                         (click)="triggerColorPrimaryImageInput(colorSet.colorId)"
+                                         [class.border-dashed]="!colorSet.primaryImage">
+                                        
+                                        <!-- Image Preview -->
+                                        <div *ngIf="colorSet.primaryImage" class="position-relative">
+                                            <img [src]="colorSet.primaryImage.preview" 
+                                                 alt="Primary Image" 
+                                                 class="img-fluid rounded"
+                                                 style="max-height: 100px;">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                    style="transform: translate(50%, -50%);"
+                                                    (click)="removeColorPrimaryImage(colorSet.colorId); $event.stopPropagation()">
+                                                <i class="ri-close-line"></i>
+                                            </button>
+                                            
+                                            <!-- Progress bar -->
+                                            <div *ngIf="colorSet.primaryImage.uploading" class="progress mt-2" style="height: 4px;">
+                                                <div class="progress-bar" 
+                                                     [style.width.%]="colorSet.primaryImage.progress"
+                                                     role="progressbar"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Upload Placeholder -->
+                                        <div *ngIf="!colorSet.primaryImage" class="text-muted">
+                                            <i class="ri-image-add-line fs-1 mb-2"></i>
+                                            <div>Cliquez pour ajouter l'image principale</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Hidden File Input -->
+                                    <input type="file" 
+                                           [id]="'primaryImage_' + colorSet.colorId"
+                                           accept="image/*"
+                                           class="d-none"
+                                           (change)="onColorPrimaryImageSelected($event, colorSet.colorId)">
+                                </div>
+
+                                <!-- Gallery Images -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Images de galerie (optionnel)</label>
+                                    <div class="border rounded p-3 text-center"
+                                         style="min-height: 120px; cursor: pointer;"
+                                         (click)="triggerColorGalleryImagesInput(colorSet.colorId)"
+                                         [class.border-dashed]="colorSet.galleryImages.length === 0">
+                                        
+                                        <!-- Gallery Images Grid -->
+                                        <div *ngIf="colorSet.galleryImages.length > 0" class="row g-1">
+                                            <div class="col-4" *ngFor="let image of colorSet.galleryImages; let i = index">
+                                                <div class="position-relative">
+                                                    <img [src]="image.preview" 
+                                                         alt="Gallery Image" 
+                                                         class="img-fluid rounded"
+                                                         style="aspect-ratio: 1; object-fit: cover;">
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                            style="transform: translate(50%, -50%);"
+                                                            (click)="removeColorGalleryImage(colorSet.colorId, i); $event.stopPropagation()">
+                                                        <i class="ri-close-line"></i>
+                                                    </button>
+                                                    
+                                                    <!-- Progress bar -->
+                                                    <div *ngIf="image.uploading" class="progress mt-1" style="height: 2px;">
+                                                        <div class="progress-bar" 
+                                                             [style.width.%]="image.progress"
+                                                             role="progressbar"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Upload Placeholder -->
+                                        <div *ngIf="colorSet.galleryImages.length === 0" class="text-muted">
+                                            <i class="ri-image-add-line fs-1 mb-2"></i>
+                                            <div>Cliquez pour ajouter des images de galerie</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Hidden File Input -->
+                                    <input type="file" 
+                                           [id]="'galleryImages_' + colorSet.colorId"
+                                           accept="image/*"
+                                           multiple
+                                           class="d-none"
+                                           (change)="onColorGalleryImagesSelected($event, colorSet.colorId)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Variant Generation Summary -->
+                <div class="col-12" *ngIf="selectedColors.length > 0 && selectedSizes.length > 0">
+                    <div class="alert alert-success" role="alert">
+                        <h6><i class="ri-check-circle-line me-2"></i>Aperçu des variantes</h6>
+                        <p class="mb-0">
+                            {{ selectedColors.length }} couleur(s) × {{ selectedSizes.length }} taille(s) = 
+                            <strong>{{ selectedColors.length * selectedSizes.length }} variante(s)</strong> seront générées automatiquement.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Progress -->
+            <div *ngIf="isUploading()" class="mt-3">
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                        <span class="visually-hidden">Uploading...</span>
+                    </div>
+                    <span class="text-muted">Upload en cours... {{ getUploadProgress() }}%</span>
+                </div>
+                <div class="progress mt-2" style="height: 6px;">
+                    <div class="progress-bar" 
+                         [style.width.%]="getUploadProgress()"
+                         role="progressbar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" 
+                    class="btn btn-light" 
+                    (click)="closeModal()"
+                    [disabled]="formSubmitting || isUploading()">
+                Annuler
+            </button>
+            <button type="submit" 
+                    class="btn btn-info" 
+                    [disabled]="formSubmitting || addProductForm.invalid || isUploading()">
+                <span *ngIf="formSubmitting || isUploading()" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!formSubmitting && !isUploading()" class="ri-add-line me-1"></i>
+                {{ formSubmitting ? 'Création...' : isUploading() ? 'Upload...' : 'Créer le produit' }}
+            </button>
+        </div>
+    </form>
+</ng-template>
+
+<!-- Edit Product Modal -->
+<ng-template #editProductModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="edit-modal-title">Modifier le produit</h4>
+        <button type="button" class="btn-close" aria-label="Close button" aria-describedby="edit-modal-title" 
+                (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    
+    <form [formGroup]="editProductForm" (ngSubmit)="onSubmitEditProduct()">
+        <div class="modal-body">
+            <!-- Success Message -->
+            <div *ngIf="editFormSuccess" class="alert alert-success d-flex align-items-center" role="alert">
+                <i class="ri-check-circle-line me-2"></i>
+                Produit modifié avec succès !
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="editFormError" class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="ri-error-warning-line me-2"></i>
+                {{ editFormError }}
+            </div>
+
+            <!-- Form Fields -->
+            <div class="row g-3">
+                <!-- Product Name -->
+                <div class="col-12">
+                    <label for="edit_nom" class="form-label">Nom du produit <span class="text-danger">*</span></label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="edit_nom" 
+                           formControlName="nom"
+                           placeholder="Nom du produit"
+                           [class.is-invalid]="isEditFieldInvalid('nom')">
+                    <div class="invalid-feedback" *ngIf="isEditFieldInvalid('nom')">
+                        {{ getEditFieldError('nom') }}
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="edit_description" class="form-label">Description</label>
+                    <textarea class="form-control" 
+                              id="edit_description" 
+                              formControlName="description"
+                              rows="3"
+                              placeholder="Description du produit"></textarea>
+                </div>
+
+                <!-- Price -->
+                <div class="col-md-6">
+                    <label for="edit_prix" class="form-label">Prix <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="number" 
+                               class="form-control" 
+                               id="edit_prix" 
+                               formControlName="prix"
+                               min="0"
+                               step="0.01"
+                               placeholder="0.00"
+                               [class.is-invalid]="isEditFieldInvalid('prix')">
+                        <span class="input-group-text">FCFA</span>
+                    </div>
+                    <div class="invalid-feedback" *ngIf="isEditFieldInvalid('prix')">
+                        {{ getEditFieldError('prix') }}
+                    </div>
+                </div>
+
+                <!-- Subcategory -->
+                <div class="col-md-6">
+                    <label for="edit_sous_categorie_id" class="form-label">Sous-catégorie</label>
+                    <select class="form-select" 
+                            id="edit_sous_categorie_id" 
+                            formControlName="sous_categorie_id">
+                        <option value="">Sélectionner une sous-catégorie</option>
+                        <option *ngFor="let cat of availableCategories" [value]="cat.id">
+                            {{ cat.nom }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Visibility -->
+                <div class="col-12">
+                    <h6 class="border-bottom pb-2 mb-2">Visibilité</h6>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit_is_hidden" formControlName="is_hidden">
+                        <label class="form-check-label" for="edit_is_hidden">Masquer le produit maintenant</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Mode de publication</label>
+                    <select class="form-select" formControlName="visibility_mode">
+                        <option value="immediate">Visible immédiatement</option>
+                        <option value="schedule">Programmer la date de publication</option>
+                        <option value="range">Programmer une plage (publier → dépublier)</option>
+                    </select>
+                </div>
+                <div class="col-md-6" *ngIf="editProductForm.get('visibility_mode')?.value === 'schedule' || editProductForm.get('visibility_mode')?.value === 'range'">
+                    <label for="edit_publish_at" class="form-label">Date/heure de publication</label>
+                    <input type="datetime-local" class="form-control" id="edit_publish_at" formControlName="publish_at">
+                </div>
+                <div class="col-md-6" *ngIf="editProductForm.get('visibility_mode')?.value === 'range'">
+                    <label for="edit_unpublish_at" class="form-label">Date/heure de dépublication</label>
+                    <input type="datetime-local" class="form-control" id="edit_unpublish_at" formControlName="unpublish_at">
+                </div>
+
+                <!-- Best Seller & Nouveautés -->
+                <div class="col-12">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="edit_is_best_seller" 
+                                       formControlName="is_best_seller">
+                                <label class="form-check-label" for="edit_is_best_seller">
+                                    <i class="ri-star-line me-1 text-warning"></i>
+                                    Produit best-seller
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="edit_is_new" 
+                                       formControlName="is_new">
+                                <label class="form-check-label" for="edit_is_new">
+                                    <i class="ri-sparkles-line me-1 text-info"></i>
+                                    Nouveauté (afficher dans section Nouveautés)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Photos Display -->
+                <div class="col-12" *ngIf="editingProduct">
+                    <hr class="my-4">
+                    <h6 class="mb-3">
+                        <i class="ri-image-line me-2"></i>Photos actuelles
+                    </h6>
+                    
+                    <div class="row">
+                        <!-- Current Front Photo -->
+                        <div class="col-md-6">
+                            <label class="form-label">Photo de face actuelle</label>
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div *ngIf="editingProduct.front_photo_path; else noFrontPhoto">
+                                    <img [src]="editingProduct.front_photo_path" 
+                                         alt="Photo de face" 
+                                         class="img-fluid rounded"
+                                         style="max-height: 150px;">
+                                    <div class="mt-2">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger"
+                                                (click)="removeCurrentFrontPhoto()">
+                                            <i class="ri-delete-bin-line me-1"></i>Supprimer
+                                        </button>
+                                    </div>
+                                </div>
+                                <ng-template #noFrontPhoto>
+                                    <i class="ri-image-line text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mb-0">Aucune photo de face</p>
+                                </ng-template>
+                            </div>
+                        </div>
+
+                        <!-- Current Back Photo -->
+                        <div class="col-md-6">
+                            <label class="form-label">Photo de dos actuelle</label>
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div *ngIf="editingProduct.back_photo_path; else noBackPhoto">
+                                    <img [src]="editingProduct.back_photo_path" 
+                                         alt="Photo de dos" 
+                                         class="img-fluid rounded"
+                                         style="max-height: 150px;">
+                                    <div class="mt-2">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger"
+                                                (click)="removeCurrentBackPhoto()">
+                                            <i class="ri-delete-bin-line me-1"></i>Supprimer
+                                        </button>
+                                    </div>
+                                </div>
+                                <ng-template #noBackPhoto>
+                                    <i class="ri-image-line text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mb-0">Aucune photo de dos</p>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Photos Upload -->
+                <div class="col-12">
+                    <h6 class="mb-3">
+                        <i class="ri-upload-line me-2"></i>Nouvelles photos
+                    </h6>
+                    
+                    <div class="row">
+                        <!-- New Front Photo Upload -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nouvelle photo de face</label>
+                            <div class="upload-section">
+                                <input type="file" 
+                                       id="editFrontPhoto" 
+                                       class="d-none" 
+                                       accept="image/*"
+                                       (change)="onEditFrontPhotoSelected($event)">
+                                <div class="border border-dashed rounded p-3 text-center" 
+                                     style="cursor: pointer;"
+                                     (click)="triggerEditFrontPhotoInput()">
+                                    <div *ngIf="editFrontPhotoFiles.length === 0">
+                                        <i class="ri-upload-cloud-2-line text-primary" style="font-size: 2rem;"></i>
+                                        <p class="mb-1">Cliquez pour sélectionner</p>
+                                        <small class="text-muted">ou glissez-déposez une image</small>
+                                    </div>
+                                    <div *ngFor="let file of editFrontPhotoFiles" class="upload-preview">
+                                        <div class="position-relative d-inline-block">
+                                            <img [src]="file.preview" 
+                                                 alt="Aperçu" 
+                                                 class="img-thumbnail"
+                                                 style="max-height: 100px;">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                    (click)="removeEditFrontPhoto($event)">
+                                                <i class="ri-close-line"></i>
+                                            </button>
+                                        </div>
+                                        <div class="mt-2" *ngIf="file.uploading">
+                                            <div class="progress" style="height: 5px;">
+                                                <div class="progress-bar" 
+                                                     [style.width.%]="file.progress">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger small mt-1" *ngIf="file.error">
+                                            {{ file.error }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- New Back Photo Upload -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nouvelle photo de dos</label>
+                            <div class="upload-section">
+                                <input type="file" 
+                                       id="editBackPhoto" 
+                                       class="d-none" 
+                                       accept="image/*"
+                                       (change)="onEditBackPhotoSelected($event)">
+                                <div class="border border-dashed rounded p-3 text-center" 
+                                     style="cursor: pointer;"
+                                     (click)="triggerEditBackPhotoInput()">
+                                    <div *ngIf="editBackPhotoFiles.length === 0">
+                                        <i class="ri-upload-cloud-2-line text-primary" style="font-size: 2rem;"></i>
+                                        <p class="mb-1">Cliquez pour sélectionner</p>
+                                        <small class="text-muted">ou glissez-déposez une image</small>
+                                    </div>
+                                    <div *ngFor="let file of editBackPhotoFiles" class="upload-preview">
+                                        <div class="position-relative d-inline-block">
+                                            <img [src]="file.preview" 
+                                                 alt="Aperçu" 
+                                                 class="img-thumbnail"
+                                                 style="max-height: 100px;">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                    (click)="removeEditBackPhoto($event)">
+                                                <i class="ri-close-line"></i>
+                                            </button>
+                                        </div>
+                                        <div class="mt-2" *ngIf="file.uploading">
+                                            <div class="progress" style="height: 5px;">
+                                                <div class="progress-bar" 
+                                                     [style.width.%]="file.progress">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger small mt-1" *ngIf="file.error">
+                                            {{ file.error }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" 
+                    class="btn btn-light" 
+                    (click)="closeEditModal()"
+                    [disabled]="editFormSubmitting">
+                Annuler
+            </button>
+            <button type="submit" 
+                    class="btn btn-primary" 
+                    [disabled]="editFormSubmitting || editProductForm.invalid">
+                <span *ngIf="editFormSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!editFormSubmitting" class="ri-pencil-line me-1"></i>
+                {{ editFormSubmitting ? 'Modification...' : 'Modifier le produit' }}
+            </button>
+        </div>
+    </form>
+</ng-template>

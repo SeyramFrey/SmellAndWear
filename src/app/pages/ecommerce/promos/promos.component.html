@@ -1,0 +1,848 @@
+<!-- Promotion Management Dashboard -->
+<div class="container-fluid">
+  <!-- Page Header -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+        <h4 class="mb-sm-0">Gestion des Promotions</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item"><a href="javascript: void(0);">E-commerce</a></li>
+            <li class="breadcrumb-item active">Promotions</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row" *ngIf="stats">
+    <div class="col-xl-2 col-md-4">
+      <div class="card card-animate">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Total</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-end justify-content-between mt-4">
+            <div>
+              <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{ stats.total }}</h4>
+            </div>
+            <div class="avatar-sm flex-shrink-0">
+              <span class="avatar-title bg-primary rounded fs-3">
+                <i class="ri-file-list-3-line"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4">
+      <div class="card card-animate">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Actives</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-end justify-content-between mt-4">
+            <div>
+              <h4 class="fs-22 fw-semibold ff-secondary mb-4 text-success">{{ stats.active }}</h4>
+            </div>
+            <div class="avatar-sm flex-shrink-0">
+              <span class="avatar-title bg-success rounded fs-3">
+                <i class="ri-play-circle-line"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4">
+      <div class="card card-animate">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Réductions Produit</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-end justify-content-between mt-4">
+            <div>
+              <h4 class="fs-22 fw-semibold ff-secondary mb-4 text-info">{{ stats.productDiscounts }}</h4>
+            </div>
+            <div class="avatar-sm flex-shrink-0">
+              <span class="avatar-title bg-info rounded fs-3">
+                <i class="ri-price-tag-3-line"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4">
+      <div class="card card-animate">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Réductions Livraison</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-end justify-content-between mt-4">
+            <div>
+              <h4 class="fs-22 fw-semibold ff-secondary mb-4 text-warning">{{ stats.deliveryDiscounts }}</h4>
+            </div>
+            <div class="avatar-sm flex-shrink-0">
+              <span class="avatar-title bg-warning rounded fs-3">
+                <i class="ri-truck-line"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4">
+      <div class="card card-animate">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Brouillons</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-end justify-content-between mt-4">
+            <div>
+              <h4 class="fs-22 fw-semibold ff-secondary mb-4 text-secondary">{{ stats.draft }}</h4>
+            </div>
+            <div class="avatar-sm flex-shrink-0">
+              <span class="avatar-title bg-secondary rounded fs-3">
+                <i class="ri-draft-line"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4">
+      <div class="card card-animate">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Terminées</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-end justify-content-between mt-4">
+            <div>
+              <h4 class="fs-22 fw-semibold ff-secondary mb-4 text-danger">{{ stats.ended }}</h4>
+            </div>
+            <div class="avatar-sm flex-shrink-0">
+              <span class="avatar-title bg-danger rounded fs-3">
+                <i class="ri-stop-circle-line"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center g-3">
+            <div class="col-md-3">
+              <h5 class="card-title mb-0">Promotions</h5>
+            </div>
+            <div class="col-md-auto ms-auto">
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary" (click)="openCreateModal(content)">
+                  <i class="ri-add-line align-bottom me-1"></i> Nouvelle Promotion
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Search Bar -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <form [formGroup]="searchForm">
+                <div class="search-box">
+                  <input 
+                    type="text" 
+                    class="form-control search" 
+                    placeholder="Rechercher une promotion..."
+                    formControlName="query"
+                  >
+                  <i class="ri-search-line search-icon"></i>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="loading" class="text-center p-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2">Chargement des promotions...</p>
+          </div>
+
+          <!-- Error State -->
+          <div *ngIf="error" class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+
+          <!-- Promotions Table -->
+          <div class="table-responsive mb-0" *ngIf="!loading && !error" >
+            <table class="table table-hover table-nowrap align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Titre</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Réduction</th>
+                  <th scope="col">Statut</th>
+                  <th scope="col">Début</th>
+                  <th scope="col">Fin</th>
+                  <th scope="col">Poids</th>
+                  <th scope="col" class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let promotion of filteredPromotions; trackBy: trackByPromotionId">
+                  <!-- Title and Message -->
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="flex-grow-1">
+                        <h6 class="fs-14 mb-1">{{ promotion.title }}</h6>
+                        <p class="text-muted mb-0 promo-description" style="max-width: 200px;">
+                          {{ promotion.message | truncate:80 }}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Promotion Type -->
+                  <td>
+                    <span class="badge bg-light text-dark">
+                      <i [class]="getPromotionTypeIcon(promotion.promotion_type) + ' me-1'"></i>
+                      {{ getPromotionTypeLabel(promotion.promotion_type) }}
+                    </span>
+                  </td>
+
+                  <!-- Discount -->
+                  <td>
+                    <span class="badge" [ngClass]="promotion.discount_value ? 'bg-danger' : 'bg-secondary'">
+                      {{ formatDiscount(promotion) }}
+                    </span>
+                  </td>
+
+                  <!-- Status -->
+                  <td>
+                    <div ngbDropdown class="dropdown">
+                      <button 
+                        class="btn btn-sm btn-outline-light text-reset dropdown-toggle" 
+                        ngbDropdownToggle
+                        data-bs-toggle="dropdown" 
+                        aria-haspopup="true" 
+                        aria-expanded="false"
+                      >
+                        <span class="badge" [ngClass]="getStatusBadgeClass(promotion.status)">
+                          {{ getStatusLabel(promotion.status) }}
+                        </span>
+                        <i class="mdi mdi-chevron-down"></i>
+                      </button>
+                      <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
+                        <ng-container *ngFor="let status of statusOptions">
+                          <a 
+                            class="dropdown-item" 
+                            href="javascript:void(0);" 
+                            (click)="updateStatus(promotion, status.value)"
+                            [class.active]="promotion.status === status.value"
+                          >
+                            <span class="badge badge-sm" [ngClass]="status.class"></span>
+                            {{ status.label }}
+                          </a>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Start Date -->
+                  <td>
+                    <span class="text-muted">{{ formatDate(promotion.start_at) }}</span>
+                  </td>
+
+                  <!-- End Date -->
+                  <td>
+                    <span class="text-muted">{{ formatDate(promotion.end_at) }}</span>
+                  </td>
+
+                  <!-- Weight -->
+                  <td>
+                    <span class="badge bg-secondary">{{ promotion.weight }}</span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td>
+                    <div ngbDropdown class="dropdown">
+                      <button 
+                        class="btn btn-soft-secondary btn-sm dropdown-toggle" 
+                        ngbDropdownToggle
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                      >
+                        <i class="ri-more-fill align-middle"></i>
+                      </button>
+                      <ul ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
+                        <li>
+                          <a 
+                            class="dropdown-item" 
+                            href="javascript:void(0);" 
+                            (click)="openEditModal(content, promotion)"
+                          >
+                            <i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier
+                          </a>
+                        </li>
+                        <li>
+                          <a 
+                            class="dropdown-item" 
+                            href="javascript:void(0);" 
+                            (click)="duplicatePromotion(promotion)"
+                          >
+                            <i class="ri-file-copy-line align-bottom me-2 text-muted"></i> Dupliquer
+                          </a>
+                        </li>
+                        <li class="dropdown-divider"></li>
+                        <li>
+                          <a 
+                            class="dropdown-item text-danger" 
+                            href="javascript:void(0);" 
+                            (click)="deletePromotion(promotion)"
+                          >
+                            <i class="ri-delete-bin-fill align-bottom me-2 text-danger"></i> Supprimer
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Empty State -->
+            <div *ngIf="filteredPromotions.length === 0" class="noresult text-center py-4">
+              <div class="text-center">
+                <i class="ri-file-list-3-line display-4 text-muted"></i>
+                <h5 class="mt-2">Aucune promotion trouvée</h5>
+                <p class="text-muted mb-0">Créez votre première promotion pour commencer.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Promotion Modal -->
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">
+      <i class="ri-megaphone-line me-2"></i>
+      {{ modalMode === 'create' ? 'Nouvelle Promotion' : 'Modifier la Promotion' }}
+    </h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="promotionForm" (ngSubmit)="onSubmitPromotion()" novalidate>
+      
+      <!-- Nav Tabs -->
+      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs mb-4">
+        <li [ngbNavItem]="1">
+          <a ngbNavLink>
+            <i class="ri-information-line me-1"></i> Informations
+          </a>
+          <ng-template ngbNavContent>
+            <div class="row">
+              <!-- Title -->
+              <div class="col-md-12 mb-3">
+                <label for="title" class="form-label">Titre <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  id="title"
+                  class="form-control" 
+                  formControlName="title"
+                  placeholder="Titre de la promotion"
+                  [class.is-invalid]="f['title'].touched && f['title'].errors"
+                >
+                <div class="invalid-feedback" *ngIf="f['title'].touched && f['title'].errors">
+                  <div *ngIf="f['title'].errors?.['required']">Le titre est obligatoire.</div>
+                  <div *ngIf="f['title'].errors?.['maxlength']">Le titre ne peut pas dépasser 255 caractères.</div>
+                </div>
+              </div>
+
+              <!-- Message -->
+              <div class="col-md-12 mb-3">
+                <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
+                <textarea 
+                  id="message"
+                  class="form-control" 
+                  formControlName="message"
+                  placeholder="Message de la promotion"
+                  rows="3"
+                  [class.is-invalid]="f['message'].touched && f['message'].errors"
+                ></textarea>
+                <div class="invalid-feedback" *ngIf="f['message'].touched && f['message'].errors">
+                  <div *ngIf="f['message'].errors?.['required']">Le message est obligatoire.</div>
+                </div>
+              </div>
+
+              <!-- URL -->
+              <div class="col-md-6 mb-3">
+                <label for="url" class="form-label">URL (optionnel)</label>
+                <input 
+                  type="url" 
+                  id="url"
+                  class="form-control" 
+                  formControlName="url"
+                  placeholder="https://example.com/promo"
+                >
+              </div>
+
+              <!-- Placement -->
+              <div class="col-md-6 mb-3">
+                <label for="placement" class="form-label">Placement <span class="text-danger">*</span></label>
+                <select 
+                  id="placement"
+                  class="form-select" 
+                  formControlName="placement"
+                >
+                  <option value="topbar">Barre supérieure</option>
+                  <option value="banner">Bannière</option>
+                  <option value="popup">Pop-up</option>
+                </select>
+              </div>
+
+              <!-- Start Date -->
+              <div class="col-md-6 mb-3">
+                <label for="start_at" class="form-label">Date de début <span class="text-danger">*</span></label>
+                <input 
+                  type="datetime-local" 
+                  id="start_at"
+                  class="form-control" 
+                  formControlName="start_at"
+                  [class.is-invalid]="f['start_at'].touched && f['start_at'].errors"
+                >
+                <div class="invalid-feedback" *ngIf="f['start_at'].touched && f['start_at'].errors">
+                  <div *ngIf="f['start_at'].errors?.['required']">La date de début est obligatoire.</div>
+                </div>
+              </div>
+
+              <!-- End Date -->
+              <div class="col-md-6 mb-3">
+                <label for="end_at" class="form-label">Date de fin <span class="text-danger">*</span></label>
+                <input 
+                  type="datetime-local" 
+                  id="end_at"
+                  class="form-control" 
+                  formControlName="end_at"
+                  [class.is-invalid]="f['end_at'].touched && f['end_at'].errors"
+                >
+                <div class="invalid-feedback" *ngIf="f['end_at'].touched && f['end_at'].errors">
+                  <div *ngIf="f['end_at'].errors?.['required']">La date de fin est obligatoire.</div>
+                </div>
+              </div>
+
+              <!-- Display Duration -->
+              <div class="col-md-4 mb-3">
+                <label for="duration" class="form-label">Durée d'affichage (sec) <span class="text-danger">*</span></label>
+                <input 
+                  type="number" 
+                  id="duration"
+                  class="form-control" 
+                  formControlName="display_duration_seconds"
+                  min="1"
+                  max="60"
+                  [class.is-invalid]="f['display_duration_seconds'].touched && f['display_duration_seconds'].errors"
+                >
+              </div>
+
+              <!-- Weight -->
+              <div class="col-md-4 mb-3">
+                <label for="weight" class="form-label">Poids (priorité) <span class="text-danger">*</span></label>
+                <input 
+                  type="number" 
+                  id="weight"
+                  class="form-control" 
+                  formControlName="weight"
+                  min="0"
+                >
+              </div>
+
+              <!-- Animation -->
+              <div class="col-md-4 mb-3">
+                <label for="animation" class="form-label">Animation <span class="text-danger">*</span></label>
+                <select 
+                  id="animation"
+                  class="form-select" 
+                  formControlName="animation"
+                >
+                  <option value="slide">Glissement</option>
+                  <option value="fade">Fondu</option>
+                  <option value="marquee">Défilement</option>
+                  <option value="none">Aucune</option>
+                </select>
+              </div>
+
+              <!-- Dismissible -->
+              <div class="col-md-12 mb-3">
+                <div class="form-check">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="is_dismissible"
+                    formControlName="is_dismissible"
+                  >
+                  <label class="form-check-label" for="is_dismissible">
+                    Autoriser la fermeture par l'utilisateur
+                  </label>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="2">
+          <a ngbNavLink>
+            <i class="ri-price-tag-3-line me-1"></i> Réduction
+          </a>
+          <ng-template ngbNavContent>
+            <div class="row">
+              <!-- Promotion Type -->
+              <div class="col-md-12 mb-4">
+                <label class="form-label">Type de promotion <span class="text-danger">*</span></label>
+                <div class="d-flex gap-3 flex-wrap">
+                  <div *ngFor="let type of promotionTypeOptions" class="form-check form-check-card">
+                    <input 
+                      class="form-check-input" 
+                      type="radio" 
+                      [id]="'type_' + type.value"
+                      formControlName="promotion_type"
+                      [value]="type.value"
+                    >
+                    <label class="form-check-label p-3 border rounded d-flex align-items-center gap-2" [for]="'type_' + type.value">
+                      <i [class]="type.icon + ' fs-4'"></i>
+                      <span>{{ type.label }}</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Discount Settings (shown only for discount types) -->
+              <ng-container *ngIf="f['promotion_type'].value !== 'DISPLAY'">
+                <div class="col-md-6 mb-3">
+                  <label for="discount_type" class="form-label">Type de réduction <span class="text-danger">*</span></label>
+                  <select 
+                    id="discount_type"
+                    class="form-select" 
+                    formControlName="discount_type"
+                    [class.is-invalid]="f['discount_type'].touched && f['discount_type'].errors"
+                  >
+                    <option [ngValue]="null">Sélectionner...</option>
+                    <option *ngFor="let dt of discountTypeOptions" [value]="dt.value">{{ dt.label }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="f['discount_type'].touched && f['discount_type'].errors">
+                    <div *ngIf="f['discount_type'].errors?.['required']">Le type de réduction est obligatoire.</div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="discount_value" class="form-label">Valeur de la réduction <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input 
+                      type="number" 
+                      id="discount_value"
+                      class="form-control" 
+                      formControlName="discount_value"
+                      min="0.01"
+                      step="0.01"
+                      [class.is-invalid]="f['discount_value'].touched && f['discount_value'].errors"
+                    >
+                    <span class="input-group-text">
+                      {{ f['discount_type'].value === 'PERCENTAGE' ? '%' : '€' }}
+                    </span>
+                  </div>
+                  <div class="invalid-feedback" *ngIf="f['discount_value'].touched && f['discount_value'].errors">
+                    <div *ngIf="f['discount_value'].errors?.['required']">La valeur est obligatoire.</div>
+                    <div *ngIf="f['discount_value'].errors?.['min']">La valeur doit être supérieure à 0.</div>
+                  </div>
+                </div>
+
+                <!-- Additional options for delivery discounts -->
+                <ng-container *ngIf="f['promotion_type'].value === 'DELIVERY_DISCOUNT'">
+                  <div class="col-md-6 mb-3">
+                    <label for="min_order_amount" class="form-label">Montant minimum de commande (optionnel)</label>
+                    <div class="input-group">
+                      <input 
+                        type="number" 
+                        id="min_order_amount"
+                        class="form-control" 
+                        formControlName="min_order_amount"
+                        min="0"
+                        step="0.01"
+                        placeholder="Ex: 50"
+                      >
+                      <span class="input-group-text">€</span>
+                    </div>
+                    <small class="text-muted">Commande minimum pour bénéficier de la réduction</small>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="max_discount_amount" class="form-label">Réduction maximum (optionnel)</label>
+                    <div class="input-group">
+                      <input 
+                        type="number" 
+                        id="max_discount_amount"
+                        class="form-control" 
+                        formControlName="max_discount_amount"
+                        min="0"
+                        step="0.01"
+                        placeholder="Ex: 10"
+                      >
+                      <span class="input-group-text">€</span>
+                    </div>
+                    <small class="text-muted">Plafond de la réduction en euros</small>
+                  </div>
+                </ng-container>
+              </ng-container>
+
+              <!-- Target Rules -->
+              <ng-container *ngIf="f['promotion_type'].value !== 'DISPLAY'">
+                <div class="col-12 mt-4">
+                  <hr>
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">
+                      <i class="ri-focus-3-line me-1"></i>
+                      Cibles de la promotion
+                    </h6>
+                    <button type="button" class="btn btn-sm btn-soft-primary" (click)="addRule()">
+                      <i class="ri-add-line me-1"></i> Ajouter une cible
+                    </button>
+                  </div>
+
+                  <div *ngIf="rulesArray.length === 0" class="alert alert-info">
+                    <i class="ri-information-line me-2"></i>
+                    Ajoutez au moins une cible pour appliquer la réduction.
+                  </div>
+
+                  <div formArrayName="rules">
+                    <div *ngFor="let rule of rulesArray.controls; let i = index" [formGroupName]="i" class="card mb-2">
+                      <div class="card-body py-2">
+                        <div class="row align-items-center">
+                          <div class="col-md-4">
+                            <select 
+                              class="form-select form-select-sm" 
+                              formControlName="target_type"
+                              (change)="onTargetTypeChange(i)"
+                            >
+                              <option value="">Type de cible...</option>
+                              <option *ngFor="let tt of getAvailableTargetTypes()" [value]="tt.value">{{ tt.label }}</option>
+                            </select>
+                          </div>
+
+                          <!-- Category selector -->
+                          <div class="col-md-6" *ngIf="rule.get('target_type')?.value === 'CATEGORY'">
+                            <select class="form-select form-select-sm" formControlName="target_id">
+                              <option [ngValue]="null">Sélectionner une catégorie...</option>
+                              <option *ngFor="let cat of mainCategories" [value]="cat.id">{{ cat.name }}</option>
+                            </select>
+                          </div>
+
+                          <!-- Subcategory selector -->
+                          <div class="col-md-6" *ngIf="rule.get('target_type')?.value === 'SUBCATEGORY'">
+                            <select class="form-select form-select-sm" formControlName="target_id">
+                              <option [ngValue]="null">Sélectionner une sous-catégorie...</option>
+                              <option *ngFor="let cat of subcategories" [value]="cat.id">{{ cat.name }}</option>
+                            </select>
+                          </div>
+
+                          <!-- Product selector -->
+                          <div class="col-md-6" *ngIf="rule.get('target_type')?.value === 'PRODUCT'">
+                            <select class="form-select form-select-sm" formControlName="target_id">
+                              <option [ngValue]="null">Sélectionner un produit...</option>
+                              <option *ngFor="let prod of products" [value]="prod.id">
+                                {{ prod.name }} <span *ngIf="prod.category_name">({{ prod.category_name }})</span>
+                              </option>
+                            </select>
+                          </div>
+
+                          <!-- Delivery zone selector -->
+                          <div class="col-md-6" *ngIf="rule.get('target_type')?.value === 'DELIVERY_ZONE'">
+                            <select class="form-select form-select-sm" formControlName="target_id">
+                              <option [ngValue]="null">Sélectionner une zone...</option>
+                              <option *ngFor="let zone of deliveryZones" [value]="zone.id">
+                                {{ zone.label }} ({{ zone.country_code }})
+                              </option>
+                            </select>
+                          </div>
+
+                          <!-- Country code for all delivery -->
+                          <div class="col-md-6" *ngIf="rule.get('target_type')?.value === 'ALL_DELIVERY'">
+                            <input 
+                              type="text" 
+                              class="form-control form-control-sm" 
+                              formControlName="target_code"
+                              placeholder="Code pays (ex: CI, FR)"
+                            >
+                          </div>
+
+                          <!-- No additional selector for ALL_PRODUCTS -->
+                          <div class="col-md-6" *ngIf="rule.get('target_type')?.value === 'ALL_PRODUCTS'">
+                            <span class="text-muted small">Tous les produits seront concernés</span>
+                          </div>
+
+                          <div class="col-md-2 text-end">
+                            <button type="button" class="btn btn-sm btn-soft-danger" (click)="removeRule(i)">
+                              <i class="ri-delete-bin-line"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="3">
+          <a ngbNavLink>
+            <i class="ri-palette-line me-1"></i> Thème
+          </a>
+          <ng-template ngbNavContent>
+            <div class="row">
+              <!-- Background Color -->
+              <div class="col-md-4 mb-3">
+                <label for="theme_bg" class="form-label">
+                  Couleur de fond <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input 
+                    type="color" 
+                    id="theme_bg"
+                    class="form-control form-control-color" 
+                    formControlName="theme_bg"
+                    title="Choisissez la couleur de fond"
+                  >
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="theme_bg"
+                    placeholder="#000000"
+                    maxlength="7"
+                  >
+                </div>
+              </div>
+
+              <!-- Text Color -->
+              <div class="col-md-4 mb-3">
+                <label for="theme_fg" class="form-label">
+                  Couleur du texte <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input 
+                    type="color" 
+                    id="theme_fg"
+                    class="form-control form-control-color" 
+                    formControlName="theme_fg"
+                    title="Choisissez la couleur du texte"
+                  >
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="theme_fg"
+                    placeholder="#ffffff"
+                    maxlength="7"
+                  >
+                </div>
+              </div>
+
+              <!-- Accent Color -->
+              <div class="col-md-4 mb-3">
+                <label for="theme_accent" class="form-label">
+                  Couleur d'accent <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input 
+                    type="color" 
+                    id="theme_accent"
+                    class="form-control form-control-color" 
+                    formControlName="theme_accent"
+                    title="Choisissez la couleur d'accent"
+                  >
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="theme_accent"
+                    placeholder="#ff0000"
+                    maxlength="7"
+                  >
+                </div>
+              </div>
+
+              <!-- Theme Preview -->
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Aperçu du thème</label>
+                <div class="theme-preview p-3 rounded border" 
+                     [ngStyle]="{
+                       'background-color': f['theme_bg'].value,
+                       'color': f['theme_fg'].value
+                     }">
+                  <h6 [ngStyle]="{'color': f['theme_accent'].value}">
+                    {{ f['title'].value || 'Titre de la promotion' }}
+                  </h6>
+                  <p class="mb-2">{{ f['message'].value || 'Message de la promotion' }}</p>
+                  <div class="d-flex gap-2 align-items-center">
+                    <button class="btn btn-sm" 
+                            [ngStyle]="{
+                              'background-color': f['theme_accent'].value,
+                              'color': f['theme_bg'].value,
+                              'border': 'none'
+                            }">
+                      Bouton d'action
+                    </button>
+                    <span *ngIf="f['discount_value'].value" class="badge" [ngStyle]="{'background-color': f['theme_accent'].value}">
+                      {{ f['discount_type'].value === 'PERCENTAGE' ? '-' + f['discount_value'].value + '%' : '-' + f['discount_value'].value + '€' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </li>
+      </ul>
+
+      <div [ngbNavOutlet]="nav"></div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.dismiss('cancel')">
+      Annuler
+    </button>
+    <button type="button" class="btn btn-primary" (click)="onSubmitPromotion()">
+      <i class="ri-save-line me-1"></i>
+      {{ modalMode === 'create' ? 'Créer' : 'Modifier' }}
+    </button>
+  </div>
+</ng-template>

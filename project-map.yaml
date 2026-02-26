@@ -1,0 +1,618 @@
+# Smell_Wear Project Map
+# Auto-generated structure and context index
+
+project:
+  name: Smell_Wear
+  version: "4.3.0"
+  framework: Angular 18.0.4
+  backend: Supabase
+  payment: CinetPay
+
+folders:
+  # Root Configuration
+  - path: supabase/
+    purpose: Supabase backend configuration
+    responsibilities:
+      - Edge Functions for payment webhooks
+      - Database migrations (RLS policies)
+      - Local development configuration
+      - Database seeding
+    keyFiles:
+      - config.toml
+      - seed.sql
+    relatedRoutes: []
+
+  - path: supabase/functions/cinetpay-notification/
+    purpose: CinetPay payment webhook handler
+    responsibilities:
+      - Receive payment status updates
+      - Update order status in database
+    keyFiles:
+      - index.ts
+    relatedRoutes: []
+
+  - path: supabase/functions/cinetpay-return/
+    purpose: CinetPay payment return handler
+    responsibilities:
+      - Handle customer return from payment gateway
+      - Redirect to success/failure page
+    keyFiles:
+      - index.ts
+    relatedRoutes: []
+
+  - path: supabase/functions/invite-admin/
+    purpose: Admin invitation edge function
+    responsibilities:
+      - Generate admin invitation links
+      - Create admin records in database
+    keyFiles:
+      - index.ts
+    relatedRoutes: []
+
+  - path: src/environments/
+    purpose: Environment configuration files
+    responsibilities:
+      - Supabase URL and API keys
+      - Production vs development settings
+    keyFiles:
+      - environment.ts
+      - environment.prod.ts
+    relatedRoutes: []
+
+  # Core Module
+  - path: src/app/core/
+    purpose: Core singleton services and utilities
+    responsibilities:
+      - Business logic services
+      - Authentication and authorization
+      - Route guards
+      - TypeScript interfaces
+      - HTTP interceptors
+    keyFiles:
+      - services/supabase-auth.service.ts
+      - services/cart.service.ts
+      - services/commande.service.ts
+      - models/models.ts
+    relatedRoutes: []
+
+  - path: src/app/core/guards/
+    purpose: Route protection guards
+    responsibilities:
+      - Admin-only access (DB-verified)
+      - Authenticated user access
+      - Client/non-admin user access
+    keyFiles:
+      - admin.guard.ts
+      - auth.guard.ts
+      - client.guard.ts
+    relatedRoutes:
+      - /admin/* (AdminGuard)
+      - /account/* (ClientGuard)
+
+  - path: src/app/core/services/
+    purpose: Business logic services (45+ services)
+    responsibilities:
+      - Supabase client wrapper
+      - Shopping cart management
+      - Order processing
+      - Product operations
+      - Customer management
+      - Payment processing
+    keyFiles:
+      - supabase.service.ts
+      - supabase-auth.service.ts
+      - cart.service.ts
+      - commande.service.ts
+      - produit.service.ts
+      - categorie.service.ts
+      - variant.service.ts
+      - delivery-prices.service.ts
+    relatedRoutes: []
+
+  - path: src/app/core/models/
+    purpose: TypeScript interfaces and types
+    responsibilities:
+      - Define entity structures (Produit, Variante, Commande, etc.)
+      - Type safety for API responses
+    keyFiles:
+      - models.ts
+      - delivery-price.model.ts
+      - promotion.models.ts
+    relatedRoutes: []
+
+  - path: src/app/core/data/
+    purpose: Mock and seed data
+    responsibilities:
+      - Sample data for development
+      - Initial data structures
+    keyFiles:
+      - product.ts
+      - category.ts
+      - customer.ts
+    relatedRoutes: []
+
+  # Account Module (Admin Auth)
+  - path: src/app/account/
+    purpose: Admin authentication module
+    responsibilities:
+      - Admin login page
+      - Password reset flow
+      - Admin invitation handling
+      - OAuth callback processing
+    keyFiles:
+      - account-routing.module.ts
+      - login/login.component.ts
+      - admin-invite/admin-invite.component.ts
+    relatedRoutes:
+      - /auth/login
+      - /auth/reset-password
+      - /auth/admin-invite
+      - /auth/auth-callback
+
+  # Landing Module (Customer Site)
+  - path: src/app/landing/
+    purpose: Customer-facing e-commerce pages
+    responsibilities:
+      - Homepage and marketing pages
+      - Product browsing and search
+      - Shopping cart and checkout
+      - Customer authentication
+      - Customer account management
+    keyFiles:
+      - landing-routing.module.ts
+      - landing.module.ts
+    relatedRoutes:
+      - /
+      - /wear
+      - /checkout
+      - /product-detail/:id
+
+  - path: src/app/landing/index/
+    purpose: Homepage component
+    responsibilities:
+      - Landing page hero sections
+      - Featured products
+      - Promotional banners
+    keyFiles:
+      - index.component.ts
+    relatedRoutes:
+      - /
+
+  - path: src/app/landing/checkout/
+    purpose: "CHECKOUT - Payment page flow"
+    responsibilities:
+      - Cart display and management
+      - Delivery address selection
+      - Shipping cost calculation
+      - CinetPay payment integration
+      - Order creation
+    keyFiles:
+      - checkout.component.ts
+      - checkout.component.html
+    relatedRoutes:
+      - /checkout
+
+  - path: src/app/landing/wear-choice/
+    purpose: "WEAR - Category browsing UI (men/women selection)"
+    responsibilities:
+      - Display men's and women's category options
+      - Navigate to collection pages
+    keyFiles:
+      - wear-choice.component.ts
+    relatedRoutes:
+      - /wear
+
+  - path: src/app/landing/wear-men/
+    purpose: "WEAR - Men's collection browsing"
+    responsibilities:
+      - Display men's fashion categories
+      - Navigate to subcategories
+    keyFiles:
+      - wear-men.component.ts
+    relatedRoutes:
+      - /wear-men
+
+  - path: src/app/landing/women/
+    purpose: "WEAR - Women's collection browsing"
+    responsibilities:
+      - Display women's fashion categories
+      - Navigate to subcategories
+    keyFiles:
+      - women.component.ts
+    relatedRoutes:
+      - /women
+
+  - path: src/app/landing/l-sous-categories/
+    purpose: Subcategory listing page
+    responsibilities:
+      - Display subcategories for a category
+      - Filter by category type
+    keyFiles:
+      - l-sous-categories.component.ts
+    relatedRoutes:
+      - /under-categories-men/:categoryId
+
+  - path: src/app/landing/s-c-products/
+    purpose: Products in subcategory
+    responsibilities:
+      - List products by subcategory
+      - Filtering and sorting
+    keyFiles:
+      - s-c-products.component.ts
+    relatedRoutes:
+      - /subcategory-products/:id
+
+  - path: src/app/landing/all-categorie/
+    purpose: All categories view
+    responsibilities:
+      - Display all product categories
+      - Category navigation
+    keyFiles:
+      - all-categorie.component.ts
+    relatedRoutes:
+      - /all-categorie/:categoryId
+
+  - path: src/app/landing/all-products/
+    purpose: Shop-all products page
+    responsibilities:
+      - Display all products
+      - Search and filtering
+    keyFiles:
+      - all-products.component.ts
+    relatedRoutes:
+      - /shop-all
+
+  - path: src/app/landing/product-detail/
+    purpose: Product detail page
+    responsibilities:
+      - Display product information
+      - Variant selection (size, color)
+      - Add to cart functionality
+      - Product images gallery
+    keyFiles:
+      - product-detail.component.ts
+    relatedRoutes:
+      - /product-detail/:id
+
+  - path: src/app/landing/bestsellers/
+    purpose: Best sellers section
+    responsibilities:
+      - Display top-selling products
+    keyFiles:
+      - bestsellers.component.ts
+    relatedRoutes:
+      - /best-sellers
+
+  - path: src/app/landing/auth/
+    purpose: Customer authentication pages
+    responsibilities:
+      - Customer login
+      - Customer signup
+    keyFiles:
+      - login/login-landing.component.ts
+      - signup/signup-landing.component.ts
+    relatedRoutes:
+      - /customer/login
+      - /customer/signup
+
+  - path: src/app/landing/account/
+    purpose: Customer account management (protected)
+    responsibilities:
+      - Account dashboard
+      - Saved addresses
+      - Order history
+      - Wishlist/favorites
+      - Account settings
+    keyFiles:
+      - account-landing.module.ts
+      - dashboard/account-dashboard.component.ts
+    relatedRoutes:
+      - /account/dashboard
+      - /account/addresses
+      - /account/orders
+      - /account/favorites
+      - /account/settings
+
+  # Pages Module (Admin Dashboard)
+  - path: src/app/pages/
+    purpose: Admin dashboard pages
+    responsibilities:
+      - E-commerce management
+      - Analytics and reporting
+      - User management
+      - Media management
+    keyFiles:
+      - pages-routing.module.ts
+      - pages.module.ts
+    relatedRoutes:
+      - /admin/*
+
+  - path: src/app/pages/ecommerce/
+    purpose: E-commerce management for admins
+    responsibilities:
+      - Product CRUD operations
+      - Category management
+      - Order management
+      - Customer management
+      - Promotion management
+      - Shipping configuration
+    keyFiles:
+      - ecommerce-routing.module.ts
+      - products/products.component.ts
+      - orders/orders.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/produits
+      - /admin/ecommerce/categories
+      - /admin/ecommerce/orders
+      - /admin/ecommerce/customers
+
+  - path: src/app/pages/ecommerce/products/
+    purpose: Product list management
+    responsibilities:
+      - Display all products
+      - Product search and filtering
+      - Navigation to product edit
+    keyFiles:
+      - products.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/produits
+
+  - path: src/app/pages/ecommerce/add-product/
+    purpose: Add/edit product form
+    responsibilities:
+      - Product creation
+      - Product editing
+      - Image upload
+      - Variant management
+    keyFiles:
+      - add-product.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/add-product/:produitId
+
+  - path: src/app/pages/ecommerce/categories/
+    purpose: Category management
+    responsibilities:
+      - CRUD operations for categories
+      - Category ordering
+    keyFiles:
+      - categories.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/categories
+
+  - path: src/app/pages/ecommerce/sous-categories/
+    purpose: Subcategory management
+    responsibilities:
+      - CRUD operations for subcategories
+      - Parent category assignment
+    keyFiles:
+      - sous-categories.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/sous-categories/:categorieId
+
+  - path: src/app/pages/ecommerce/orders/
+    purpose: Order management
+    responsibilities:
+      - Display all orders
+      - Order status updates
+      - Order filtering
+    keyFiles:
+      - orders.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/orders
+
+  - path: src/app/pages/ecommerce/order-details/
+    purpose: Order detail view
+    responsibilities:
+      - Display order information
+      - Order items list
+      - Customer and address details
+    keyFiles:
+      - order-details.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/order-details/:orderId
+
+  - path: src/app/pages/ecommerce/customers/
+    purpose: Customer management
+    responsibilities:
+      - Display customer list
+      - Customer details
+    keyFiles:
+      - customers.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/customers
+
+  - path: src/app/pages/ecommerce/promos/
+    purpose: Promotion management
+    responsibilities:
+      - Create and edit promotions
+      - Discount configuration
+    keyFiles:
+      - promos.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/promos
+
+  - path: src/app/pages/ecommerce/variants-list/
+    purpose: Product variant management
+    responsibilities:
+      - Manage size/color variants
+      - Stock management per variant
+    keyFiles:
+      - variant-list.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/variants-list/:produitId
+
+  - path: src/app/pages/ecommerce/delivery-management/
+    purpose: Shipping configuration
+    responsibilities:
+      - Delivery zones setup
+      - Shipping cost configuration
+    keyFiles:
+      - delivery-management.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/delivery-prices
+
+  - path: src/app/pages/dashboards/
+    purpose: Analytics dashboard
+    responsibilities:
+      - Sales statistics
+      - Order summaries
+      - Revenue charts
+    keyFiles:
+      - dashboard/dashboard.component.ts
+    relatedRoutes:
+      - /admin/dashboards/dashboard
+
+  - path: src/app/pages/admin/
+    purpose: Admin-specific management pages
+    responsibilities:
+      - Admin user management
+    keyFiles:
+      - admin-users/admin-users.component.ts
+    relatedRoutes:
+      - /admin/ecommerce/admin-users
+
+  - path: src/app/pages/charts/
+    purpose: Chart visualization pages
+    responsibilities:
+      - ApexCharts integration (20+ chart types)
+      - Chart.js integration
+      - ECharts integration
+    keyFiles:
+      - charts-routing.module.ts
+    relatedRoutes:
+      - /admin/charts/*
+
+  # Layouts Module
+  - path: src/app/layouts/
+    purpose: Layout wrapper components
+    responsibilities:
+      - Page structure templates
+      - Navigation components
+      - Footer components
+    keyFiles:
+      - layout.component.ts
+      - layouts.module.ts
+    relatedRoutes: []
+
+  - path: src/app/layouts/topbar/
+    purpose: Top navigation bar
+    responsibilities:
+      - User menu
+      - Notifications
+      - Search
+    keyFiles:
+      - topbar.component.ts
+    relatedRoutes: []
+
+  - path: src/app/layouts/sidebar/
+    purpose: Admin left sidebar
+    responsibilities:
+      - Navigation menu
+      - Menu collapsing
+    keyFiles:
+      - sidebar.component.ts
+    relatedRoutes: []
+
+  # Shared Module
+  - path: src/app/shared/
+    purpose: Reusable components and utilities
+    responsibilities:
+      - UI components
+      - Custom pipes
+      - Directives
+      - Widgets
+    keyFiles:
+      - shared.module.ts
+    relatedRoutes: []
+
+  - path: src/app/shared/components/
+    purpose: Reusable UI components
+    responsibilities:
+      - Product cards
+      - Category cards
+      - Modals
+      - Buttons
+    keyFiles:
+      - product-card/
+      - product-modal/
+      - category-card/
+    relatedRoutes: []
+
+  - path: src/app/shared/landing/
+    purpose: Landing page section components
+    responsibilities:
+      - Homepage topbar
+      - Footer
+      - Cart sidebar
+      - Promotional banners
+    keyFiles:
+      - index/topbar/
+      - index/footer/
+      - index/cart-bar/
+    relatedRoutes: []
+
+  - path: src/app/shared/widget/
+    purpose: Dashboard widgets
+    responsibilities:
+      - Statistics cards
+      - Chart widgets
+      - Analytics displays
+    keyFiles:
+      - dashboard/stat/
+      - dashboard/best-selling/
+    relatedRoutes: []
+
+  - path: src/app/shared/pipes/
+    purpose: Custom Angular pipes
+    responsibilities:
+      - Currency conversion
+      - Data formatting
+    keyFiles:
+      - currency-converter.pipe.ts
+    relatedRoutes: []
+
+  # Store Module (NgRx)
+  - path: src/app/store/
+    purpose: NgRx state management
+    responsibilities:
+      - Global application state
+      - Actions, reducers, effects
+    keyFiles:
+      - index.ts
+    relatedRoutes: []
+
+  - path: src/app/store/Authentication/
+    purpose: Authentication state management
+    responsibilities:
+      - User session state
+      - Login/logout actions
+    keyFiles:
+      - authentication.actions.ts
+      - authentication.effects.ts
+      - authentication.reducer.ts
+    relatedRoutes: []
+
+  - path: src/app/store/Ecommerce/
+    purpose: E-commerce state management
+    responsibilities:
+      - Products state
+      - Cart state
+      - Orders state
+    keyFiles:
+      - ecommerce_action.ts
+      - ecommerce_effect.ts
+      - ecommerce_reducer.ts
+    relatedRoutes: []
+
+  # Extra Pages
+  - path: src/app/extraspages/
+    purpose: Utility pages
+    responsibilities:
+      - Coming soon page
+      - Maintenance page
+    keyFiles:
+      - coming-soon/coming-soon.component.ts
+      - maintenance/maintenance.component.ts
+    relatedRoutes:
+      - /pages/coming-soon
+      - /pages/maintenance

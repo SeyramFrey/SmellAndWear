@@ -1,0 +1,400 @@
+// === Favorites Page Styles ===
+// Modern, responsive, full-viewport design
+
+$brand-red: #B5190C;
+$brand-red-light: #ff3366;
+$text-primary: #1a1a1a;
+$text-secondary: #6c757d;
+$bg-light: #f8f9fa;
+$border-color: #e9ecef;
+
+.favorites-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: $bg-light;
+}
+
+// === Header Section ===
+.favorites-header {
+  background: #ffffff;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid $border-color;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  
+  @media (min-width: 768px) {
+    padding: 2rem 2.5rem 1.5rem;
+  }
+  
+  @media (min-width: 1200px) {
+    padding: 2rem 4rem 1.5rem;
+  }
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  background: none;
+  border: none;
+  color: $text-secondary;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  margin-bottom: 1rem;
+  
+  i {
+    font-size: 1.125rem;
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover {
+    color: $brand-red;
+    
+    i {
+      transform: translateX(-4px);
+    }
+  }
+  
+  &:focus {
+    outline: 2px solid $brand-red;
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 1rem;
+  }
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+  
+  @media (min-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: $text-secondary;
+  margin: 0;
+}
+
+// === Loading State ===
+.loading-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.loading-spinner {
+  text-align: center;
+  
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid $border-color;
+    border-top-color: $brand-red;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  
+  p {
+    color: $text-secondary;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// === Empty State ===
+.empty-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: calc(100vh - 120px);
+}
+
+.empty-content {
+  text-align: center;
+  max-width: 400px;
+  padding: 2rem;
+  
+  @media (min-width: 768px) {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    padding: 3rem;
+  }
+}
+
+.empty-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba($brand-red, 0.1), rgba($brand-red, 0.05));
+  border-radius: 50%;
+  
+  i {
+    font-size: 48px;
+    color: $brand-red;
+    opacity: 0.7;
+  }
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 0.75rem;
+}
+
+.empty-text {
+  font-size: 0.9375rem;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin: 0 0 2rem;
+}
+
+.browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background-color: $brand-red;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 50px;
+  transition: all 0.2s ease;
+  
+  i {
+    font-size: 1.125rem;
+  }
+  
+  &:hover {
+    background-color: darken($brand-red, 8%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba($brand-red, 0.35);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:focus {
+    outline: 2px solid $brand-red;
+    outline-offset: 4px;
+  }
+}
+
+// === Favorites Grid ===
+.favorites-content {
+  flex: 1;
+  padding: 1.5rem;
+  
+  @media (min-width: 768px) {
+    padding: 2rem 2.5rem;
+  }
+  
+  @media (min-width: 1200px) {
+    padding: 2rem 4rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+  
+  // Tablet: 2 columns
+  @media (min-width: 576px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+  
+  // Small desktop: 3 columns
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  // Large desktop: 4 columns
+  @media (min-width: 1400px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// === Favorite Item Card ===
+.favorite-item {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    
+    .item-image img {
+      transform: scale(1.05);
+    }
+    
+    .remove-btn {
+      opacity: 1;
+    }
+  }
+  
+  &:focus {
+    outline: 2px solid $brand-red;
+    outline-offset: 2px;
+  }
+  
+  // No hover dependency on mobile - always show remove button
+  @media (max-width: 768px) {
+    &:hover {
+      transform: none;
+    }
+    
+    .remove-btn {
+      opacity: 1;
+    }
+  }
+}
+
+.item-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: $bg-light;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+}
+
+.remove-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+  z-index: 2;
+  
+  i {
+    font-size: 18px;
+    color: $brand-red-light;
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover {
+    background: $brand-red-light;
+    transform: scale(1.1);
+    
+    i {
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  &:focus {
+    outline: 2px solid $brand-red;
+    outline-offset: 2px;
+  }
+  
+  // On mobile, make button always visible and larger for touch
+  @media (max-width: 768px) {
+    width: 44px;
+    height: 44px;
+    opacity: 1;
+    
+    i {
+      font-size: 20px;
+    }
+  }
+}
+
+.item-info {
+  padding: 1rem;
+  
+  @media (min-width: 768px) {
+    padding: 1.25rem;
+  }
+}
+
+.item-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0 0 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  @media (min-width: 768px) {
+    font-size: 1rem;
+  }
+}
+
+.item-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $brand-red;
+  margin: 0;
+  
+  @media (min-width: 768px) {
+    font-size: 1.0625rem;
+  }
+}

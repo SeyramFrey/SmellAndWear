@@ -1,0 +1,140 @@
+<div class="sc-products-container">
+  <!-- Topbar -->
+  <app-topbar-landing></app-topbar-landing>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-screen">
+    <div class="loading-content">
+      <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+      <p class="loading-text mt-3">Chargement des produits...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-screen">
+    <div class="error-content">
+      <i class="ri-error-warning-line error-icon"></i>
+      <h3>Oops! Une erreur s'est produite</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="goBack()">
+        <i class="ri-arrow-left-line me-2"></i>
+        Retour aux catégories
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error && subcategory" class="">
+
+    <!-- Animated Title Section -->
+    <section class="title-animation-section">
+      <div class="title-container">
+        <h1 class="animated-title"
+            [class.animated]="titleAnimated">
+          {{ subcategory.nom }}
+        </h1>
+
+        <!-- Drip Effects -->
+        <div class="drip-effects" [class.active]="titleAnimated">
+          <div class="drip drip-1"></div>
+          <div class="drip drip-2"></div>
+          <div class="drip drip-3"></div>
+          <div class="drip drip-4"></div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="decorative-elements" [class.visible]="titleAnimated">
+          <div class="element element-1"></div>
+          <div class="element element-2"></div>
+          <div class="element element-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Section -->
+    <div class="content-section" [class.visible]="showContent">
+      
+      <!-- Hero Image Section -->
+      <section class="hero-image-section" *ngIf="showContent && subcategory">
+        <div class="hero-image-container">
+          <div class="hero-image">
+            <!-- Default category hero image or subcategory specific -->
+            <!-- Overlay with category info -->
+            <div class="hero-overlay">
+              <div class="hero-content">
+                <p class="hero-subtitle">Collection</p>
+                <h2 class="hero-title">{{ subcategory.nom }}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Section -->
+      <section class="products-section" *ngIf="showContent">
+        <div class="products-container">
+          
+          <!-- Section Header -->
+          <div class="section-header">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+              <div>
+                  <div>
+                      <i class="ri-list-settings-line me-2"></i>
+                      <h3 class="section-title">Filtre & Tri</h3>
+                  </div>
+
+                <p class="section-subtitle">Découvrez notre sélection {{ subcategory.nom?.toLowerCase() }}</p>
+              </div>
+              <button class="btn btn-outline-dark back-btn d-inline-flex align-items-center gap-2 flex-row text-nowrap" (click)="goBack()">
+                <i class="ri-arrow-left-line me-2"></i>
+                Retour
+              </button>
+            </div>
+          </div>
+
+          <!-- Products Grid -->
+          <div *ngIf="products.length > 0" class="products-grid">
+            <div class="row g-4">
+              <div *ngFor="let produit of products; trackBy: trackByProduct" 
+                   class="col-6 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                <app-product-card
+                  [produit]="produit"
+                  (productClick)="onProductClick($event)"
+                  (addToCartSuccess)="onAddToCartSuccess($event)"
+                ></app-product-card>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Products Message -->
+          <div *ngIf="products.length === 0" class="no-products-section">
+            <div class="no-products-content">
+              <i class="ri-shopping-bag-line no-products-icon"></i>
+              <h4>Aucun produit disponible</h4>
+              <p>Cette catégorie ne contient pas encore de produits.</p>
+              <button class="btn btn-primary" (click)="goBack()">
+                <i class="ri-arrow-left-line me-2"></i>
+                Explorer d'autres catégories
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer *ngIf="showContent"></app-footer>
+
+  <!-- Back to Top Button -->
+  <button (click)="topFunction()" 
+          class="btn btn-danger btn-icon landing-back-top" 
+          id="back-to-top"
+          *ngIf="showContent">
+    <i class="ri-arrow-up-line"></i>
+  </button>
+</div>

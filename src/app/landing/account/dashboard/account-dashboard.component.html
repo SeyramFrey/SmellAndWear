@@ -1,0 +1,170 @@
+<div class="account-wrapper">
+  <div class="container py-5">
+    <!-- Header -->
+    <div class="account-header mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-1">My Account</h1>
+          <p class="text-muted mb-0" *ngIf="client">
+            Welcome back, {{ client.prenom }}!
+          </p>
+        </div>
+        <button class="btn btn-outline-danger btn-sm" (click)="logout()">
+          <i class="ri-logout-box-line me-1"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-lg-3 mb-4">
+        <div class="account-sidebar">
+          <nav class="account-nav">
+            <a class="account-nav-link active" routerLink="/account" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+              <i class="ri-dashboard-line"></i>
+              Dashboard
+            </a>
+            <a class="account-nav-link" routerLink="/account/orders" routerLinkActive="active">
+              <i class="ri-shopping-bag-line"></i>
+              My Orders
+              <span class="badge bg-secondary ms-auto" *ngIf="recentOrders.length > 0">{{ recentOrders.length }}</span>
+            </a>
+            <a class="account-nav-link" routerLink="/account/favorites" routerLinkActive="active">
+              <i class="ri-heart-line"></i>
+              My Favorites
+              <span class="badge bg-danger ms-auto" *ngIf="favoritesCount > 0">{{ favoritesCount }}</span>
+            </a>
+            <a class="account-nav-link" routerLink="/account/addresses" routerLinkActive="active">
+              <i class="ri-map-pin-line"></i>
+              My Addresses
+              <span class="badge bg-secondary ms-auto" *ngIf="addresses.length > 0">{{ addresses.length }}</span>
+            </a>
+            <a class="account-nav-link" routerLink="/account/settings" routerLinkActive="active">
+              <i class="ri-settings-3-line"></i>
+              Settings
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-lg-9">
+        <!-- Loading State -->
+        <div *ngIf="loading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div *ngIf="!loading">
+          <!-- Quick Stats Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <div class="stat-card" (click)="navigateTo('/account/orders')">
+                <div class="stat-icon orders">
+                  <i class="ri-shopping-bag-line"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>{{ recentOrders.length }}</h3>
+                  <p>Total Orders</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-card" (click)="navigateTo('/account/favorites')">
+                <div class="stat-icon favorites">
+                  <i class="ri-heart-line"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>{{ favoritesCount }}</h3>
+                  <p>Favorites</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-card" (click)="navigateTo('/account/addresses')">
+                <div class="stat-icon addresses">
+                  <i class="ri-map-pin-line"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>{{ addresses.length }}</h3>
+                  <p>Saved Addresses</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personal Information Card -->
+          <div class="info-card mb-4">
+            <div class="info-card-header">
+              <h5 class="mb-0">Personal Information</h5>
+              <a routerLink="/account/settings" class="btn btn-link btn-sm">Edit</a>
+            </div>
+            <div class="info-card-body" *ngIf="client">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="info-label">First Name</label>
+                  <p class="info-value">{{ client.prenom || '-' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="info-label">Last Name</label>
+                  <p class="info-value">{{ client.nom || '-' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="info-label">Email</label>
+                  <p class="info-value">{{ client.email || '-' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="info-label">Phone</label>
+                  <p class="info-value">{{ client.telephone || 'Not provided' }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="info-card-body" *ngIf="!client">
+              <div class="text-center py-4">
+                <p class="text-muted mb-3">Complete your profile to get a personalized experience.</p>
+                <a routerLink="/account/settings" class="btn btn-primary btn-sm">Complete Profile</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <h5 class="mb-0">Recent Orders</h5>
+              <a routerLink="/account/orders" class="btn btn-link btn-sm" *ngIf="recentOrders.length > 0">View All</a>
+            </div>
+            <div class="info-card-body">
+              <div *ngIf="recentOrders.length === 0" class="text-center py-4">
+                <i class="ri-shopping-bag-line text-muted" style="font-size: 48px;"></i>
+                <p class="text-muted mt-3 mb-3">You haven't placed any orders yet.</p>
+                <a routerLink="/" class="btn btn-primary btn-sm">Start Shopping</a>
+              </div>
+              
+              <div *ngIf="recentOrders.length > 0" class="orders-list">
+                <div *ngFor="let order of recentOrders" class="order-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="mb-1">Order #{{ order.id.substring(0, 8).toUpperCase() }}</h6>
+                      <p class="text-muted small mb-0">
+                        {{ order.created_at | date:'mediumDate' }}
+                      </p>
+                    </div>
+                    <div class="text-end">
+                      <span class="badge {{ getStatusBadgeClass(order.statut || '') }} mb-1">
+                        {{ getStatusLabel(order.statut || '') }}
+                      </span>
+                      <p class="fw-bold mb-0">{{ order.total | currency:'EUR' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

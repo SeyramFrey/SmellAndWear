@@ -1,0 +1,185 @@
+<div class="product-modal">
+  <div class="modal-header">
+    <h4 class="modal-title">{{ product?.nom }}</h4>
+    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+  </div>
+  
+  <div class="modal-body">
+    <div class="row">
+      <!-- Loading state -->
+      <div class="col-12 text-center" *ngIf="loading">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+        <p class="mt-2">Chargement des détails du produit...</p>
+      </div>
+
+      <!-- Error state -->
+      <div class="col-12" *ngIf="error && !loading">
+        <div class="alert alert-danger">
+          {{ error }}
+        </div>
+      </div>
+
+      <!-- Product Images -->
+      <div class="col-md-6" *ngIf="!loading && !error">
+        <div class="product-images">
+          <!-- Main Image Container with Navigation -->
+          <div class="photo-slider__main-container">
+            <div class="photo-slider__main-image">
+              <img 
+                [src]="photos.length > 0 ? photos[selectedPhotoIndex] : '/assets/images/products/placeholder.jpg'" 
+                [alt]="product?.nom || 'Image produit'" 
+                class="main-image">
+            </div>
+            
+            <!-- Main Navigation Arrows -->
+            <div class="photo-slider__navigation" *ngIf="photos.length > 1">
+              <button 
+                class="nav-arrow nav-arrow--prev" 
+                (click)="previousPhoto()"
+                [attr.aria-label]="'Previous image'">
+                <i class="ri-arrow-left-s-line"></i>
+              </button>
+              
+              <button 
+                class="nav-arrow nav-arrow--next" 
+                (click)="nextPhoto()"
+                [attr.aria-label]="'Next image'">
+                <i class="ri-arrow-right-s-line"></i>
+              </button>
+            </div>
+
+            <!-- Photo Counter -->
+            <div class="photo-slider__counter" *ngIf="photos.length > 1">
+              {{ selectedPhotoIndex + 1 }} / {{ photos.length }}
+            </div>
+          </div>
+          
+          <!-- Thumbnail System -->
+          <div class="photo-slider__thumbnails" *ngIf="photos.length > 1">
+            <!-- Desktop/Tablet: Arrows + Fixed 5 Thumbnails -->
+            <div class="thumbnails-desktop" *ngIf="!isMobile">
+              <button 
+                class="thumbnail-arrow thumbnail-arrow--prev" 
+                *ngIf="shouldShowThumbnailNavigation()"
+                [disabled]="!canNavigateThumbnailsLeft()"
+                (click)="previousThumbnails()"
+                [attr.aria-label]="'Previous thumbnails'">
+                <i class="ri-arrow-left-s-line"></i>
+              </button>
+              
+              <div class="thumbnails-container">
+                <div 
+                  *ngFor="let photo of getVisibleThumbnails(); let i = index" 
+                  class="thumbnail" 
+                  [class.active]="(thumbnailStartIndex + i) === selectedPhotoIndex"
+                  (click)="selectPhotoFromThumbnail(i)">
+                  <img [src]="photo" [alt]="'Thumbnail ' + (thumbnailStartIndex + i + 1)">
+                </div>
+              </div>
+              
+              <button 
+                class="thumbnail-arrow thumbnail-arrow--next" 
+                *ngIf="shouldShowThumbnailNavigation()"
+                [disabled]="!canNavigateThumbnailsRight()"
+                (click)="nextThumbnails()"
+                [attr.aria-label]="'Next thumbnails'">
+                <i class="ri-arrow-right-s-line"></i>
+              </button>
+            </div>
+            
+            <!-- Mobile: Horizontal Scroll -->
+            <div class="thumbnails-mobile" *ngIf="isMobile">
+              <div class="thumbnails-scroll-container">
+                <div 
+                  *ngFor="let photo of photos; let i = index" 
+                  class="thumbnail" 
+                  [class.active]="i === selectedPhotoIndex"
+                  (click)="selectPhoto(i)">
+                  <img [src]="photo" [alt]="'Thumbnail ' + (i + 1)">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Product Info -->
+      <div class="col-md-6" *ngIf="!loading && !error">
+        <div class="product-info">
+          <h3 class="product-title">{{ product?.nom }}</h3>
+          <p class="product-price">{{ getCurrentPrice() | currencyConverter }}</p>
+          
+          <!-- Product Description -->
+          <div class="product-description mb-4" *ngIf="product?.description">
+            <p>{{ product?.description }}</p>
+          </div>
+          
+          <!-- Size Selection -->
+          <div class="product-sizes mb-4" *ngIf="availableSizes.length > 0">
+            <h5>Taille <span class="text-danger" *ngIf="!selectedSize && showValidationErrors">*</span></h5>
+            <div class="size-options">
+              <button 
+                *ngFor="let size of availableSizes" 
+                class="size-option" 
+                [class.selected]="selectedSize === size.id"
+                (click)="selectSize(size.id)">
+                {{ size.libelle }}
+              </button>
+            </div>
+          </div>
+          
+          <!-- Color Selection -->
+          <div class="product-colors mb-4" *ngIf="availableColors.length > 0">
+            <h5>Couleur <span class="text-danger" *ngIf="!selectedColor && showValidationErrors">*</span></h5>
+            <div class="color-options">
+              <div 
+                *ngFor="let color of availableColors" 
+                   class="color-option" 
+                   [class.selected]="selectedColor === color.id"
+                   [style.background-color]="color.hex"
+                (click)="selectColor(color.id)"
+                   [title]="color.nom">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Message pour combinaison non disponible -->
+          <div class="alert alert-warning mb-3" *ngIf="!isValidCombination && selectedSize && selectedColor">
+            <p class="mb-0">
+              <i class="ri-error-warning-line me-1"></i>
+              Cette combinaison de taille et couleur n'est pas disponible.
+            </p>
+          </div>
+          
+          
+          <!-- Error message for selection -->
+          <div class="alert alert-danger mb-3" *ngIf="!canAddToCart() && showValidationErrors">
+            <p class="mb-0">Veuillez sélectionner une taille et une couleur avant d'ajouter au panier.</p>
+          </div>
+          
+          <!-- Quantity Selection -->
+          <div class="product-quantity mb-4" *ngIf="selectedVariant">
+            <h5>Quantité</h5>
+            <div class="quantity-selector">
+              <button class="quantity-btn minus" (click)="decrementQuantity()" [disabled]="quantity <= 1">-</button>
+              <input type="number" [(ngModel)]="quantity" min="1" max="999" class="quantity-input">
+              <button class="quantity-btn plus" (click)="incrementQuantity()">+</button>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="product-actions">
+            <button 
+              class="btn btn-dark w-100 mb-2" 
+              (click)="addToCart()"
+              [disabled]="!canAddToCart()">
+              Ajouter au panier
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

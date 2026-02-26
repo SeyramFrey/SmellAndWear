@@ -1,0 +1,291 @@
+<!-- Start Breadcrumbs -->
+<app-breadcrumbs title="Order Details" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<!-- End Breadcrumbs -->
+
+<div class="row" *ngIf="loading">
+  <div class="col-12 text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="error && !loading">
+  <div class="col-12">
+    <div class="alert alert-danger" role="alert">
+      <i class="ri-error-warning-line me-2"></i>{{ error }}
+    </div>
+    <button class="btn btn-primary" (click)="goBack()">
+      <i class="ri-arrow-left-line me-1"></i>Retour aux commandes
+    </button>
+  </div>
+</div>
+
+<div class="row" *ngIf="order && !loading">
+  <!-- Order Header -->
+  <div class="col-xl-9">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex align-items-center">
+          <h5 class="card-title flex-grow-1 mb-0">
+            Commande #{{ order.id | slice:0:8 }}
+          </h5>
+          <div class="flex-shrink-0">
+            <span class="badge text-uppercase" [ngClass]="getStatusClass(order.statut || '')">
+              {{ order.statut }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Order Info -->
+          <div class="col-lg-6">
+            <h6 class="fw-semibold text-uppercase mb-3">Informations de la commande</h6>
+            <table class="table table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td class="text-muted">ID Commande:</td>
+                  <td class="fw-medium">{{ order.id }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Date:</td>
+                  <td class="fw-medium">{{ formatDate(order.created_at) }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Référence paiement:</td>
+                  <td class="fw-medium">{{ order.payment_reference || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Total:</td>
+                  <td class="fw-medium text-success fs-5">{{ formatCurrency(order.total) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Customer Info -->
+          <div class="col-lg-6">
+            <h6 class="fw-semibold text-uppercase mb-3">Informations client</h6>
+            <table class="table table-borderless mb-0" *ngIf="order.client">
+              <tbody>
+                <tr>
+                  <td class="text-muted">Nom:</td>
+                  <td class="fw-medium">{{ order.client.prenom }} {{ order.client.nom }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Email:</td>
+                  <td class="fw-medium">
+                    <a [href]="'mailto:' + order.client.email">{{ order.client.email }}</a>
+                  </td>
+                </tr>
+                <tr *ngIf="order.client.telephone">
+                  <td class="text-muted">Téléphone:</td>
+                  <td class="fw-medium">{{ order.client.telephone }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p *ngIf="!order.client" class="text-muted">Informations client non disponibles</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Order Items -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Articles commandés ({{ orderItems.length }})</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-borderless align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Produit</th>
+                <th scope="col">Variante</th>
+                <th scope="col" class="text-end">Prix unitaire</th>
+                <th scope="col" class="text-end">Quantité</th>
+                <th scope="col" class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of orderItems">
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img 
+                      *ngIf="item.variant?.images && item.variant.images[0]" 
+                      [src]="item.variant.images[0].url" 
+                      alt="Product" 
+                      class="avatar-sm rounded"
+                      style="object-fit: cover;">
+                    <div class="flex-grow-1 ms-3" *ngIf="item.variant?.produit">
+                      <h6 class="mb-0">{{ item.variant.produit.nom }}</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span *ngIf="item.variant">
+                    {{ item.variant.couleur?.nom }} - {{ item.variant.taille?.nom }}
+                  </span>
+                </td>
+                <td class="text-end">{{ formatCurrency(item.prix_unitaire) }}</td>
+                <td class="text-end">{{ item.quantite }}</td>
+                <td class="text-end fw-medium">{{ formatCurrency(item.prix_unitaire * item.quantite) }}</td>
+              </tr>
+            </tbody>
+            <tfoot class="table-light">
+              <tr>
+                <td colspan="4" class="text-end fw-semibold">Total:</td>
+                <td class="text-end fw-bold text-success">{{ formatCurrency(order.total) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right Sidebar -->
+  <div class="col-xl-3">
+    <!-- Tracking Card -->
+    <div class="card">
+      <div class="card-header d-flex align-items-center">
+        <h5 class="card-title flex-grow-1 mb-0">
+          <i class="ri-truck-line me-2"></i>Suivi d'expédition
+        </h5>
+        <button 
+          *ngIf="!isEditingTracking" 
+          class="btn btn-soft-primary btn-sm"
+          (click)="toggleTrackingEdit()">
+          <i class="ri-edit-line"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <!-- Display mode -->
+        <div *ngIf="!isEditingTracking">
+          <div *ngIf="order.tracking_code; else noTracking">
+            <div class="mb-3">
+              <label class="text-muted small">Transporteur</label>
+              <p class="fw-medium mb-0">{{ getCarrierLabel(order.shipping_carrier || '') }}</p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted small">Code de suivi</label>
+              <p class="fw-medium mb-0">
+                <code class="fs-6">{{ order.tracking_code }}</code>
+              </p>
+            </div>
+            <div class="mb-3" *ngIf="order.shipped_at">
+              <label class="text-muted small">Expédié le</label>
+              <p class="fw-medium mb-0">{{ formatDate(order.shipped_at) }}</p>
+            </div>
+            <button 
+              class="btn btn-soft-info btn-sm w-100"
+              (click)="resendNotification()">
+              <i class="ri-mail-send-line me-1"></i>Renvoyer notification
+            </button>
+          </div>
+          <ng-template #noTracking>
+            <div class="text-center py-3">
+              <i class="ri-truck-line fs-1 text-muted"></i>
+              <p class="text-muted mt-2 mb-3">Aucun code de suivi</p>
+              <button 
+                class="btn btn-primary btn-sm"
+                (click)="toggleTrackingEdit()">
+                <i class="ri-add-line me-1"></i>Ajouter un suivi
+              </button>
+            </div>
+          </ng-template>
+        </div>
+        
+        <!-- Edit mode -->
+        <form *ngIf="isEditingTracking" [formGroup]="trackingForm" (ngSubmit)="saveTracking()">
+          <div class="mb-3">
+            <label for="carrier" class="form-label">Transporteur</label>
+            <select 
+              id="carrier" 
+              class="form-select" 
+              formControlName="carrier">
+              <option *ngFor="let c of carrierOptions" [value]="c.value">{{ c.label }}</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="trackingCode" class="form-label">Code de suivi</label>
+            <input 
+              type="text" 
+              id="trackingCode" 
+              class="form-control" 
+              formControlName="trackingCode"
+              placeholder="Ex: 1Z999AA10123456784"
+              [class.is-invalid]="trackingForm.get('trackingCode')?.invalid && trackingForm.get('trackingCode')?.touched">
+            <div class="invalid-feedback">
+              Le code de suivi est requis (min. 3 caractères)
+            </div>
+          </div>
+          
+          <div class="form-check mb-3">
+            <input 
+              type="checkbox" 
+              id="notifyCustomer" 
+              class="form-check-input" 
+              formControlName="notifyCustomer">
+            <label for="notifyCustomer" class="form-check-label">
+              Notifier le client par email
+            </label>
+          </div>
+          
+          <div class="d-flex gap-2">
+            <button 
+              type="button" 
+              class="btn btn-soft-secondary flex-grow-1"
+              (click)="toggleTrackingEdit()"
+              [disabled]="savingTracking">
+              Annuler
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary flex-grow-1"
+              [disabled]="trackingForm.invalid || savingTracking">
+              <span *ngIf="savingTracking" class="spinner-border spinner-border-sm me-1"></span>
+              Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Status Update Card -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="ri-refresh-line me-2"></i>Changer le statut
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <button 
+            *ngFor="let status of statusOptions"
+            class="btn btn-sm"
+            [ngClass]="status.class"
+            [disabled]="order.statut === status.value"
+            (click)="updateStatus(status.value)">
+            {{ status.label }}
+            <i *ngIf="order.statut === status.value" class="ri-check-line ms-1"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Actions Card -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <button class="btn btn-soft-primary" (click)="goBack()">
+            <i class="ri-arrow-left-line me-1"></i>Retour aux commandes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

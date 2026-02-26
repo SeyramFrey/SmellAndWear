@@ -1,0 +1,94 @@
+<div 
+  class="popup-promo-backdrop" 
+  [class.visible]="isVisible"
+  [ngClass]="getAnimationClass()"
+  (click)="onBackdropClick($event)"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="popupTitle"
+  #popupContainer>
+  
+  <div 
+    class="popup-promo-container" 
+    [class.visible]="isVisible"
+    [ngStyle]="getBackgroundStyle()"
+    (click)="$event.stopPropagation()">
+    
+    <!-- Close button -->
+    <button 
+      *ngIf="isDismissible"
+      #closeButton
+      type="button" 
+      class="popup-close"
+      [ngStyle]="getTextStyle()"
+      (click)="dismiss()"
+      aria-label="Fermer la promotion">
+      <i class="ri-close-line" aria-hidden="true"></i>
+    </button>
+
+    <div class="popup-content" [ngStyle]="getTextStyle()">
+      
+      <!-- Image (if provided) -->
+      <div class="popup-image-container" *ngIf="popupImage">
+        <img 
+          [src]="popupImage" 
+          [alt]="popupTitle"
+          class="popup-image"
+          loading="eager"
+          decoding="async">
+      </div>
+      
+      <div class="popup-inner">
+        <!-- Icon -->
+        <div class="popup-icon" [ngStyle]="getAccentStyle()" *ngIf="!popupImage">
+          <i class="ri-gift-line" aria-hidden="true"></i>
+        </div>
+
+        <!-- Title -->
+        <h2 class="popup-title" [ngStyle]="getAccentStyle()" id="popup-title">
+          {{ popupTitle }}
+        </h2>
+        
+        <!-- Message -->
+        <p class="popup-message" id="popup-message">
+          {{ popupMessage }}
+        </p>
+
+        <!-- Call to action buttons -->
+        <div class="popup-actions">
+          <!-- CTA Button (as link if URL provided) -->
+          <a 
+            *ngIf="ctaUrl" 
+            [routerLink]="ctaUrl" 
+            class="popup-cta btn"
+            [ngStyle]="getCtaStyle()"
+            (click)="onCtaClick()">
+            {{ ctaLabel }}
+            <i class="ri-arrow-right-line ms-2" aria-hidden="true"></i>
+          </a>
+          
+          <!-- CTA Button (as button if no URL) -->
+          <button 
+            *ngIf="!ctaUrl" 
+            type="button"
+            class="popup-cta btn"
+            [ngStyle]="getCtaStyle()"
+            (click)="onCtaClick()">
+            {{ ctaLabel }}
+            <i class="ri-arrow-right-line ms-2" aria-hidden="true"></i>
+          </button>
+          
+          <!-- Dismiss link -->
+          <button 
+            *ngIf="isDismissible" 
+            type="button" 
+            class="popup-dismiss btn btn-link"
+            [ngStyle]="getTextStyle()"
+            (click)="dismiss()">
+            Peut-être plus tard
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

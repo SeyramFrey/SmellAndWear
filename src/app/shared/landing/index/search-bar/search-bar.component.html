@@ -1,0 +1,197 @@
+<!-- Desktop Search Bar -->
+<div class="search-bar-desktop d-none d-md-block">
+  <div class="search-bar-overlay" [class.active]="isActive" (click)="close()"></div>
+  
+  <div class="search-bar-container" [class.active]="isActive">
+    <!-- Header with Logo and Close Button -->
+    <div class="search-header">
+      <div class="logo">
+        <img src="assets/images/logo/logo.svg" alt="S&W" class="logo-img">
+      </div>
+      
+      <!-- Search Input Section -->
+      <div class="search-input-section">
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search products" 
+            [formControl]="searchControl"
+            autofocus>
+          
+          <button 
+            *ngIf="searchControl.value" 
+            class="clear-btn" 
+            (click)="clearSearch()"
+            aria-label="Clear search">
+            <i class="ri-close-line"></i>
+          </button>
+          
+          <button class="search-icon-btn" aria-label="Search">
+            <i class="ri-search-line"></i>
+          </button>
+        </div>
+
+        <!-- Search Filter Dropdown -->
+        <div class="search-filter">
+          <button class="filter-btn" (click)="toggleDropdown()">
+            <span>{{ getSearchByLabel() }}</span>
+            <i class="ri-arrow-down-s-line"></i>
+          </button>
+
+          <div class="filter-dropdown" *ngIf="showDropdown">
+            <button class="filter-option" [class.active]="searchBy === 'all'" (click)="selectSearchBy('all')">All</button>
+            <button class="filter-option" [class.active]="searchBy === 'name'" (click)="selectSearchBy('name')">Name</button>
+            <button class="filter-option" [class.active]="searchBy === 'description'" (click)="selectSearchBy('description')">Description</button>
+            <button class="filter-option" [class.active]="searchBy === 'price'" (click)="selectSearchBy('price')">Price</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="close-btn" (click)="close()" aria-label="Close search">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+
+    <!-- Top Searches -->
+    <div class="top-searches" *ngIf="!searchControl.value">
+      <span class="top-searches-label">Top searches:</span>
+      <button class="top-search-tag" (click)="searchControl.setValue('Jeans')">Jeans</button>
+      <button class="top-search-tag" (click)="searchControl.setValue('Jackets')">Jackets</button>
+      <button class="top-search-tag" (click)="searchControl.setValue('Hoodie')">Hoodie</button>
+      <button class="top-search-tag" (click)="searchControl.setValue('Camo')">Camo</button>
+    </div>
+
+    <!-- Search Results Section -->
+    <div class="search-results-section" *ngIf="searchControl.value && searchControl.value.trim().length >= 2">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-container">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Searching...</span>
+        </div>
+        <p class="mt-2">Searching products...</p>
+      </div>
+
+      <!-- Results Header -->
+      <div *ngIf="!loading && products.length > 0" class="results-header">
+        <p class="results-count">Result for '{{ searchControl.value }}'</p>
+      </div>
+
+      <!-- Results Grid -->
+      <div *ngIf="!loading && products.length > 0" class="results-grid">
+        <app-product-card 
+          *ngFor="let product of products" 
+          [produit]="product">
+        </app-product-card>
+      </div>
+
+      <!-- No Results -->
+      <div *ngIf="!loading && products.length === 0" class="no-results">
+        <i class="ri-search-line"></i>
+        <p>No results found for "{{ searchControl.value }}"</p>
+        <p class="suggestion">Try searching with different keywords</p>
+      </div>
+
+      <!-- More Results Button -->
+      <div *ngIf="!loading && products.length > 0" class="more-results">
+        <button class="more-results-btn">MORE RESULTS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Search Bar (Full Screen) -->
+<div class="mobile-search-fullscreen d-md-none" [class.active]="isActive">
+  <div class="mobile-search-header">
+    <div class="mobile-search-logo">
+      <img src="assets/images/logo/logo.svg" alt="Smell & Wear" class="logo-img">
+    </div>
+    
+    <button type="button" class="mobile-search-close" (click)="close()">
+      <i class="ri-close-line"></i>
+    </button>
+  </div>
+  
+  <div class="mobile-search-content">
+    <!-- Search Input -->
+    <div class="mobile-search-input-wrapper">
+      <input 
+        type="text" 
+        class="mobile-search-input" 
+        placeholder="Search products" 
+        [formControl]="searchControl"
+        autofocus>
+      
+      <button 
+        *ngIf="searchControl.value" 
+        class="mobile-clear-btn" 
+        (click)="clearSearch()">
+        <i class="ri-close-line"></i>
+      </button>
+      
+      <button class="mobile-search-icon">
+        <i class="ri-search-line"></i>
+      </button>
+    </div>
+
+    <!-- Search Filter -->
+    <div class="mobile-search-filter">
+      <button class="mobile-filter-btn" (click)="toggleDropdown()">
+        <span>Search by: {{ getSearchByLabel() }}</span>
+        <i class="ri-arrow-down-s-line"></i>
+      </button>
+
+      <div class="mobile-filter-dropdown" *ngIf="showDropdown">
+        <button class="mobile-filter-option" [class.active]="searchBy === 'all'" (click)="selectSearchBy('all')">All</button>
+        <button class="mobile-filter-option" [class.active]="searchBy === 'name'" (click)="selectSearchBy('name')">Name</button>
+        <button class="mobile-filter-option" [class.active]="searchBy === 'description'" (click)="selectSearchBy('description')">Description</button>
+        <button class="mobile-filter-option" [class.active]="searchBy === 'price'" (click)="selectSearchBy('price')">Price</button>
+      </div>
+    </div>
+
+    <!-- Top Searches -->
+    <div class="mobile-top-searches" *ngIf="!searchControl.value">
+      <span class="mobile-top-searches-label">Top searches:</span>
+      <button class="mobile-top-search-tag" (click)="searchControl.setValue('Jeans')">Jeans</button>
+      <button class="mobile-top-search-tag" (click)="searchControl.setValue('Jackets')">Jackets</button>
+      <button class="mobile-top-search-tag" (click)="searchControl.setValue('Hoodie')">Hoodie</button>
+      <button class="mobile-top-search-tag" (click)="searchControl.setValue('Camo')">Camo</button>
+    </div>
+
+    <!-- Search Results -->
+    <div class="mobile-search-results" *ngIf="searchControl.value && searchControl.value.trim().length >= 2">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="mobile-loading">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p>Searching...</p>
+      </div>
+
+      <!-- Results Header -->
+      <div *ngIf="!loading && products.length > 0" class="mobile-results-header">
+        <p>Result for '{{ searchControl.value }}'</p>
+      </div>
+
+      <!-- Results Grid - 2 by 2 -->
+      <div *ngIf="!loading && products.length > 0" class="mobile-results-grid">
+        <app-product-card 
+          *ngFor="let product of products" 
+          [produit]="product">
+        </app-product-card>
+      </div>
+
+      <!-- No Results -->
+      <div *ngIf="!loading && products.length === 0" class="mobile-no-results">
+        <i class="ri-search-line"></i>
+        <p>No results found</p>
+      </div>
+
+      <!-- More Results -->
+      <div *ngIf="!loading && products.length > 0" class="mobile-more-results">
+        <button class="mobile-more-btn">MORE RESULTS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Overlay -->
+<div class="mobile-search-overlay d-md-none" [class.active]="isActive" (click)="close()"></div>

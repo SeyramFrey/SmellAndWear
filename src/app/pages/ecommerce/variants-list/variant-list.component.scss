@@ -1,0 +1,85 @@
+.dropzone-container {
+  .dropzone {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.375rem;
+    background: #f8f9fa;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      border-color: #6f42c1;
+      background: #f8f7ff;
+    }
+
+    &.dz-drag-hover {
+      border-color: #6f42c1;
+      background: #f8f7ff;
+    }
+
+    .dz-message {
+      color: #6c757d;
+      font-size: 0.875rem;
+      margin: 0;
+    }
+
+    .dz-preview {
+      display: none; // We handle preview separately
+    }
+  }
+}
+
+.upload-preview {
+  .img-thumbnail {
+    border: 2px solid #dee2e6;
+  }
+
+  .progress {
+    background-color: #e9ecef;
+    
+    .progress-bar {
+      background-color: #6f42c1;
+    }
+  }
+}
+
+.modal-xl {
+  .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+// Custom styles for the form
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.invalid-feedback {
+  font-size: 0.75rem;
+}
+
+// Upload status indicators
+.text-success.small {
+  font-weight: 500;
+}
+
+.text-danger.small {
+  font-weight: 500;
+}
+
+// Button styles
+.btn-outline-danger {
+  border-width: 1px;
+  
+  &:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+  }
+}

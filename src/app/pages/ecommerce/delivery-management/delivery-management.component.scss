@@ -1,0 +1,138 @@
+// Delivery Management Component Styles
+
+.card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.table {
+  tbody tr {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(64, 81, 137, 0.03);
+    }
+  }
+}
+
+code {
+  background-color: #f5f7fa;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  border: 1px solid #e9ecef;
+}
+
+.form-check-input {
+  &:checked {
+    background-color: #405189;
+    border-color: #405189;
+  }
+}
+
+.btn {
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.badge {
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+
+  i {
+    font-size: 1em;
+    vertical-align: middle;
+  }
+}
+
+.form-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.invalid-feedback {
+  font-size: 0.875em;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .page-title-box {
+    flex-direction: column;
+    align-items: flex-start !important;
+
+    .page-title-right {
+      margin-top: 0.5rem;
+    }
+  }
+
+  .btn {
+    width: 100%;
+    margin-top: 0.5rem;
+
+    &.ms-2 {
+      margin-left: 0 !important;
+    }
+  }
+
+  .hstack {
+    flex-direction: column;
+    align-items: stretch !important;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+// Animation for loading state
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.table-responsive {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Custom scrollbar for table
+.table-responsive {
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+
+    &:hover {
+      background: #555;
+    }
+  }
+}
+

@@ -1,0 +1,169 @@
+<div class="auth-page-wrapper pt-5">
+    <!-- auth page bg -->
+    <div class="auth-one-bg-position auth-one-bg" id="auth-particles">
+        <div class="bg-overlay"></div>
+
+        <div class="shape">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1440 120">
+                <path d="M 0,36 C 144,53.6 432,123.2 720,124 C 1008,124.8 1296,56.8 1440,40L1440 140L0 140z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- auth page content -->
+    <div class="auth-page-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-center mt-sm-5 mb-4">
+                        <!-- Animated Logo Container -->
+                        <div class="logo-animation-container">
+                            <img 
+                                src="assets/images/logo/logo_white.svg" 
+                                alt="Smell & Wear Logo" 
+                                class="logo logo-white"
+                                [class.active]="isDarkLogo">
+                            <img 
+                                src="assets/images/logo/logo.svg" 
+                                alt="Smell & Wear Logo" 
+                                class="logo logo-dark"
+                                [class.active]="!isDarkLogo">
+                        </div>
+                        <p class="mt-3 fs-15 fw-medium text-white">Smell And Wear</p>
+                    </div>
+                </div>
+            </div>
+            <!-- end row -->
+
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-5">
+                    <!-- Glassmorphism Card -->
+                    <div class="glass-card mt-4">
+                        <div class="glass-card-body p-4">
+                            <div class="text-center mt-2 mb-4">
+                                <h5 class="text-white mb-2 login-title">Admin Login</h5>
+                                <p class="text-white-50 login-subtitle">Connectez-vous pour accéder au dashboard.</p>
+                            </div>
+                            
+                            <!-- Error Alert -->
+                            @if (error && submitted) {
+                            <div class="alert alert-danger alert-dismissible fade show glass-alert" role="alert">
+                                <i class="ri-error-warning-line me-2"></i>{{ error }}
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            }
+                            
+                            <div class="p-2 mt-4">
+                                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+                                    <!-- Email Field -->
+                                    <div class="mb-3">
+                                        <label class="form-label text-white" for="email">Email</label>
+                                        <input 
+                                            type="email" 
+                                            class="form-control glass-input" 
+                                            id="email" 
+                                            formControlName="email" 
+                                            [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" 
+                                            placeholder="Enter your email"
+                                            autocomplete="email">
+                                        @if (submitted && f['email'].errors) {
+                                        <div class="invalid-feedback">
+                                            @if (f['email'].errors['required']) {
+                                            <div>Email is required</div>
+                                            }
+                                            @if (f['email'].errors['email']) {
+                                            <div>Please enter a valid email address</div>
+                                            }
+                                        </div>
+                                        }
+                                    </div>
+
+                                    <!-- Password Field -->
+                                    <div class="mb-3">
+                                        <div class="float-end">
+                                            <a routerLink="/auth/forgot-password" class="text-white-50 text-decoration-none">Forgot password?</a>
+                                        </div>
+                                        <label class="form-label text-white" for="password-input">Password</label>
+                                        <div class="position-relative auth-pass-inputgroup mb-3">
+                                            <input 
+                                                [type]="fieldTextType ? 'text' : 'password'" 
+                                                class="form-control glass-input pe-5" 
+                                                placeholder="Enter password" 
+                                                id="password-input" 
+                                                formControlName="password" 
+                                                [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
+                                                autocomplete="current-password">
+                                            <button 
+                                                class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-white-50" 
+                                                type="button" 
+                                                id="password-addon"
+                                                (click)="toggleFieldTextType()">
+                                                <i class="mdi align-middle" 
+                                                   [ngClass]="{'mdi-eye-off-outline': !fieldTextType, 'mdi-eye-outline': fieldTextType}"></i>
+                                            </button>
+                                            @if (submitted && f['password'].errors) {
+                                            <div class="invalid-feedback">
+                                                @if (f['password'].errors['required']) {
+                                                <span>Password is required</span>
+                                                }
+                                                @if (f['password'].errors['minlength']) {
+                                                <span>Password must be at least 6 characters</span>
+                                                }
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <!-- Remember Me -->
+                                    <div class="form-check mb-4">
+                                        <input class="form-check-input glass-checkbox" type="checkbox" value="" id="auth-remember-check">
+                                        <label class="form-check-label text-white-50" for="auth-remember-check">Remember me</label>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="mt-4">
+                                        <button 
+                                            class="btn btn-primary-glass w-100" 
+                                            type="submit" 
+                                            [disabled]="loading">
+                                            @if (loading) {
+                                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Connexion...
+                                            } @else {
+                                            Connexion
+                                            }
+                                        </button>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                        <!-- end glass card body -->
+                    </div>
+                    <!-- end glass card -->
+
+                </div>
+            </div>
+            <!-- end row -->
+        </div>
+        <!-- end container -->
+    </div>
+    <!-- end auth page content -->
+
+    <!-- footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-center">
+                        <p class="mb-0 text-white-50">&copy; {{year}} Smell and Wear. Crafted with ✨ by Seyram .G</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- end Footer -->
+</div>
+<!-- end auth-page-wrapper -->
+<app-toasts aria-live="polite" aria-atomic="true"></app-toasts>

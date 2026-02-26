@@ -1,0 +1,435 @@
+// =============================================================================
+// SMELL & WEAR - THEME VARIABLES (CSS Custom Properties)
+// =============================================================================
+// This file defines CSS custom properties for light and dark themes.
+// All colors should reference these tokens for consistent theming.
+// =============================================================================
+
+:root {
+  // === BRAND COLORS ===
+  --sw-primary: #B5190C;
+  --sw-primary-dark: #8a1309;
+  --sw-primary-light: #d41e10;
+  --sw-primary-soft: rgba(181, 25, 12, 0.12);
+  
+  // === LIGHT THEME (Default) ===
+  --sw-bg-primary: #ffffff;
+  --sw-bg-secondary: #f8f9fa;
+  --sw-bg-tertiary: #e9ecef;
+  --sw-bg-surface: #ffffff;
+  --sw-bg-elevated: #ffffff;
+  
+  --sw-text-primary: #1a1a1a;
+  --sw-text-secondary: #666666;
+  --sw-text-muted: #999999;
+  --sw-text-inverse: #ffffff;
+  
+  --sw-border-primary: #e5e7eb;
+  --sw-border-secondary: #f0f0f0;
+  --sw-border-focus: var(--sw-primary);
+  
+  --sw-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --sw-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --sw-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+  
+  --sw-icon-primary: #1a1a1a;
+  --sw-icon-secondary: #666666;
+  --sw-icon-muted: #999999;
+  --sw-icon-inverse: #ffffff;
+  
+  // Topbar specific
+  --sw-topbar-bg: #ffffff;
+  --sw-topbar-bg-scrolled: #ffffff;
+  --sw-topbar-icon-default: #ffffff; // White on transparent topbar (desktop)
+  --sw-topbar-icon-scrolled: #1a1a1a; // Black after scroll
+  --sw-topbar-icon-mobile: #1a1a1a; // Always black on mobile
+  --sw-topbar-border: rgba(0, 0, 0, 0.08);
+  
+  // Card/Surface
+  --sw-card-bg: #ffffff;
+  --sw-card-border: #e5e7eb;
+  --sw-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  
+  // Form inputs
+  --sw-input-bg: #ffffff;
+  --sw-input-border: #ced4da;
+  --sw-input-focus-border: var(--sw-primary);
+  --sw-input-placeholder: #999999;
+  
+  // Buttons
+  --sw-btn-primary-bg: var(--sw-primary);
+  --sw-btn-primary-text: #ffffff;
+  --sw-btn-secondary-bg: #ffffff;
+  --sw-btn-secondary-text: #1a1a1a;
+  --sw-btn-secondary-border: #e5e7eb;
+  
+  // Navigation links
+  --sw-nav-link: #ffffff; // White on transparent
+  --sw-nav-link-scrolled: #1a1a1a; // Black after scroll
+  --sw-nav-link-hover: #f3f4f6;
+  
+  // Overlays
+  --sw-overlay-bg: rgba(0, 0, 0, 0.5);
+  --sw-overlay-backdrop: blur(4px);
+  
+  // Alerts/Toasts
+  --sw-success: #10b981;
+  --sw-warning: #f59e0b;
+  --sw-error: #ef4444;
+  --sw-info: #3b82f6;
+}
+
+// === DARK THEME ===
+[data-sw-theme="dark"],
+[data-bs-theme="dark"] {
+  --sw-bg-primary: #121212;
+  --sw-bg-secondary: #1e1e1e;
+  --sw-bg-tertiary: #2d2d2d;
+  --sw-bg-surface: #1e1e1e;
+  --sw-bg-elevated: #2d2d2d;
+  
+  --sw-text-primary: #f5f5f5;
+  --sw-text-secondary: #b0b0b0;
+  --sw-text-muted: #8a8a8a;
+  --sw-text-inverse: #1a1a1a;
+  
+  --sw-border-primary: #3d3d3d;
+  --sw-border-secondary: #2d2d2d;
+  --sw-border-focus: var(--sw-primary-light);
+  
+  --sw-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --sw-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --sw-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+  
+  --sw-icon-primary: #f5f5f5;
+  --sw-icon-secondary: #b0b0b0;
+  --sw-icon-muted: #8a8a8a;
+  --sw-icon-inverse: #1a1a1a;
+  
+  // Topbar specific (dark mode)
+  --sw-topbar-bg: #1e1e1e;
+  --sw-topbar-bg-scrolled: #1e1e1e;
+  --sw-topbar-icon-default: #f5f5f5;
+  --sw-topbar-icon-scrolled: #f5f5f5;
+  --sw-topbar-icon-mobile: #f5f5f5;
+  --sw-topbar-border: rgba(255, 255, 255, 0.1);
+  
+  // Card/Surface
+  --sw-card-bg: #1e1e1e;
+  --sw-card-border: #3d3d3d;
+  --sw-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  
+  // Form inputs
+  --sw-input-bg: #2d2d2d;
+  --sw-input-border: #3d3d3d;
+  --sw-input-focus-border: var(--sw-primary-light);
+  --sw-input-placeholder: #8a8a8a;
+  
+  // Buttons
+  --sw-btn-secondary-bg: #2d2d2d;
+  --sw-btn-secondary-text: #f5f5f5;
+  --sw-btn-secondary-border: #3d3d3d;
+  
+  // Navigation links
+  --sw-nav-link: #f5f5f5;
+  --sw-nav-link-scrolled: #f5f5f5;
+  --sw-nav-link-hover: #d0d0d0;
+  
+  // Overlays
+  --sw-overlay-bg: rgba(0, 0, 0, 0.7);
+}
+
+// =============================================================================
+// THEME UTILITY CLASSES
+// =============================================================================
+
+.theme-bg-primary { background-color: var(--sw-bg-primary) !important; }
+.theme-bg-secondary { background-color: var(--sw-bg-secondary) !important; }
+.theme-bg-surface { background-color: var(--sw-bg-surface) !important; }
+
+.theme-text-primary { color: var(--sw-text-primary) !important; }
+.theme-text-secondary { color: var(--sw-text-secondary) !important; }
+.theme-text-muted { color: var(--sw-text-muted) !important; }
+
+.theme-border { border-color: var(--sw-border-primary) !important; }
+
+.theme-icon { color: var(--sw-icon-primary) !important; }
+.theme-icon-secondary { color: var(--sw-icon-secondary) !important; }
+
+// Topbar icon classes based on scroll state
+.topbar-icon {
+  color: var(--sw-topbar-icon-default);
+  transition: color 0.3s ease;
+  
+  &.scrolled {
+    color: var(--sw-topbar-icon-scrolled);
+  }
+  
+  @media (max-width: 768px) {
+    color: var(--sw-topbar-icon-mobile) !important;
+  }
+}
+
+// =============================================================================
+// DARK MODE SPECIFIC OVERRIDES
+// =============================================================================
+
+body.dark-mode {
+  background-color: var(--sw-bg-primary);
+  color: var(--sw-text-primary);
+  
+  // Card overrides
+  .card {
+    background-color: var(--sw-card-bg);
+    border-color: var(--sw-card-border);
+  }
+  
+  // Form controls
+  .form-control,
+  .form-select {
+    background-color: var(--sw-input-bg);
+    border-color: var(--sw-input-border);
+    color: var(--sw-text-primary);
+    
+    &::placeholder {
+      color: var(--sw-input-placeholder);
+    }
+    
+    &:focus {
+      border-color: var(--sw-input-focus-border);
+      box-shadow: 0 0 0 0.2rem var(--sw-primary-soft);
+    }
+  }
+  
+  // Dropdowns
+  .dropdown-menu {
+    background-color: var(--sw-bg-elevated);
+    border-color: var(--sw-border-primary);
+    
+    .dropdown-item {
+      color: var(--sw-text-primary);
+      
+      &:hover,
+      &:focus {
+        background-color: var(--sw-bg-tertiary);
+      }
+    }
+    
+    .dropdown-divider {
+      border-color: var(--sw-border-secondary);
+    }
+  }
+  
+  // Modals
+  .modal-content {
+    background-color: var(--sw-bg-surface);
+    border-color: var(--sw-border-primary);
+  }
+  
+  // Tables
+  .table {
+    color: var(--sw-text-primary);
+    
+    th, td {
+      border-color: var(--sw-border-secondary);
+    }
+    
+    &.table-light {
+      th, td {
+        background-color: var(--sw-bg-secondary);
+      }
+    }
+  }
+  
+  // Alerts
+  .alert {
+    border-color: var(--sw-border-primary);
+  }
+  
+  // Text muted
+  .text-muted {
+    color: var(--sw-text-muted) !important;
+  }
+  
+  // Links
+  a:not(.btn) {
+    color: var(--sw-primary-light);
+    
+    &:hover {
+      color: var(--sw-primary);
+    }
+  }
+  
+  // Headings
+  h1, h2, h3, h4, h5, h6,
+  .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: var(--sw-text-primary) !important;
+  }
+  
+  // Labels
+  label,
+  .form-label {
+    color: var(--sw-text-primary) !important;
+  }
+  
+  // Text colors
+  .text-dark {
+    color: var(--sw-text-primary) !important;
+  }
+  
+  .text-body,
+  .text-secondary {
+    color: var(--sw-text-secondary) !important;
+  }
+  
+  // Badge text
+  .badge {
+    color: #ffffff !important;
+  }
+  
+  // List group items
+  .list-group-item {
+    color: var(--sw-text-primary);
+    background-color: var(--sw-bg-surface);
+    border-color: var(--sw-border-primary);
+  }
+  
+  // Nav items
+  .nav-link {
+    color: var(--sw-text-primary);
+    
+    &:hover,
+    &:focus {
+      color: var(--sw-primary-light);
+    }
+  }
+  
+  // Breadcrumb
+  .breadcrumb-item {
+    color: var(--sw-text-secondary);
+    
+    &.active {
+      color: var(--sw-text-primary);
+    }
+    
+    a {
+      color: var(--sw-text-secondary);
+      
+      &:hover {
+        color: var(--sw-primary-light);
+      }
+    }
+  }
+  
+  // Pagination
+  .page-link {
+    color: var(--sw-text-primary);
+    background-color: var(--sw-bg-surface);
+    border-color: var(--sw-border-primary);
+    
+    &:hover {
+      color: var(--sw-primary-light);
+      background-color: var(--sw-bg-tertiary);
+    }
+  }
+  
+  .page-item.active .page-link {
+    color: #ffffff;
+    background-color: var(--sw-primary);
+    border-color: var(--sw-primary);
+  }
+  
+  .page-item.disabled .page-link {
+    color: var(--sw-text-muted);
+    background-color: var(--sw-bg-secondary);
+  }
+  
+  // Accordion
+  .accordion-button {
+    color: var(--sw-text-primary);
+    background-color: var(--sw-bg-surface);
+    
+    &:not(.collapsed) {
+      color: var(--sw-text-primary);
+      background-color: var(--sw-bg-tertiary);
+    }
+  }
+  
+  .accordion-body {
+    color: var(--sw-text-primary);
+  }
+  
+  // Tabs
+  .nav-tabs .nav-link {
+    color: var(--sw-text-secondary);
+    
+    &:hover {
+      color: var(--sw-text-primary);
+    }
+    
+    &.active {
+      color: var(--sw-text-primary);
+      background-color: var(--sw-bg-surface);
+      border-color: var(--sw-border-primary);
+    }
+  }
+  
+  // Progress
+  .progress {
+    background-color: var(--sw-bg-tertiary);
+  }
+  
+  // Toasts
+  .toast {
+    background-color: var(--sw-bg-surface);
+    color: var(--sw-text-primary);
+    border-color: var(--sw-border-primary);
+  }
+  
+  .toast-header {
+    color: var(--sw-text-primary);
+    background-color: var(--sw-bg-secondary);
+    border-bottom-color: var(--sw-border-primary);
+  }
+  
+  // Popovers
+  .popover {
+    background-color: var(--sw-bg-elevated);
+    border-color: var(--sw-border-primary);
+  }
+  
+  .popover-header {
+    background-color: var(--sw-bg-tertiary);
+    color: var(--sw-text-primary);
+  }
+  
+  .popover-body {
+    color: var(--sw-text-primary);
+  }
+  
+  // Tooltips
+  .tooltip-inner {
+    background-color: var(--sw-bg-elevated);
+    color: var(--sw-text-primary);
+  }
+}
+
+// =============================================================================
+// SMOOTH THEME TRANSITION
+// =============================================================================
+
+html {
+  // Smooth color transitions when theme changes
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body,
+.card,
+.dropdown-menu,
+.modal-content,
+.form-control,
+.form-select,
+.btn {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+

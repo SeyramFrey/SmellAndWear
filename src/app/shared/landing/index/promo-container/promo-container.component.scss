@@ -1,0 +1,46 @@
+// Promo Container Component Styles
+
+// Global CSS custom property for topbar offset
+:host {
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: 1050;
+}
+
+// Global adjustment for fixed topbar when promo is active
+::ng-deep {
+  .fixed-top.navbar-landing {
+    top: var(--promo-bar-height, 0px) !important;
+    transition: top 0.3s ease;
+  }
+}
+
+// Container wrapper for all promo types
+.promo-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+// Topbar promo should be first and take its own space
+app-topbar-promo {
+  width: 100%;
+  display: block;
+}
+
+// Banner promo follows naturally in the flow
+app-banner-promo {
+  width: 100%;
+  display: block;
+}
+
+// Popup promo is positioned absolutely/fixed over everything
+app-popup-promo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1060; // Above everything
+}

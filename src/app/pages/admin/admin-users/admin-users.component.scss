@@ -1,0 +1,134 @@
+.card {
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.25rem;
+}
+
+.card-title {
+  font-weight: 600;
+  color: #495057;
+}
+
+// Avatar styling
+.avatar-xs {
+  width: 2rem;
+  height: 2rem;
+}
+
+.avatar-lg {
+  width: 4rem;
+  height: 4rem;
+}
+
+.avatar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 500;
+}
+
+// Button styling
+.btn-soft-primary {
+  background-color: rgba(64, 81, 137, 0.1);
+  color: #405189;
+  border: none;
+
+  &:hover {
+    background-color: #405189;
+    color: white;
+  }
+}
+
+.btn-soft-danger {
+  background-color: rgba(240, 101, 72, 0.1);
+  color: #f06548;
+  border: none;
+
+  &:hover {
+    background-color: #f06548;
+    color: white;
+  }
+}
+
+// Badge styling
+.bg-success-subtle {
+  background-color: rgba(10, 179, 156, 0.1) !important;
+}
+
+.bg-soft-primary {
+  background-color: rgba(64, 81, 137, 0.15);
+}
+
+// Table styling
+.table {
+  th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+  }
+}
+
+// Code styling
+code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+}
+
+// Alert styling
+.alert-info {
+  background-color: #d1e7fd;
+  border-color: #9ec5fe;
+  color: #084298;
+}
+
+// Form styling
+.form-control {
+  &:focus {
+    border-color: #405189;
+    box-shadow: 0 0 0 0.15rem rgba(64, 81, 137, 0.25);
+  }
+}
+
+.input-group-text {
+  background-color: #f3f6f9;
+  border-color: #ced4da;
+}
+
+// Page title
+.page-title-box {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.breadcrumb {
+  margin-bottom: 0;
+
+  .breadcrumb-item {
+    a {
+      color: #405189;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    &.active {
+      color: #6c757d;
+    }
+  }
+}
+

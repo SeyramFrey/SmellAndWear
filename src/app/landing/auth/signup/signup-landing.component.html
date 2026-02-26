@@ -1,0 +1,214 @@
+<div class="auth-landing-wrapper">
+  <div class="auth-container">
+    <!-- Back to shop link -->
+    <a routerLink="/" class="back-to-shop">
+      <i class="ri-arrow-left-line"></i>
+      Back to Shop
+    </a>
+
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2>Create Account</h2>
+        <p>Join us and start shopping</p>
+      </div>
+
+      <!-- Pending Guest Email Notice -->
+      <div *ngIf="pendingGuestEmail" class="alert alert-info" role="alert">
+        <i class="ri-information-line me-2"></i>
+        We found a previous order with this email. Creating an account will link your order history.
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error && submitted" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="ri-error-warning-line me-2"></i>{{ error }}
+        <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+      </div>
+
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+        <!-- Name Row -->
+        <div class="row">
+          <div class="col-6">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <div class="input-wrapper">
+                <i class="ri-user-line"></i>
+                <input 
+                  type="text" 
+                  id="firstName" 
+                  formControlName="firstName"
+                  class="form-control"
+                  [class.is-invalid]="submitted && f['firstName'].errors"
+                  placeholder="First name"
+                  autocomplete="given-name">
+              </div>
+              <div *ngIf="submitted && f['firstName'].errors" class="invalid-feedback d-block">
+                <span *ngIf="f['firstName'].errors['required']">Required</span>
+                <span *ngIf="f['firstName'].errors['minlength']">Min 2 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <div class="input-wrapper">
+                <i class="ri-user-line"></i>
+                <input 
+                  type="text" 
+                  id="lastName" 
+                  formControlName="lastName"
+                  class="form-control"
+                  [class.is-invalid]="submitted && f['lastName'].errors"
+                  placeholder="Last name"
+                  autocomplete="family-name">
+              </div>
+              <div *ngIf="submitted && f['lastName'].errors" class="invalid-feedback d-block">
+                <span *ngIf="f['lastName'].errors['required']">Required</span>
+                <span *ngIf="f['lastName'].errors['minlength']">Min 2 characters</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-wrapper">
+            <i class="ri-mail-line"></i>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email"
+              class="form-control"
+              [class.is-invalid]="submitted && f['email'].errors"
+              placeholder="Enter your email"
+              autocomplete="email"
+              [readonly]="pendingGuestEmail !== null">
+          </div>
+          <div *ngIf="submitted && f['email'].errors" class="invalid-feedback d-block">
+            <span *ngIf="f['email'].errors['required']">Email is required</span>
+            <span *ngIf="f['email'].errors['email']">Please enter a valid email</span>
+          </div>
+        </div>
+
+        <!-- Phone (Optional) with Country Selector -->
+        <div class="form-group">
+          <label for="phone">Phone Number <span class="optional">(Optional)</span></label>
+          <div class="phone-input-group">
+            <div class="country-selector">
+              <select 
+                class="form-select country-select"
+                [value]="selectedPhoneCountry.code"
+                (change)="onPhoneCountryChange($any($event.target).value)">
+                <option *ngFor="let country of phoneCountries" [value]="country.code">
+                  {{ country.flag }} {{ country.code }}
+                </option>
+              </select>
+            </div>
+            <div class="phone-number-input">
+              <input 
+                type="tel" 
+                id="phone" 
+                formControlName="phone"
+                class="form-control"
+                [placeholder]="selectedPhoneCountry.placeholder"
+                autocomplete="tel"
+                (input)="formatPhoneInput($event)">
+            </div>
+          </div>
+          <small class="form-text text-muted">
+            Format: {{ selectedPhoneCountry.code }} {{ selectedPhoneCountry.placeholder }}
+          </small>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <i class="ri-lock-line"></i>
+            <input 
+              [type]="fieldTextType ? 'text' : 'password'" 
+              id="password" 
+              formControlName="password"
+              class="form-control"
+              [class.is-invalid]="submitted && f['password'].errors"
+              placeholder="Create a password"
+              autocomplete="new-password">
+            <button 
+              type="button" 
+              class="password-toggle"
+              (click)="toggleFieldTextType()">
+              <i [class]="fieldTextType ? 'ri-eye-line' : 'ri-eye-off-line'"></i>
+            </button>
+          </div>
+          <div *ngIf="submitted && f['password'].errors" class="invalid-feedback d-block">
+            <span *ngIf="f['password'].errors['required']">Password is required</span>
+            <span *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="input-wrapper">
+            <i class="ri-lock-line"></i>
+            <input 
+              [type]="fieldTextTypeConfirm ? 'text' : 'password'" 
+              id="confirmPassword" 
+              formControlName="confirmPassword"
+              class="form-control"
+              [class.is-invalid]="submitted && f['confirmPassword'].errors"
+              placeholder="Confirm your password"
+              autocomplete="new-password">
+            <button 
+              type="button" 
+              class="password-toggle"
+              (click)="toggleFieldTextTypeConfirm()">
+              <i [class]="fieldTextTypeConfirm ? 'ri-eye-line' : 'ri-eye-off-line'"></i>
+            </button>
+          </div>
+          <div *ngIf="submitted && f['confirmPassword'].errors" class="invalid-feedback d-block">
+            <span *ngIf="f['confirmPassword'].errors['required']">Please confirm your password</span>
+            <span *ngIf="f['confirmPassword'].errors['passwordMismatch']">Passwords do not match</span>
+          </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="form-check mb-4">
+          <input 
+            type="checkbox" 
+            id="acceptTerms" 
+            formControlName="acceptTerms"
+            class="form-check-input"
+            [class.is-invalid]="submitted && f['acceptTerms'].errors">
+          <label for="acceptTerms" class="form-check-label">
+            I agree to the <a routerLink="/pages/terms" target="_blank">Terms of Service</a> 
+            and <a routerLink="/pages/privacy" target="_blank">Privacy Policy</a>
+          </label>
+          <div *ngIf="submitted && f['acceptTerms'].errors" class="invalid-feedback d-block">
+            You must accept the terms and conditions
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-block"
+          [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ loading ? 'Creating account...' : 'Create Account' }}
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <div class="auth-footer">
+        <p>Already have an account? <a (click)="navigateToLogin()">Sign in</a></p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="auth-bottom-text">
+      <p>&copy; {{ year }} Smell and Wear. All rights reserved.</p>
+    </div>
+  </div>
+</div>
+

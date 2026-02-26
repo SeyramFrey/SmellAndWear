@@ -1,0 +1,64 @@
+<div 
+  class="banner-promo"
+  [class.visible]="isVisible"
+  [class.banner-top]="bannerPosition === 'top'"
+  [class.banner-inline]="bannerPosition === 'inline'"
+  [class.banner-hero]="bannerPosition === 'hero'"
+  [ngClass]="getAnimationClass()"
+  [ngStyle]="getBackgroundStyle()"
+  role="region"
+  aria-label="Promotion">
+  
+  <div class="banner-container">
+    <!-- Image (for inline/top positions) -->
+    <div class="banner-image-container" *ngIf="bannerImage && bannerPosition !== 'hero'">
+      <img 
+        [src]="bannerImage" 
+        [alt]="bannerTitle"
+        class="banner-image"
+        loading="lazy"
+        decoding="async">
+    </div>
+    
+    <!-- Content -->
+    <div class="banner-content" [ngStyle]="getTextStyle()">
+      <h3 class="banner-title" [ngStyle]="getAccentStyle()">
+        {{ bannerTitle }}
+      </h3>
+      
+      <p class="banner-message" *ngIf="bannerMessage">
+        {{ bannerMessage }}
+      </p>
+      
+      <!-- CTA -->
+      <a 
+        *ngIf="ctaUrl"
+        [routerLink]="ctaUrl" 
+        class="banner-cta btn"
+        [ngStyle]="getCtaStyle()">
+        {{ ctaLabel }}
+        <i class="ri-arrow-right-line ms-2" aria-hidden="true"></i>
+      </a>
+      
+      <button 
+        *ngIf="!ctaUrl && ctaLabel"
+        type="button"
+        class="banner-cta btn"
+        [ngStyle]="getCtaStyle()">
+        {{ ctaLabel }}
+        <i class="ri-arrow-right-line ms-2" aria-hidden="true"></i>
+      </button>
+    </div>
+    
+    <!-- Dismiss button -->
+    <button 
+      *ngIf="isDismissible"
+      type="button" 
+      class="banner-close"
+      [ngStyle]="getTextStyle()"
+      (click)="dismiss()"
+      aria-label="Fermer la promotion">
+      <i class="ri-close-line" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>

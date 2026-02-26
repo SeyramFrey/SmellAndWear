@@ -1,0 +1,253 @@
+<!-- Start Breadcrumbs -->
+<app-breadcrumbs title="Sous-catégories" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<!-- End Breadcrumbs -->
+
+<div class="card">
+    <div class="card-header border-0 rounded">
+        <div class="row g-2">
+            <div class="col-xl-3">
+                <div class="search-box">
+                    <input type="text" class="form-control search" placeholder="Rechercher des sous-catégories..." [(ngModel)]="searchTerm" (ngModelChange)="performSearch()">
+                    <i class="ri-search-line search-icon"></i>
+                </div>
+            </div>
+            <!--end col-->
+            <div class="col-xl-3 ms-auto">
+                <div>
+                    <select class="form-control" data-choices data-choices-search-false [(ngModel)]="category" (ngModelChange)="categoryFilter()">
+                        <option value="">Choisir une Sous-catégorie</option>
+                        <option value="All">Toutes</option>
+                        @for(categoryName of getUniqueCategories(); track categoryName) {
+                            <option [value]="categoryName">{{categoryName}}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <!--end col-->
+            <div class="col-lg-auto">
+                <div class="hstack gap-2">
+                    <button type="button" class="btn btn-danger"><i class="ri-equalizer-fill me-1 align-bottom"></i>
+                        Filtres</button>
+                    <button type="button" class="btn btn-secondary" (click)="router.navigate(['/admin/ecommerce/categories'])">
+                        <i class="ri-arrow-left-line me-1 align-bottom"></i>Retour aux catégories
+                    </button>
+                </div>
+            </div>
+            <!--end col-->
+        </div>
+        <!--end row-->
+    </div>
+</div>
+
+<!-- Error Message -->
+@if (error) {
+    <div class="alert alert-danger" role="alert">
+        <i class="ri-error-warning-line me-2"></i>
+        {{ error }}
+        <button type="button" class="btn btn-sm btn-outline-danger ms-3" (click)="refreshData()">
+            <i class="ri-refresh-line me-1"></i>Réessayer
+        </button>
+    </div>
+}
+
+<!-- Loading State -->
+@if (loading && !error) {
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Chargement des sous-catégories...</p>
+        </div>
+    </div>
+} @else if (!loading && categories.length === 0 && !error) {
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="py-5">
+                <i class="ri-folder-open-line display-1 text-muted"></i>
+                <h5 class="mt-3">Aucune sous-catégorie trouvée</h5>
+                <p class="text-muted">Cette catégorie ne contient aucune sous-catégorie.</p>
+                <button type="button" class="btn btn-primary mt-3" (click)="router.navigate(['/admin/ecommerce/categories'])">
+                    <i class="ri-arrow-left-line me-1"></i>Retour aux catégories
+                </button>
+            </div>
+        </div>
+    </div>
+} @else {
+    <div class="row mt-4">
+        @for(data of categories; track trackByCategoryId($index, data)) {
+        <div class="col-xl-4 col-lg-6">
+            <div class="card ribbon-box right overflow-hidden subcategory-card">
+                <div class="card-body text-center p-4">
+                    <img src="{{data.image || 'assets/images/categories/default-subcategory.png'}}" alt="{{data.nom}}" height="200" class="rounded mb-3">
+                    <h5 class="mb-1 mt-4">
+                        <a href="javascript:void(0);" class="link-primary" (click)="navigateToProducts(data.id)">
+                            {{data.nom}}
+                        </a>
+                    </h5>
+                    <p class="text-muted mb-3">Sous-catégorie de {{parentCategoryName}}</p>
+                    <div class="mt-4">
+                        <div class="d-flex flex-column gap-2">
+                            <button type="button" 
+                                    class="btn btn-primary" 
+                                    (click)="navigateToProducts(data.id)">
+                                <i class="ri-shopping-bag-line me-1"></i>VOIR LES PRODUITS
+                            </button>
+                            <div class="d-flex gap-2">
+                                <button type="button" 
+                                        class="btn btn-outline-secondary flex-fill"
+                                        (click)="editSubcategory(data)"
+                                        [attr.aria-label]="'Modifier ' + data.nom">
+                                    <i class="ri-edit-line me-1"></i>Modifier
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-outline-danger flex-fill"
+                                        (click)="deleteSubcategory(data)"
+                                        [attr.aria-label]="'Supprimer ' + data.nom">
+                                    <i class="ri-delete-bin-line me-1"></i>Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+        <!--end col-->
+    </div>
+    <!--end row-->
+}
+
+<!-- Pagination -->
+@if (!loading && categories.length > 0) {
+<div class="px-3">
+    <div class="row justify-content-md-between align-items-md-center g-0 pagination">
+        <div class="col-sm-12 col-md-5">
+            <div class="dataTables_info mb-2" id="subcategories-table_info" role="status" aria-live="polite">
+                Affichage de
+                {{service.startIndex}} à
+                {{service.endIndex}} sur {{sellerList.length}}
+                sous-catégories
+            </div>
+        </div>
+        <!-- Pagination -->
+        <div class="col-sm-12 col-md-5">
+            <div class="text-md-right float-md-end pagination-rounded gridjs-pagination mb-3">
+                <ngb-pagination [collectionSize]="sellerList.length" [(page)]="service.page" [pageSize]="service.pageSize" (pageChange)="changePage()">
+                </ngb-pagination>
+            </div>
+        </div>
+        <!-- End Pagination -->
+    </div>
+</div>
+}
+
+<!-- Hidden loader (managed by hideLoader method) -->
+<div id="elmLoader" class="d-none">
+    <div class="spinner-border text-primary avatar-sm" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<!-- Modal for Edit Subcategory -->
+<ng-template #content role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">
+            <i class="ri-folder-edit-line me-2"></i>Modifier la sous-catégorie
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    
+    <div class="modal-body">
+        <form [formGroup]="subcategoryForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="row">
+                <!-- Subcategory Name -->
+                <div class="col-12">
+                    <div class="mb-4">
+                        <label for="subcategoryName" class="form-label">
+                            <i class="ri-text me-1"></i>Nom de la Sous-catégorie <span class="text-danger">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="subcategoryName"
+                            class="form-control" 
+                            formControlName="nom"
+                            placeholder="Entrez le nom de la sous-catégorie"
+                            [class.is-invalid]="submitted && f['nom'].errors"
+                            [class.is-valid]="submitted && !f['nom'].errors"
+                        >
+                        <div class="invalid-feedback" *ngIf="submitted && f['nom'].errors">
+                            <div *ngIf="f['nom'].errors?.['required']">Le nom de la sous-catégorie est obligatoire.</div>
+                            <div *ngIf="f['nom'].errors?.['minlength']">Le nom doit contenir au moins 2 caractères.</div>
+                            <div *ngIf="f['nom'].errors?.['maxlength']">Le nom ne peut pas dépasser 100 caractères.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="col-12">
+                    <div class="mb-4">
+                        <label for="subcategoryImage" class="form-label">
+                            <i class="ri-image-line me-1"></i>Image de la Sous-catégorie
+                        </label>
+                        
+                        <!-- Image Preview -->
+                        <div class="image-upload-container" *ngIf="!imagePreview">
+                            <div class="upload-placeholder" (click)="fileInput.click()">
+                                <i class="ri-upload-cloud-2-line upload-icon"></i>
+                                <p class="upload-text">Cliquez pour télécharger une image</p>
+                                <p class="upload-hint">PNG, JPG, GIF jusqu'à 5MB</p>
+                            </div>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="image-preview-container" *ngIf="imagePreview">
+                            <div class="image-preview">
+                                <img [src]="imagePreview" alt="Aperçu de l'image" class="preview-img">
+                                <div class="image-overlay">
+                                    <button type="button" class="btn btn-light btn-sm me-2" (click)="fileInput.click()">
+                                        <i class="ri-edit-line me-1"></i>Modifier
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" (click)="removeImage()">
+                                        <i class="ri-delete-bin-line me-1"></i>Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input 
+                            #fileInput
+                            type="file" 
+                            id="subcategoryImage"
+                            class="form-control d-none" 
+                            accept="image/*"
+                            (change)="onFileSelected($event)"
+                        >
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="modal-footer">
+        <button 
+            type="button" 
+            class="btn btn-light" 
+            data-bs-dismiss="modal" 
+            (click)="modal.dismiss('Cross click')"
+            [disabled]="saving"
+        >
+            <i class="ri-close-line me-1"></i>Annuler
+        </button>
+        <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="onSubmit()"
+            [disabled]="saving"
+        >
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i class="ri-save-3-line me-1" *ngIf="!saving"></i>
+            {{ saving ? 'Enregistrement...' : 'Modifier' }}
+        </button>
+    </div>
+</ng-template>

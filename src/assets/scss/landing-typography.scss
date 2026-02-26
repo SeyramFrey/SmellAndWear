@@ -1,0 +1,377 @@
+// ========================================
+// LANDING PAGE TYPOGRAPHY SYSTEM
+// ========================================
+// Uniform font scheme across all landing pages
+// Links: Montserrat
+// Buttons: Montserrat
+// Text: Open Sans
+// Titles: Bebas Neue
+// ========================================
+
+// ========================================
+// TITLES - Bebas Neue
+// ========================================
+
+.layout-wrapper.landing,
+.landing-page,
+[class*="landing-"],
+[class*="-landing"] {
+  
+  // All headings use Bebas Neue
+  h1, h2, h3, h4, h5, h6,
+  .h1, .h2, .h3, .h4, .h5, .h6,
+  .display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+    letter-spacing: 0.05em;
+  }
+
+  // Specific heading sizes
+  h1, .h1, .display-1 {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+  }
+
+  h2, .h2, .display-2 {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+  }
+
+  h3, .h3, .display-3 {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+  }
+
+  h4, .h4, .display-4 {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+  }
+
+  h5, .h5, .display-5 {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+  }
+
+  h6, .h6, .display-6 {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+  }
+
+  // Section titles
+  .section-title,
+  .animated-title,
+  .hero-title,
+  .banner-title,
+  .category-title,
+  .product-title,
+  .page-title,
+  .modal-title,
+  .card-title {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+    letter-spacing: 0.05em;
+  }
+
+  // ========================================
+  // BODY TEXT - Open Sans
+  // ========================================
+
+  // Default body text
+  body,
+  p,
+  span,
+  div,
+  .text,
+  .description,
+  .lead,
+  .section-subtitle,
+  .hero-subtitle,
+  .product-description,
+  .category-description,
+  .promo-text,
+  .promo-message,
+  .card-text,
+  label,
+  .form-label,
+  .form-text,
+  small,
+  .small,
+  .text-muted,
+  .badge,
+  input,
+  textarea,
+  select,
+  .form-control,
+  .form-select {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  }
+
+  // Specific text elements
+  .hero-content p,
+  .banner-content p,
+  .section-content p,
+  .product-card p,
+  .category-card p {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  }
+
+  // ========================================
+  // LINKS - Montserrat
+  // ========================================
+
+  a,
+  .nav-link,
+  .nav-link-custom,
+  .navbar-nav a,
+  .menu-link,
+  .dropdown-item,
+  .breadcrumb-item a,
+  .link,
+  .link-primary,
+  .link-secondary,
+  .link-success,
+  .link-danger,
+  .link-warning,
+  .link-info,
+  .link-light,
+  .link-dark,
+  .promo-link,
+  .banner-link,
+  .footer-link,
+  [class*="link-"] {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 600;
+  }
+
+  // Navigation links
+  .navbar-nav,
+  .nav-links-list,
+  .mobile-menu-link,
+  .mega-menu a {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 700;
+  }
+
+  // ========================================
+  // BUTTONS - Montserrat
+  // ========================================
+
+  button,
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-success,
+  .btn-danger,
+  .btn-warning,
+  .btn-info,
+  .btn-light,
+  .btn-dark,
+  .btn-outline-primary,
+  .btn-outline-secondary,
+  .btn-outline-success,
+  .btn-outline-danger,
+  .btn-outline-warning,
+  .btn-outline-info,
+  .btn-outline-light,
+  .btn-outline-dark,
+  .btn-link,
+  [class*="btn-"],
+  .filter-btn,
+  .back-btn,
+  .promo-cta,
+  .banner-cta,
+  .popup-cta {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  // Button variants
+  .btn-lg {
+    font-weight: 800;
+  }
+
+  .btn-sm {
+    font-weight: 600;
+  }
+
+  // ========================================
+  // SPECIAL CASES
+  // ========================================
+
+  // Promo components
+  .promo-title,
+  .popup-title,
+  .banner-title {
+    font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+  }
+
+  .promo-message,
+  .promo-text,
+  .popup-message,
+  .banner-message {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  }
+
+  .promo-link,
+  .promo-cta,
+  .popup-cta,
+  .banner-cta {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 700;
+  }
+
+  // Footer
+  .footer-component,
+  app-footer {
+    p, span, div:not(.section-title) {
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    }
+
+    a {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      font-weight: 600;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+    }
+  }
+
+  // Product cards
+  .product-card,
+  app-product-card {
+    h1, h2, h3, h4, h5, h6,
+    .product-title,
+    .product-name {
+      font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+    }
+
+    p,
+    .product-description,
+    .product-price,
+    .product-details {
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    }
+
+    button,
+    .btn,
+    a.btn {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      font-weight: 700;
+    }
+  }
+
+  // Category cards
+  .category-card,
+  app-category-card {
+    h1, h2, h3, h4, h5, h6,
+    .category-title,
+    .category-name {
+      font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+    }
+
+    p,
+    .category-description {
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    }
+
+    button,
+    .btn,
+    a.btn {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      font-weight: 700;
+    }
+  }
+
+  // Topbar
+  app-topbar-landing,
+  .topbar-component {
+    a,
+    .nav-link,
+    .nav-link-custom {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      font-weight: 700;
+    }
+
+    button,
+    .btn {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      font-weight: 700;
+    }
+  }
+
+  // Search bar
+  .search-bar,
+  app-search-bar {
+    input,
+    .form-control {
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    }
+  }
+
+  // Cart
+  .cart-bar,
+  app-cart-bar {
+    .cart-item-name,
+    .product-name {
+      font-family: 'Bebas Neue', 'Arial Black', sans-serif !important;
+    }
+
+    .cart-item-price,
+    .product-price,
+    p {
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    }
+
+    button,
+    .btn,
+    a {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      font-weight: 700;
+    }
+  }
+}
+
+// ========================================
+// FONT WEIGHT UTILITIES
+// ========================================
+
+.fw-light { font-weight: 300 !important; }
+.fw-normal { font-weight: 400 !important; }
+.fw-medium { font-weight: 500 !important; }
+.fw-semibold { font-weight: 600 !important; }
+.fw-bold { font-weight: 700 !important; }
+.fw-bolder { font-weight: 800 !important; }
+.fw-black { font-weight: 900 !important; }
+
+// ========================================
+// RESPONSIVE TYPOGRAPHY
+// ========================================
+
+// Mobile optimizations
+@media (max-width: 768px) {
+  .layout-wrapper.landing {
+    // Slightly smaller base font size on mobile
+    font-size: 15px;
+
+    h1, .h1 { font-size: 2.5rem !important; }
+    h2, .h2 { font-size: 2rem !important; }
+    h3, .h3 { font-size: 1.75rem !important; }
+    h4, .h4 { font-size: 1.5rem !important; }
+    h5, .h5 { font-size: 1.25rem !important; }
+    h6, .h6 { font-size: 1.1rem !important; }
+  }
+}
+
+// Desktop optimizations
+@media (min-width: 1200px) {
+  .layout-wrapper.landing {
+    h1, .h1 { font-size: 3.5rem !important; }
+    h2, .h2 { font-size: 2.75rem !important; }
+    h3, .h3 { font-size: 2.25rem !important; }
+  }
+}
+
+// ========================================
+// LETTER SPACING UTILITIES
+// ========================================
+
+.letter-spacing-tight { letter-spacing: -0.02em !important; }
+.letter-spacing-normal { letter-spacing: 0 !important; }
+.letter-spacing-wide { letter-spacing: 0.05em !important; }
+.letter-spacing-wider { letter-spacing: 0.1em !important; }
+.letter-spacing-widest { letter-spacing: 0.15em !important; }
+

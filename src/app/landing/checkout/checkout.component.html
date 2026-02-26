@@ -1,0 +1,461 @@
+<!-- Start Breadcrumbs -->
+<app-topbar-landing></app-topbar-landing>
+
+<div class="spacer"></div>
+
+<div class="row" style="padding: 2rem">
+    <div class="col-xl-8 order-2 order-xl-1">
+        <div class="card">
+            <div class="card-body checkout-tab">
+                <div class="step-arrow-nav mt-n3 mx-n3 mb-3">
+                    <ul ngbNav #customNav="ngbNav" [activeId]="1" class="nav nav-pills custom-nav nav-justified"
+                        role="tablist">
+                        <li [ngbNavItem]="1" class="nav-item">
+                            <a ngbNavLink class="nav-link fs-15 p-3" data-bs-toggle="tab" role="tab" style="color: white">
+                                <i
+                                    class="ri-user-2-line fs-16 p-2 bg-primary-subtle text-primary rounded-circle align-middle mx-2"></i>
+                                Informations personnelles
+                            </a>
+                            <ng-template ngbNavContent>
+                                <div>
+                                    <h5 class="mb-1">Informations sur la facturation</h5>
+                                    <p class="text-muted mb-4">Veuillez remplir tous les champs ci dessous</p>
+                                </div>
+
+                                <form [formGroup]="checkoutForm" (ngSubmit)="proceedToPayment()">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="billinginfo-firstName" class="form-label">Prénom</label>
+                                                <input type="text" class="form-control" id="billinginfo-firstName"
+                                                    placeholder="Entrez votre prénom" formControlName="firstName">
+                                                <div *ngIf="checkoutForm.get('firstName')?.invalid && checkoutForm.get('firstName')?.touched" class="text-danger">
+                                                    Prénom requis
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="billinginfo-lastName" class="form-label">Nom</label>
+                                                <input type="text" class="form-control" id="billinginfo-lastName"
+                                                    placeholder="Entrez votre nom" formControlName="lastName">
+                                                <div *ngIf="checkoutForm.get('lastName')?.invalid && checkoutForm.get('lastName')?.touched" class="text-danger">
+                                                    Nom requis
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="billinginfo-email" class="form-label">Email
+                                                    <span class="text-danger">*</span></label>
+                                                <input type="email" class="form-control" id="billinginfo-email"
+                                                    placeholder="Entrez votre email" formControlName="email">
+                                                <div *ngIf="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched" class="text-danger">
+                                                    Email valide requis
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="billinginfo-phone" class="form-label">Numéro de téléphone</label>
+                                                
+                                                <!-- France: Standard phone input -->
+                                                <div *ngIf="isFranceSelected()">
+                                                    <input type="tel" class="form-control" id="billinginfo-phone"
+                                                        placeholder="+33 1 23 45 67 89" formControlName="phone">
+                                                    <div *ngIf="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched" class="text-danger">
+                                                        Numéro de téléphone français requis (format: +33...)
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Côte d'Ivoire: International phone input -->
+                                                <div *ngIf="isCoteIvoireSelected()" class="phone-input-group">
+                                                    <div class="input-group">
+                                                        <select class="form-select" style="max-width: 140px;" 
+                                                            [(ngModel)]="selectedCountryCode" 
+                                                            [ngModelOptions]="{standalone: true}"
+                                                            (change)="onCountryCodeChange()">
+                                                            <option *ngFor="let country of phoneCountries" [value]="country.code">
+                                                                {{ country.flag }} {{ country.code }}
+                                                            </option>
+                                                        </select>
+                                                        <input type="tel" class="form-control" 
+                                                            [placeholder]="getPhonePlaceholder()" 
+                                                            (input)="formatPhoneNumber($event)"
+                                                            maxlength="15">
+                                                    </div>
+                                                    <small class="form-text text-muted">
+                                                        Format: {{ selectedCountryCode }} {{ getPhonePlaceholder() }}
+                                                    </small>
+                                                    <div *ngIf="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched" class="text-danger">
+                                                        Numéro de téléphone requis
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Shipping zone selection - Only for Côte d'Ivoire -->
+                                    <div class="mt-4" *ngIf="isCoteIvoireSelected()">
+                                        <h5 class="fs-15 mb-3">Informations sur votre zone</h5>
+
+                                        <!-- Loading state -->
+                                        <div *ngIf="isLoadingDeliveryPrices" class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Chargement...</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Delivery zones from database -->
+                                        <div class="row g-4" *ngIf="!isLoadingDeliveryPrices">
+                                            <div class="col-lg-4" *ngFor="let zone of availableDeliveryZones; let i = index; trackBy: trackByZoneId">
+                                                <div class="form-check card-radio">
+                                                    <input 
+                                                        [id]="'shippingMethod' + (i + 1)" 
+                                                        name="shippingZone" 
+                                                        type="radio"
+                                                        class="form-check-input" 
+                                                        [value]="zone.zone_code" 
+                                                        formControlName="shippingZone"
+                                                        [class.is-invalid]="checkoutForm.get('shippingZone')?.invalid && checkoutForm.get('shippingZone')?.touched"
+                                                        (change)="updateShippingCost(zone.zone_code)">
+                                                    <label class="form-check-label" [for]="'shippingMethod' + (i + 1)">
+                                                        <div class="row">
+                                                            <span class="fs-16 mb-1 text-wrap d-block">{{ zone.label }}</span>
+                                                            <span class="fs-20 float-end mt-2 text-wrap d-block fw-bold">
+                                                                {{ zone.price | currencyConverter:zone.currency }}
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <!-- Zone descriptions (hardcoded for now, can be moved to DB later) -->
+                                                        <span class="text-muted mt-2 fw-normal text-wrap d-block" *ngIf="zone.zone_code === 'abidjan_nord'">
+                                                            Adjame, Abobo, Attecoube, Cocody, Plateau
+                                                        </span>
+                                                        <span class="text-muted mt-2 fw-normal text-wrap d-block" *ngIf="zone.zone_code === 'abidjan_sud'">
+                                                            Zone 4, Biétry, Marcory résidentiel, Port Bouet, Treichville, Yopougon
+                                                        </span>
+                                                        <span class="text-muted mt-2 fw-normal text-wrap d-block" *ngIf="zone.zone_code === 'hors_zone'">
+                                                            Anyama, Songon, Bassam
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Validation error for delivery zone -->
+                                        <div class="invalid-feedback d-block" *ngIf="checkoutForm.get('shippingZone')?.invalid && checkoutForm.get('shippingZone')?.touched">
+                                            Veuillez sélectionner une zone de livraison.
+                                        </div>
+                                    </div>
+
+                                    <!-- Address - France: Autocomplete -->
+                                    <div class="mb-3 mt-3" *ngIf="isFranceSelected()">
+                                        <label for="billinginfo-address" class="form-label">
+                                            Adresse <span class="text-danger">*</span>
+                                            <small class="text-muted">(Île-de-France uniquement)</small>
+                                        </label>
+                                        
+                                        <div class="position-relative">
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                id="billinginfo-address"
+                                                placeholder="12 rue de Rivoli Paris (min. 4 caractères)" 
+                                                formControlName="address"
+                                                (input)="onAddressInput($event)"
+                                                autocomplete="off"
+                                            >
+                                            
+                                            <div *ngIf="isLoadingAddress" class="position-absolute top-50 end-0 translate-middle-y me-3">
+                                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                            </div>
+                                            
+                                            <div class="list-group position-absolute w-100" style="z-index: 1000; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" *ngIf="showSuggestions">
+                                                <button 
+                                                    type="button"
+                                                    class="list-group-item list-group-item-action text-start"
+                                                    *ngFor="let s of addressSuggestions"
+                                                    (click)="onSelectAddress(s)"
+                                                >
+                                                    <i class="ri-map-pin-line me-2"></i>{{ s.properties.label }}
+                                                </button>
+                                                
+                                                <div class="list-group-item" *ngIf="addressSuggestions.length === 0">
+                                                    <i class="ri-information-line me-2 text-info"></i>
+                                                    <span class="text-muted">Aucune adresse Île-de-France trouvée (dép. 75, 77, 78, 91, 92, 93, 94, 95)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="text-danger mt-1" *ngIf="addressError">
+                                            <i class="ri-error-warning-line"></i> {{ addressError }}
+                                        </div>
+                                        
+                                        <div *ngIf="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched" class="text-danger mt-1">
+                                            Adresse requise
+                                        </div>
+                                        
+                                        <input type="hidden" formControlName="street">
+                                        <input type="hidden" formControlName="city">
+                                        <input type="hidden" formControlName="postcode">
+                                        <input type="hidden" formControlName="latitude">
+                                        <input type="hidden" formControlName="longitude">
+                                    </div>
+                                    
+                                    <!-- Address - Other countries -->
+                                    <div class="mb-3 mt-3" *ngIf="!isFranceSelected()">
+                                        <label for="billinginfo-address" class="form-label">Adresse</label>
+                                        <textarea class="form-control" id="billinginfo-address"
+                                            placeholder="Entrez votre adresse" rows="3" formControlName="address"></textarea>
+                                        <div *ngIf="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched" class="text-danger">
+                                            Adresse requise
+                                        </div>
+                                    </div>
+
+                                    <!-- Express Delivery Option -->
+                                    <div class="mt-4" *ngIf="isFranceSelected() || isCoteIvoireSelected()">
+                                        <h5 class="fs-15 mb-2">Livraison express</h5>
+                                        <div class="express-delivery-card">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="expressDeliveryToggle"
+                                                       formControlName="expressDelivery">
+                                                <label class="form-check-label fw-semibold" for="expressDeliveryToggle">
+                                                    Ajouter l'option express (+{{ getExpressFeeBaseAmount() | currencyConverter:getExpressFeeCurrency() }})
+                                                </label>
+                                            </div>
+                                            <p class="express-note text-muted mb-0">
+                                                {{ isFranceSelected() 
+                                                    ? 'Livraison assurée en 24h ouvrées partout en Île-de-France.' 
+                                                    : 'Livraison en 24h dans Abidjan et sa périphérie.' }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <h5 class="fs-15 mb-3">Méthode de paiement</h5>
+
+                                        <!-- France: Credit Card Payment -->
+                                        <div *ngIf="isFranceSelected()">
+                                            <div class="form-check card-radio">
+                                                <input id="paymentMethodCard" name="paymentMethod" type="radio"
+                                                    class="form-check-input" value="stripe" formControlName="paymentMethod" checked>
+                                                <label class="form-check-label" for="paymentMethodCard">
+                                                    <span class="fs-16 text-muted mx-2"><i class="ri-bank-card-line align-bottom"></i></span>
+                                                    <span class="fs-14 text-wrap">Paiement par carte bancaire</span>
+                                                    <div class="mt-1">
+                                                        <small class="text-muted d-block">Visa, Mastercard, CB</small>
+                                                    </div>
+                                                </label>
+                                            </div>
+
+                                            <!-- Credit Card Form -->
+                                            <div class="credit-card-form">
+                                                <h6 class="mb-3">Informations de carte bancaire</h6>
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <label for="cardHolder" class="form-label">Nom sur la carte</label>
+                                                        <input type="text" class="form-control" id="cardHolder"
+                                                            placeholder="Nom tel qu'il apparaît sur la carte" formControlName="cardHolder">
+                                                        <div *ngIf="checkoutForm.get('cardHolder')?.invalid && checkoutForm.get('cardHolder')?.touched" class="text-danger">
+                                                            Nom sur la carte requis
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 mb-3">
+                                                        <label for="cardNumber" class="form-label">Numéro de carte</label>
+                                                        <input type="text" class="form-control" id="cardNumber"
+                                                            placeholder="1234 5678 9012 3456" 
+                                                            formControlName="cardNumber"
+                                                            (input)="formatCardNumber($event)"
+                                                            maxlength="19">
+                                                        <div *ngIf="checkoutForm.get('cardNumber')?.invalid && checkoutForm.get('cardNumber')?.touched" class="text-danger">
+                                                            Numéro de carte valide requis
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6 mb-3">
+                                                        <label for="cardExpiry" class="form-label">Date d'expiration</label>
+                                                        <input type="text" class="form-control" id="cardExpiry"
+                                                            placeholder="MM/AA" 
+                                                            formControlName="cardExpiry"
+                                                            (input)="formatExpiryDate($event)"
+                                                            maxlength="5">
+                                                        <div *ngIf="checkoutForm.get('cardExpiry')?.invalid && checkoutForm.get('cardExpiry')?.touched" class="text-danger">
+                                                            Date d'expiration requise (MM/AA)
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6 mb-3">
+                                                        <label for="cardCvv" class="form-label">CVV</label>
+                                                        <input type="text" class="form-control" id="cardCvv"
+                                                            placeholder="123" 
+                                                            formControlName="cardCvv"
+                                                            (input)="formatCvv($event)"
+                                                            maxlength="4">
+                                                        <div *ngIf="checkoutForm.get('cardCvv')?.invalid && checkoutForm.get('cardCvv')?.touched" class="text-danger">
+                                                            CVV requis
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Côte d'Ivoire: Mobile Money Payment -->
+                                        <div *ngIf="isCoteIvoireSelected()">
+                                            <div class="row g-4">
+                                                <div class="col-lg-12 col-sm-12">
+                                                    <div>
+                                                        <div class="form-check card-radio">
+                                                            <input id="paymentMethod01" name="paymentMethod" type="radio"
+                                                                class="form-check-input" value="paystack" formControlName="paymentMethod" checked>
+                                                            <label class="form-check-label" for="paymentMethod01">
+                                                                <span class="fs-16 text-muted mx-2"><i
+                                                                        class="ri-bank-card-line align-bottom"></i></span>
+                                                                <span class="fs-14 text-wrap">Paiement en ligne sécurisé</span>
+                                                                <div class="mt-1">
+                                                                    <small class="text-muted d-block">Paiement via Paystack (Mobile Money, Carte bancaire, Virement bancaire)</small>
+                                                                </div>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-start gap-3 mt-3">
+                                        <button type="submit" class="btn btn-label right ms-auto" style="background-color: #B5190C; color: white">
+                                            <i class="ri-bank-card-line label-icon align-middle fs-16 ms-2"></i>Continuer vers le paiement</button>
+                                    </div>
+                                </form>
+
+                            </ng-template>
+                        </li>
+                        <li [ngbNavItem]="4" class="nav-item" [disabled]="true">
+                            <a ngbNavLink class="nav-link fs-15 p-3" data-bs-toggle="tab" role="tab">
+                                <i
+                                    class="ri-checkbox-circle-line fs-16 p-2 bg-primary-subtle text-primary rounded-circle align-middle mx-2"></i>Finalisation
+                            </a>
+                            <ng-template ngbNavContent>
+                                <div class="text-center py-5">
+
+                                    <div class="mb-4">
+                                        <lord-icon src="https://cdn.lordicon.com/lupuorrc.json" trigger="loop"
+                                            colors="primary:#0ab39c,secondary:#405189" style="width:120px;height:120px">
+                                        </lord-icon>
+                                    </div>
+                                    <h5>Merci ! Commande passée !</h5>
+                                    <p class="text-muted">Vous recevrez une facture par mail ainsi que les informations de votre livreur</p>
+
+                                    <h3 class="fw-semibold">Numéro de commande: <a routerLink="/ecommerce/order-details"
+                                            class="text-decoration-underline">{{ string_decoder }}</a></h3>
+                                </div>
+                            </ng-template>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div [ngbNavOutlet]="customNav"></div>
+                </div>
+
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+
+    <div class="col-xl-4 order-1 order-xl-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-0">Résumé de votre commande</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive table-card">
+                    <table class="table table-borderless align-middle mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th style="width: 90px;" scope="col">Article</th>
+                                <th scope="col">Détails</th>
+                                <th scope="col" class="text-end">Prix</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Articles du panier -->
+                            <tr *ngFor="let item of cartItems">
+                                <td>
+                                    <div class="avatar-md bg-light rounded p-1">
+                                        <img [src]="getCartImageUrl(item?.imageUrl) || 'assets/images/products/placeholder.jpg'" alt="" 
+                                             class="img-fluid d-block" 
+                                             style="width: 100%; height: 100%; object-fit: contain;"
+                                             loading="lazy"
+                                             decoding="async">
+                                    </div>
+                                </td>
+                                <td>
+                                    <h5 class="fs-14"><a [routerLink]="['/landing/product-details', item.productId]"
+                                            class="text-body">{{ item.name }}</a>
+                                    </h5>
+                                    <p class="text-muted mb-0">{{ item.price | currencyConverter }} x {{ item.quantity }}</p>
+                                    <p class="text-muted mb-0 small">{{ item.color }} / {{ item.size }}</p>
+                                </td>
+                                <td class="text-end">{{ item.price * item.quantity | currencyConverter }}</td>
+                            </tr>
+                            
+                            <!-- Message si le panier est vide -->
+                            <tr *ngIf="cartItems.length === 0">
+                                <td colspan="3" class="text-center py-3">
+                                    <div class="avatar-md mx-auto">
+                                        <div class="avatar-title bg-info-subtle text-info fs-24 rounded-circle">
+                                            <i class='bx bx-cart' style="color: black"></i>
+                                        </div>
+                                    </div>
+                                    <p class="mt-2">Votre panier est vide</p>
+                                    <a routerLink="/landing/tshirts-men" class="btn btn-sm btn-success">Acheter maintenant</a>
+                                </td>
+                            </tr>
+                            
+                            <!-- Totaux -->
+                            <tr *ngIf="cartItems.length > 0">
+                                <td class="fw-semibold" colspan="2">Sous-total :</td>
+                                <td class="fw-semibold text-end">{{ getDisplaySubtotal() | currencyConverter:getSubtotalCurrency() }}</td>
+                            </tr>
+                            <tr *ngIf="cartItems.length > 0" [ngClass]="{'d-none': isFranceSelected()}">
+                                <td colspan="2">Frais de livraison :</td>
+                                <td class="text-end">{{ shippingCost | currencyConverter:shippingCurrency }}</td>
+                            </tr>
+                            <tr *ngIf="cartItems.length > 0 && isExpressDeliverySelected()">
+                                <td colspan="2">Option express :</td>
+                                <td class="text-end">{{ expressDeliveryFee | currencyConverter:expressDeliveryCurrency }}</td>
+                            </tr>
+                            <tr class="table-active" *ngIf="cartItems.length > 0">
+                                <th colspan="2">Total :</th>
+                                <td class="text-end">
+                                    <span class="fw-semibold">
+                                        {{ getFinalTotal() | currencyConverter:getSubtotalCurrency() }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+</div>
+
+<app-footer></app-footer>
+
+<!--start back-to-top-->
+<button (click)="topFunction()" class="btn btn-danger btn-icon landing-back-top" id="back-to-top">
+    <i class="ri-arrow-up-line"></i>
+</button>

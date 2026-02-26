@@ -1,0 +1,49 @@
+<!-- Begin page -->
+<div class="layout-wrapper landing">
+    <app-topbar-landing></app-topbar-landing>
+    <!-- end navbar -->
+
+    <div class="landing-page">
+
+        <!-- Main Content -->
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <!-- woman Section -->
+                <div class="col-md-6 woman-section" [ngStyle]="womenBackgroundStyle">
+                    <div class="section-content">
+                        <h1 class="display-4 fw-bold">Femme</h1>
+                        <p class="lead">Arrive bientôt</p>
+<!--                        <a routerLink="/pages/maintenance" class="btn btn-light btn-lg rounded-pill">Foncer</a>-->
+                    </div>
+                </div>
+
+                <!-- man Section -->
+                <div
+                        class="col-md-6 man-section"
+                        [ngStyle]="menBackgroundStyle"
+                        routerLink="/wear-men"
+                        role="link"
+                        tabindex="0"
+                >
+                    <div class="section-content">
+                        <h1 class="display-4 fw-bold">Homme</h1>
+                        <p class="lead">L'élégance simplement</p>
+
+                        <a routerLink="/wear-men" class="btn btn-light btn-lg rounded-pill" (click)="$event.stopPropagation()">
+                            Aller
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <app-footer></app-footer>
+
+    <!--start back-to-top-->
+    <button (click)="topFunction()" class="btn btn-danger btn-icon landing-back-top" id="back-to-top">
+        <i class="ri-arrow-up-line"></i>
+    </button>
+    <!--end back-to-top-->
+</div>

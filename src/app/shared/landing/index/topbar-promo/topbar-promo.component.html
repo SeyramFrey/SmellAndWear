@@ -1,0 +1,30 @@
+<div class="topbar-promo-container" 
+     [ngStyle]="getBackgroundStyle()"
+     [ngClass]="getAnimationClass()">
+  <div class="promo-content" [ngStyle]="getTextStyle()">
+    <!-- Message -->
+    <div class="promo-message" [class.marquee]="promotion.animation === 'marquee'">
+      <span class="promo-title" [ngStyle]="getAccentStyle()">{{ promotion.title }}</span>
+      <span class="promo-text">{{ promotion.message }}</span>
+      
+      <!-- Call to action link -->
+      <a *ngIf="promotion.url" 
+         [routerLink]="promotion.url" 
+         class="promo-link"
+         [ngStyle]="getAccentStyle()">
+        En savoir plus <i class="ri-arrow-right-line"></i>
+      </a>
+    </div>
+
+    <!-- Dismiss button -->
+    <button *ngIf="promotion.is_dismissible" 
+            type="button" 
+            class="promo-close"
+            [ngStyle]="getTextStyle()"
+            (click)="dismiss()"
+            aria-label="Fermer">
+      <i class="ri-close-line"></i>
+    </button>
+  </div>
+</div>
+

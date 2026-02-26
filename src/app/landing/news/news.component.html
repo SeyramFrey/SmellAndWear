@@ -1,0 +1,60 @@
+<app-topbar-landing></app-topbar-landing>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">NEW ARRIVALS</h1>
+    <p class="hero-subtitle">Discover our latest collection</p>
+  </div>
+  <div class="hero-overlay"></div>
+  <img src="assets/images/hero/new-products.jpg" alt="New Products" class="hero-image" onerror="this.src='assets/images/hero/default-hero.jpg'">
+</section>
+
+<!-- Filter Section -->
+<div class="filter-section">
+  <div class="container-fluid">
+    <div class="filter-bar">
+      <div class="category-info">
+        <h1 class="category-title">Nouveautés</h1>
+        <p class="product-count">{{ products.length }} produit{{ products.length > 1 ? 's' : '' }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Products Section -->
+<section class="products-section">
+  <div class="container-fluid px-3 px-md-4 px-lg-5">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center p-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3">Loading new products...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && products.length === 0" class="text-center p-5">
+      <p>No new products available at the moment</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loading && !error && products.length > 0" class="row g-3 g-md-4 mt-2">
+      <div class="col-6 col-sm-6 col-lg-4 col-xl-3" *ngFor="let product of products; trackBy: trackByProduct">
+        <app-product-card [produit]="product"></app-product-card>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>
+
+<!-- Back to top button -->
+<button (click)="topFunction()" class="btn btn-danger btn-icon landing-back-top" id="back-to-top">
+  <i class="ri-arrow-up-line"></i>
+</button>

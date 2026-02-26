@@ -1,0 +1,64 @@
+<!-- Begin page -->
+<div class="layout-wrapper landing">
+    <!-- Promo Container - MUST BE FIRST to avoid overlap -->
+    <app-promo-container></app-promo-container>
+    
+    <!-- Topbar - Will be pushed down by promo if active -->
+    <app-topbar-landing></app-topbar-landing>
+    <!-- end navbar -->
+
+
+    <!--
+    <app-client-logo></app-client-logo>
+    <app-services></app-services>
+    <app-collection></app-collection>
+    <app-cta></app-cta>
+    <app-designed></app-designed>
+    <app-plan></app-plan>
+    <app-faqs></app-faqs>
+    <app-review></app-review>
+    <app-counter></app-counter>
+    <app-work-process></app-work-process>
+    <app-contact></app-contact>
+    <app-cta></app-cta>
+    <app-footer></app-footer>
+
+     -->
+
+    <div class="landing-page">
+
+        <!-- Main Content -->
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+
+                <!-- Wear Section -->
+                <div class="col-md-12 wear-section" routerLink="/wear" [ngStyle]="wearBackgroundStyle">
+                    <div class="section-content">
+                        <h1 class="display-4 fw-bold">WEAR</h1>
+                        <p class="lead">Explorez notre collection de vêtements premium</p>
+                        <a routerLink="/wear" class="btn btn-light btn-lg rounded-pill">Découvrir</a>
+                    </div>
+                </div>
+
+               <!--  Smell Section
+                <div class="col-md-6 smell-section" [ngStyle]="smellBackgroundStyle">
+                    <div class="section-content">
+                        <h1 class="display-4 fw-bold">SMELL</h1>
+                        <p class="lead">Découvrez notre collection de parfums exclusifs</p>
+                        <a routerLink="/pages/maintenance" class="btn btn-light btn-lg rounded-pill">Explorer</a>
+                    </div>
+                </div>
+-->
+
+            </div>
+        </div>
+    </div>
+
+    <app-footer></app-footer>
+
+    <!--start back-to-top-->
+    <button (click)="topFunction()" class="btn btn-danger btn-icon landing-back-top" id="back-to-top">
+        <i class="ri-arrow-up-line"></i>
+    </button>
+    <!--end back-to-top-->
+</div>

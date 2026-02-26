@@ -1,0 +1,279 @@
+<!-- Start Breadcrumbs -->
+<app-breadcrumbs title="Categories" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<!-- End Breadcrumbs -->
+
+
+<div class="card">
+    <div class="card-header border-0 rounded">
+        <div class="row g-2">
+            <div class="col-xl-3">
+                <div class="search-box">
+                    <input type="text" class="form-control search" placeholder="Search for categories & owner name or something..." [(ngModel)]="searchTerm" (ngModelChange)="performSearch()">
+                    <i class="ri-search-line search-icon"></i>
+                </div>
+            </div>
+            <!--end col-->
+            <div class="col-xl-3 ms-auto">
+                <div>
+                    <select class="form-control" data-choices data-choices-search-false [(ngModel)]="category" (ngModelChange)="categoryFilter()">
+                        <option value="">Choisir une Categorie</option>
+                        <option value="All">Toutes</option>
+                        @for(categoryName of getUniqueCategories(); track categoryName) {
+                            <option [value]="categoryName">{{categoryName}}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <!--end col-->
+            <div class="col-lg-auto">
+                <div class="hstack gap-2">
+                    <button type="button" class="btn btn-danger"><i class="ri-equalizer-fill me-1 align-bottom"></i>
+                        Filters</button>
+                    <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#addCategorie" (click)="openModal(content)"><i class="ri-add-fill me-1 align-bottom"></i>Ajouter une Categorie</button>
+                </div>
+            </div>
+            <!--end col-->
+        </div>
+        <!--end row-->
+    </div>
+</div>
+
+<!-- Error Message -->
+@if (error) {
+    <div class="alert alert-danger" role="alert">
+        <i class="ri-error-warning-line me-2"></i>
+        {{ error }}
+        <button type="button" class="btn btn-sm btn-outline-danger ms-3" (click)="fetchData()">
+            <i class="ri-refresh-line me-1"></i>Réessayer
+        </button>
+    </div>
+}
+
+<!-- Loading State -->
+@if (loading && !error) {
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Chargement des catégories...</p>
+        </div>
+    </div>
+} @else if (!loading && categories.length === 0 && !error) {
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="py-5">
+                <i class="ri-folder-open-line display-1 text-muted"></i>
+                <h5 class="mt-3">Aucune catégorie trouvée</h5>
+                <p class="text-muted">Aucune catégorie ne correspond à vos critères de recherche.</p>
+            </div>
+        </div>
+    </div>
+} @else {
+    <div class="row mt-4">
+        @for(data of categories;track data.id;){
+        <div class="col-xl-4 col-lg-6">
+        <div class="card ribbon-box right overflow-hidden">
+            <div class="card-body text-center p-4">
+                <!-- <img src="assets/images/companies/img-1.png" alt="" height="45"> -->
+                <img [src]="getCategoryImageUrl(data.image)" [alt]="data.nom" height="245">
+                <h5 class="mb-1 mt-4">
+                    <a href="javascript:void(0);" class="link-primary" (click)="navigateToSubcategories(data.id)">
+                        {{data.nom}}
+                    </a>
+                </h5>
+                <div class="mt-4">
+                    <div class="d-flex flex-column gap-2">
+                        <button type="button" 
+                                class="btn btn-primary" 
+                                (click)="navigateToSubcategories(data.id)">
+                            <i class="ri-folder-open-line me-1"></i>VOIR LES SOUS-CATÉGORIES
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" 
+                                    class="btn btn-outline-secondary flex-fill"
+                                    (click)="editCategory(data)"
+                                    [attr.aria-label]="'Modifier ' + data.nom">
+                                <i class="ri-edit-line me-1"></i>Modifier
+                            </button>
+                            <button type="button" 
+                                    class="btn btn-outline-danger flex-fill"
+                                    (click)="deleteCategory(data)"
+                                    [attr.aria-label]="'Supprimer ' + data.nom">
+                                <i class="ri-delete-bin-line me-1"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+    <!--end col-->
+
+    </div>
+    <!--end row-->
+}
+<div class="px-3 ">
+    <div class="row justify-content-md-between align-items-md-center g-0 pagination">
+        <div class="col-sm-12 col-md-5">
+            <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                Showing
+                {{service.startIndex}} to
+                {{service.endIndex}} of {{sellerList.length}}
+                entries
+            </div>
+        </div>
+        <!-- Pagination -->
+        <div class="col-sm-12 col-md-5">
+            <div class="text-md-right float-md-end pagination-rounded gridjs-pagination mb-3">
+                <ngb-pagination [collectionSize]="sellerList.length" [(page)]="service.page" [pageSize]="service.pageSize" (pageChange)="changePage()">
+                </ngb-pagination>
+            </div>
+        </div>
+        <!-- End Pagination -->
+    </div>
+    <div id="elmLoader">
+        <div class="spinner-border text-primary avatar-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<ng-template #content role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="addCategorieLabel">
+            <i class="ri-folder-{{ isEditMode ? 'edit' : 'add' }}-line me-2"></i>
+            {{ isEditMode ? 'Modifier la catégorie' : 'Ajouter une catégorie' }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    
+    <div class="modal-body">
+        <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="row">
+                <!-- Category Name -->
+                <div class="col-12">
+                    <div class="mb-4">
+                        <label for="categoryName" class="form-label">
+                            <i class="ri-text me-1"></i>Nom de la Catégorie <span class="text-danger">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="categoryName"
+                            class="form-control" 
+                            formControlName="nom"
+                            placeholder="Entrez le nom de la catégorie (ex: T-shirts, Pantalons...)"
+                            [class.is-invalid]="submitted && f['nom'].errors"
+                            [class.is-valid]="submitted && !f['nom'].errors"
+                        >
+                        <div class="invalid-feedback" *ngIf="submitted && f['nom'].errors">
+                            <div *ngIf="f['nom'].errors?.['required']">Le nom de la catégorie est obligatoire.</div>
+                            <div *ngIf="f['nom'].errors?.['minlength']">Le nom doit contenir au moins 2 caractères.</div>
+                            <div *ngIf="f['nom'].errors?.['maxlength']">Le nom ne peut pas dépasser 100 caractères.</div>
+                        </div>
+                        <div class="form-text">
+                            <i class="ri-information-line me-1"></i>
+                            Choisissez un nom descriptif et unique pour votre catégorie
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Type -->
+                <div class="col-12">
+                    <div class="mb-4">
+                        <label for="categoryType" class="form-label">
+                            <i class="ri-folder-line me-1"></i>Type de Catégorie
+                        </label>
+                        <select 
+                            id="categoryType"
+                            class="form-select" 
+                            formControlName="parent_id"
+                        >
+                            <option [value]="null">Catégorie Principale</option>
+                            <option *ngFor="let cat of sellerList" [value]="cat.id">
+                                Sous-catégorie de {{ cat.nom }}
+                            </option>
+                        </select>
+                        <div class="form-text">
+                            <i class="ri-information-line me-1"></i>
+                            Laissez vide pour créer une catégorie principale, ou sélectionnez une catégorie parent pour créer une sous-catégorie
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="col-12">
+                    <div class="mb-4">
+                        <label for="categoryImage" class="form-label">
+                            <i class="ri-image-line me-1"></i>Image de la Catégorie
+                        </label>
+                        
+                        <!-- Image Preview -->
+                        <div class="image-upload-container" *ngIf="!imagePreview">
+                            <div class="upload-placeholder" (click)="fileInput.click()">
+                                <i class="ri-upload-cloud-2-line upload-icon"></i>
+                                <p class="upload-text">Cliquez pour télécharger une image</p>
+                                <p class="upload-hint">PNG, JPG, GIF jusqu'à 5MB</p>
+                            </div>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="image-preview-container" *ngIf="imagePreview">
+                            <div class="image-preview">
+                                <img [src]="imagePreview" alt="Aperçu de l'image" class="preview-img">
+                                <div class="image-overlay">
+                                    <button type="button" class="btn btn-light btn-sm me-2" (click)="fileInput.click()">
+                                        <i class="ri-edit-line me-1"></i>Modifier
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" (click)="removeImage()">
+                                        <i class="ri-delete-bin-line me-1"></i>Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input 
+                            #fileInput
+                            type="file" 
+                            id="categoryImage"
+                            class="form-control d-none" 
+                            accept="image/*"
+                            (change)="onFileSelected($event)"
+                        >
+                        
+                        <div class="form-text">
+                            <i class="ri-information-line me-1"></i>
+                            Recommandé: Image carrée de 400x400px minimum pour un meilleur rendu
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="modal-footer">
+        <button 
+            type="button" 
+            class="btn btn-light" 
+            data-bs-dismiss="modal" 
+            (click)="modal.dismiss('Cross click')"
+            [disabled]="saving"
+        >
+            <i class="ri-close-line me-1"></i>Annuler
+        </button>
+        <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="onSubmit()"
+            [disabled]="saving"
+        >
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i class="ri-save-3-line me-1" *ngIf="!saving"></i>
+            {{ saving ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Enregistrer') }}
+        </button>
+    </div>
+</ng-template>
+<!--end modal-->

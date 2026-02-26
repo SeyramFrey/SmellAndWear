@@ -1,0 +1,335 @@
+<div class="container-fluid">
+  <!-- Page Title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+        <h4 class="mb-sm-0">Gestion des Tarifs de Livraison</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item"><a href="javascript: void(0);">E-commerce</a></li>
+            <li class="breadcrumb-item active">Tarifs de Livraison</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">
+            <i [class]="isEditing ? 'ri-pencil-line' : 'ri-add-line'"></i>
+            {{ isEditing ? 'Modifier le Tarif' : 'Ajouter un Nouveau Tarif' }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="priceForm" (ngSubmit)="onSubmit()">
+            <div class="row g-3">
+              <!-- Country Code -->
+              <div class="col-md-2">
+                <label class="form-label">Code Pays <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [class.is-invalid]="isFieldInvalid('country_code')"
+                  formControlName="country_code" 
+                  placeholder="CI" 
+                  maxlength="2"
+                  style="text-transform: uppercase;">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('country_code')">
+                  {{ getFieldError('country_code') }}
+                </div>
+                <small class="text-muted">ISO 3166-1 alpha-2</small>
+              </div>
+
+              <!-- Zone Code -->
+              <div class="col-md-3">
+                <label class="form-label">Code Zone <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [class.is-invalid]="isFieldInvalid('zone_code')"
+                  formControlName="zone_code" 
+                  placeholder="abidjan_nord">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('zone_code')">
+                  {{ getFieldError('zone_code') }}
+                </div>
+                <small class="text-muted">Identifiant unique</small>
+              </div>
+
+              <!-- Label -->
+              <div class="col-md-4">
+                <label class="form-label">Libellé <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [class.is-invalid]="isFieldInvalid('label')"
+                  formControlName="label" 
+                  placeholder="Abidjan Nord">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('label')">
+                  {{ getFieldError('label') }}
+                </div>
+                <small class="text-muted">Nom affiché aux clients</small>
+              </div>
+
+              <!-- Price -->
+              <div class="col-md-2">
+                <label class="form-label">Prix <span class="text-danger">*</span></label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  [class.is-invalid]="isFieldInvalid('price')"
+                  formControlName="price" 
+                  min="0" 
+                  step="0.01">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('price')">
+                  {{ getFieldError('price') }}
+                </div>
+              </div>
+
+              <!-- Currency -->
+              <div class="col-md-1">
+                <label class="form-label">Devise</label>
+                <select class="form-select" formControlName="currency">
+                  <option value="XOF">XOF</option>
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+
+              <!-- Display Order -->
+              <div class="col-md-2">
+                <label class="form-label">Ordre d'affichage</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  formControlName="display_order" 
+                  min="0">
+                <small class="text-muted">0 = premier</small>
+              </div>
+
+              <!-- Express Checkbox -->
+              <div class="col-md-3">
+                <label class="form-label d-block">&nbsp;</label>
+                <div class="form-check form-switch form-switch-md">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="expressCheck"
+                    formControlName="is_express">
+                  <label class="form-check-label" for="expressCheck">
+                    <i class="ri-flashlight-line text-warning"></i> Livraison Express
+                  </label>
+                </div>
+              </div>
+
+              <!-- Active Checkbox -->
+              <div class="col-md-3">
+                <label class="form-label d-block">&nbsp;</label>
+                <div class="form-check form-switch form-switch-md">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="activeCheck"
+                    formControlName="is_active">
+                  <label class="form-check-label" for="activeCheck">
+                    <i class="ri-checkbox-circle-line text-success"></i> Actif
+                  </label>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="col-12">
+                <button 
+                  type="submit" 
+                  class="btn btn-success"
+                  [disabled]="priceForm.invalid || loading">
+                  <i [class]="isEditing ? 'ri-save-line' : 'ri-add-line'"></i>
+                  {{ isEditing ? 'Mettre à Jour' : 'Créer le Tarif' }}
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-secondary ms-2" 
+                  (click)="resetForm()" 
+                  *ngIf="isEditing">
+                  <i class="ri-close-line"></i> Annuler
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters & Stats -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="filterCountry" (change)="applyFilters()">
+        <option value="all">Tous les pays</option>
+        <option value="CI">🇨🇮 Côte d'Ivoire</option>
+        <option value="FR">🇫🇷 France</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="filterActive" (change)="applyFilters()">
+        <option value="all">Tous les statuts</option>
+        <option value="active">✓ Actifs uniquement</option>
+        <option value="inactive">✗ Inactifs uniquement</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="filterExpress" (change)="applyFilters()">
+        <option value="all">Tous les types</option>
+        <option value="standard">Standard</option>
+        <option value="express">Express</option>
+      </select>
+    </div>
+    <div class="col-md-3 text-end">
+      <div class="alert alert-info mb-0 py-2">
+        <i class="ri-information-line"></i>
+        <strong>{{ filteredPrices.length }}</strong> tarif(s)
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ri-price-tag-3-line"></i> Liste des Tarifs
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Loading State -->
+          <div class="text-center py-5" *ngIf="loading">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-3 text-muted">Chargement des tarifs...</p>
+          </div>
+
+          <!-- Table -->
+          <div class="table-responsive" *ngIf="!loading && filteredPrices.length > 0">
+            <table class="table table-hover table-nowrap align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Pays</th>
+                  <th scope="col">Zone</th>
+                  <th scope="col">Libellé</th>
+                  <th scope="col">Prix</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Statut</th>
+                  <th scope="col">Ordre</th>
+                  <th scope="col" class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let price of filteredPrices; trackBy: trackByPriceId">
+                  <!-- Country -->
+                  <td>
+                    <span class="badge bg-primary-subtle text-primary fs-12">
+                      {{ price.country_code }}
+                    </span>
+                  </td>
+
+                  <!-- Zone Code -->
+                  <td>
+                    <code class="text-dark">{{ price.zone_code }}</code>
+                  </td>
+
+                  <!-- Label -->
+                  <td>
+                    <strong>{{ price.label }}</strong>
+                  </td>
+
+                  <!-- Price -->
+                  <td>
+                    <span class="fw-semibold text-success fs-15">
+                      {{ price.price | number:'1.0-2' }} {{ price.currency }}
+                    </span>
+                  </td>
+
+                  <!-- Type -->
+                  <td>
+                    <span 
+                      class="badge" 
+                      [class.bg-warning-subtle]="price.is_express" 
+                      [class.text-warning]="price.is_express"
+                      [class.bg-info-subtle]="!price.is_express"
+                      [class.text-info]="!price.is_express">
+                      <i [class]="price.is_express ? 'ri-flashlight-fill' : 'ri-truck-line'"></i>
+                      {{ price.is_express ? 'Express' : 'Standard' }}
+                    </span>
+                  </td>
+
+                  <!-- Status -->
+                  <td>
+                    <span 
+                      class="badge" 
+                      [class.bg-success-subtle]="price.is_active" 
+                      [class.text-success]="price.is_active"
+                      [class.bg-secondary-subtle]="!price.is_active"
+                      [class.text-secondary]="!price.is_active">
+                      <i [class]="price.is_active ? 'ri-checkbox-circle-line' : 'ri-close-circle-line'"></i>
+                      {{ price.is_active ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+
+                  <!-- Display Order -->
+                  <td>
+                    <span class="badge bg-light text-dark">{{ price.display_order }}</span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="text-end">
+                    <div class="hstack gap-2 justify-content-end">
+                      <!-- Edit Button -->
+                      <button 
+                        class="btn btn-sm btn-soft-primary" 
+                        (click)="editPrice(price)"
+                        title="Modifier">
+                        <i class="ri-pencil-line"></i>
+                      </button>
+
+                      <!-- Toggle Status Button -->
+                      <button 
+                        class="btn btn-sm" 
+                        [class.btn-soft-danger]="price.is_active"
+                        [class.btn-soft-success]="!price.is_active"
+                        (click)="toggleStatus(price)"
+                        [title]="price.is_active ? 'Désactiver' : 'Activer'">
+                        <i [class]="price.is_active ? 'ri-eye-off-line' : 'ri-eye-line'"></i>
+                      </button>
+
+                      <!-- Delete Button -->
+                      <button 
+                        class="btn btn-sm btn-soft-danger" 
+                        (click)="deletePrice(price)"
+                        title="Supprimer définitivement">
+                        <i class="ri-delete-bin-line"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div class="text-center py-5" *ngIf="!loading && filteredPrices.length === 0">
+            <div class="mb-3">
+              <i class="ri-inbox-line display-4 text-muted"></i>
+            </div>
+            <h5 class="text-muted">Aucun tarif trouvé</h5>
+            <p class="text-muted">Ajoutez votre premier tarif de livraison ci-dessus.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

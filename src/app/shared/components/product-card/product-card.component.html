@@ -1,0 +1,90 @@
+<div class="product-card" (click)="navigateToProductDetail()">
+  <div class="product-card__image-container">
+    <img
+      [src]="currentImage"
+      [attr.srcset]="getCurrentSrcSet()"
+      sizes="(max-width: 768px) 100vw, 400px"
+      [alt]="getProductName()"
+      class="product-card__image"
+      loading="lazy"
+      decoding="async"
+      (mouseenter)="showBackImage()"
+      (mouseleave)="showFrontImage()"
+    >
+
+    <!-- Discount Badge -->
+    <div class="product-card__discount-badge" *ngIf="hasActiveDiscount && discountLabel">
+      {{ discountLabel }}
+    </div>
+
+    <!-- Hover indicator for second image -->
+    <div class="product-card__hover-indicator" *ngIf="backImage && !isHovering">
+      <i class="ri-refresh-line"></i>
+    </div>
+  </div>
+
+  <div class="product-card__content">
+
+    <!-- Action Row: Colors on left, Actions on right -->
+    <div class="product-card__action-row">
+      <!-- Color Swatches (Left) -->
+      <div class="product-card__colors" *ngIf="getAvailableColors().length > 0">
+        <div class="color-palette">
+          <div
+            *ngFor="let color of getAvailableColors(); let i = index"
+            class="color-swatch"
+            [style.background-color]="color.hex"
+            [title]="color.nom"
+            [class.color-swatch--selected]="selectedColorId === color.id"
+            (click)="onColorSelect(color, $event)"
+            [class.color-swatch--limited]="i >= 4">
+          </div>
+          <span class="color-count" *ngIf="getAvailableColors().length > 4">
+            +{{ getAvailableColors().length - 4 }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions (Right) -->
+      <div class="product-card__actions">
+        <button
+          class="product-card__action product-card__action--favorite"
+          [class.active]="isFavorite"
+          (click)="toggleFavorite($event)"
+        >
+          <i class="ri-heart-fill" *ngIf="isFavorite"></i>
+          <i class="ri-heart-line" *ngIf="!isFavorite"></i>
+        </button>
+
+        <button
+          class="product-card__action product-card__action--cart"
+          (click)="openProductModal($event)"
+        >
+          <i class="ri-shopping-bag-line"></i>
+        </button>
+      </div>
+    </div>
+
+    <h3 class="product-card__title">{{ getProductName() }}</h3>
+
+    <!-- Price Display -->
+    <div class="product-card__price" [class.product-card__price--has-discount]="hasActiveDiscount">
+      <!-- Current/Final Price -->
+      <span
+        class="product-card__price-current"
+        [style.color]="hasActiveDiscount ? priceHighlightColor : '#212529'"
+      >
+        {{ finalPrice | currencyConverter }}
+      </span>
+
+      <!-- Original Price (striked) - Only shown when there's an active discount -->
+      <span
+        class="product-card__price-original"
+        *ngIf="hasActiveDiscount && basePrice > finalPrice"
+      >
+        {{ basePrice | currencyConverter }}
+      </span>
+    </div>
+
+  </div>
+</div>

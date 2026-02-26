@@ -1,0 +1,304 @@
+<app-topbar-landing></app-topbar-landing>
+
+<div class="m-4 p-4" style="color: #ffffff"></div>
+
+
+<div class="product-detail">
+
+  
+  <!-- Product Detail Content -->
+  <div *ngIf="!loading && !error && produit" class="product-detail__content container-fluid">
+    <div class="row g-0">
+      <!-- Left Column - Product Media -->
+      <div class="col-md-6 product-detail__media">
+        <!-- Main Photo Carousel Container -->
+        <div class="photo-slider">
+          <!-- Main Image with Fixed Size -->
+          <div class="photo-slider__main-container">
+            <div class="photo-slider__main-image">
+              <img 
+                [src]="mainPhoto || '/assets/images/products/placeholder.jpg'"
+                [alt]="produit.nom || 'Product image'" 
+                class="main-image"
+                loading="eager"
+                decoding="async"
+                (error)="$any($event.target).src='/assets/images/products/placeholder.jpg'"
+              >
+            </div>
+            
+            <!-- Main Navigation Arrows -->
+            <div class="photo-slider__navigation" *ngIf="getAllProductImages().length > 1">
+              <button 
+                class="nav-arrow nav-arrow--prev" 
+                (click)="previousPhoto()"
+                [attr.aria-label]="'Previous image'"
+              >
+                <i class="ri-arrow-left-s-line"></i>
+              </button>
+              
+              <button 
+                class="nav-arrow nav-arrow--next" 
+                (click)="nextPhoto()"
+                [attr.aria-label]="'Next image'"
+              >
+                <i class="ri-arrow-right-s-line"></i>
+              </button>
+            </div>
+
+            <!-- Photo Counter -->
+            <div class="photo-slider__counter" *ngIf="getAllProductImages().length > 1">
+              {{ selectedPhotoIndex + 1 }} / {{ getAllProductImages().length }}
+            </div>
+          </div>
+          
+          <!-- Thumbnail System -->
+          <div class="photo-slider__thumbnails" *ngIf="getAllProductImages().length > 1">
+            <!-- Desktop/Tablet: Arrows + Fixed 5 Thumbnails -->
+            <div class="thumbnails-desktop" *ngIf="!isMobile">
+              <button 
+                class="thumbnail-arrow thumbnail-arrow--prev" 
+                *ngIf="shouldShowThumbnailNavigation()"
+                [disabled]="!canNavigateThumbnailsLeft()"
+                (click)="previousThumbnails()"
+                [attr.aria-label]="'Previous thumbnails'"
+              >
+                <i class="ri-arrow-left-s-line"></i>
+              </button>
+              
+              <div class="thumbnails-container">
+                <div 
+                  *ngFor="let photo of getVisibleThumbnails(); let i = index" 
+                  class="thumbnail" 
+                  [class.active]="(thumbnailStartIndex + i) === selectedPhotoIndex"
+                  (click)="selectPhotoFromThumbnail(i)"
+                >
+                  <img [src]="photo" [alt]="'Thumbnail ' + (thumbnailStartIndex + i + 1)" loading="lazy" decoding="async">
+                </div>
+              </div>
+              
+              <button 
+                class="thumbnail-arrow thumbnail-arrow--next" 
+                *ngIf="shouldShowThumbnailNavigation()"
+                [disabled]="!canNavigateThumbnailsRight()"
+                (click)="nextThumbnails()"
+                [attr.aria-label]="'Next thumbnails'"
+              >
+                <i class="ri-arrow-right-s-line"></i>
+              </button>
+            </div>
+            
+            <!-- Mobile: Horizontal Scroll -->
+            <div class="thumbnails-mobile" *ngIf="isMobile">
+              <div class="thumbnails-scroll-container">
+                <div 
+                  *ngFor="let photo of getAllProductImages(); let i = index" 
+                  class="thumbnail" 
+                  [class.active]="i === selectedPhotoIndex"
+                  (click)="selectPhoto(i)"
+                >
+                  <img [src]="photo" [alt]="'Thumbnail ' + (i + 1)" loading="lazy" decoding="async">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column - Product Info -->
+      <div class="col-md-6 product-detail__info">
+        <div class="product-info-content">
+          <!-- Product Title -->
+          <h1 class="product-title">{{ produit.nom }}</h1>
+          
+          <!-- Price Section with Promotion Support -->
+          <div class="price-section" [class.price-section--has-discount]="hasActiveDiscount">
+            <!-- Discount Badge -->
+            <span class="discount-badge" *ngIf="hasActiveDiscount && discountLabel">
+              {{ discountLabel }}
+            </span>
+            
+            <!-- Final Price (discounted or normal) -->
+            <span 
+              class="price" 
+              [style.color]="hasActiveDiscount ? priceHighlightColor : '#212529'"
+            >
+              {{ getDisplayPrice() | currencyConverter }}
+            </span>
+            
+            <!-- Original Price (striked) - Only shown when there's an active discount -->
+            <span 
+              class="price-original" 
+              *ngIf="shouldShowOriginalPrice()"
+            >
+              {{ basePrice | currencyConverter }}
+            </span>
+          </div>
+          
+          <!-- Color Selection -->
+          <div class="selection-group" *ngIf="availableColors.length > 0">
+            <label class="selection-label">Color: <span class="selected-value">{{ getSelectedColorName() }}</span></label>
+            <div class="color-options">
+              <div 
+                *ngFor="let color of availableColors" 
+                class="color-swatch"
+                [class.selected]="selectedColor === color.id"
+                [style.background-color]="color.hex"
+                (click)="selectColor(color.id)"
+                [title]="color.nom"
+              ></div>
+            </div>
+          </div>
+          
+          <!-- Size Selection -->
+          <div class="selection-group" *ngIf="availableSizes.length > 0">
+            <div class="size-header">
+              <label class="selection-label">Size: <span class="selected-value">{{ getSelectedSizeName() }}</span></label>
+              <a href="#" class="size-guide-link">Size & Fit</a>
+            </div>
+            <div class="size-options">
+              <button 
+                *ngFor="let size of availableSizes" 
+                class="size-btn" 
+                [class.selected]="selectedSize === size.id"
+                (click)="selectSize(size.id)"
+              >
+                {{ size.libelle }}
+              </button>
+            </div>
+          </div>
+          
+          <!-- Quantity Selector -->
+          <div class="selection-group">
+            <label class="selection-label">Quantité</label>
+            <div class="quantity-selector">
+              <button class="quantity-btn" (click)="decrementQuantity()" [disabled]="quantity <= 1">−</button>
+              <input type="number" 
+                     [(ngModel)]="quantity" 
+                     min="1" 
+                     max="999"
+                     class="quantity-input"
+                     readonly>
+              <button class="quantity-btn" 
+                      (click)="incrementQuantity()">+</button>
+            </div>
+          </div>
+          
+          <!-- Add to Cart Button -->
+          <button 
+            class="add-to-cart-btn" 
+            (click)="addToCart()" 
+            [disabled]="!canAddToCart"
+          >
+            ADD TO CART
+          </button>
+          
+          <!-- Collapsible Details -->
+          <div class="details-accordion">
+            <!-- Details -->
+            <div class="accordion-item" [class.active]="activeAccordion === 'details'">
+              <button class="accordion-header" type="button" (click)="toggleAccordion('details')">
+                <span>DETAILS</span>
+                <i class="chevron-icon" [class.rotated]="activeAccordion === 'details'">›</i>
+              </button>
+              <div class="accordion-content" [class.show]="activeAccordion === 'details'">
+                <div class="accordion-content-inner">
+                  <p *ngIf="produit.description">{{ produit.description }}</p>
+                  <p *ngIf="!produit.description">Aucune description disponible pour ce produit.</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Delivery -->
+            <div class="accordion-item" [class.active]="activeAccordion === 'delivery'">
+              <button class="accordion-header" type="button" (click)="toggleAccordion('delivery')">
+                <span>DELIVERY</span>
+                <i class="chevron-icon" [class.rotated]="activeAccordion === 'delivery'">›</i>
+              </button>
+              <div class="accordion-content" [class.show]="activeAccordion === 'delivery'">
+                <div class="accordion-content-inner">
+                  <!-- Delivery Promotion Banner -->
+                  <div class="delivery-promo-banner" *ngIf="deliveryPromotionMessage">
+                    <i class="ri-gift-line"></i>
+                    <span>{{ deliveryPromotionMessage }}</span>
+                  </div>
+                  
+                  <p>Nous expédions votre commande sous 24 à 48h ouvrées. Les délais de livraison varient selon votre pays et l'option choisie au checkout.</p>
+                  <p>Chaque colis est soigneusement emballé et suivi jusqu'à votre porte. Vous recevrez un email ou SMS contenant votre numéro de suivi dès que votre commande est expédiée.</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Returns -->
+            <div class="accordion-item" [class.active]="activeAccordion === 'returns'">
+              <button class="accordion-header" type="button" (click)="toggleAccordion('returns')">
+                <span>RETURNS</span>
+                <i class="chevron-icon" [class.rotated]="activeAccordion === 'returns'">›</i>
+              </button>
+              <div class="accordion-content" [class.show]="activeAccordion === 'returns'">
+                <div class="accordion-content-inner">
+                  <p>Vous disposez de 14 jours après réception pour retourner un article.</p>
+                  <p>Les produits doivent être renvoyés dans leur état d'origine, non portés, non lavés et avec toutes les étiquettes.</p>
+                  <p>Dès réception et validation de votre retour, un remboursement ou un avoir peut être émis selon votre choix.</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Care Instructions -->
+            <div class="accordion-item" [class.active]="activeAccordion === 'care'">
+              <button class="accordion-header" type="button" (click)="toggleAccordion('care')">
+                <span>CARE INSTRUCTION</span>
+                <i class="chevron-icon" [class.rotated]="activeAccordion === 'care'">›</i>
+              </button>
+              <div class="accordion-content" [class.show]="activeAccordion === 'care'">
+                <div class="accordion-content-inner">
+                  <p><em>Pour préserver la qualité et la longévité de vos pièces, nous recommandons :</em></p>
+                  <ul class="care-list">
+                    <li>Lavage à froid ou à 30°C</li>
+                    <li>Séchage naturel, à plat si possible</li>
+                    <li>Repassage doux sur l'envers</li>
+                    <li>Éviter l'usage prolongé du sèche-linge ou de produits abrasifs</li>
+                  </ul>
+                  <p><em>Chaque matériau est sélectionné pour durer : prenez soin de vos pièces, elles vous accompagneront longtemps.</em></p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Review -->
+            <div class="accordion-item" [class.active]="activeAccordion === 'review'">
+              <button class="accordion-header" type="button" (click)="toggleAccordion('review')">
+                <span>REVIEW</span>
+                <i class="chevron-icon" [class.rotated]="activeAccordion === 'review'">›</i>
+              </button>
+              <div class="accordion-content" [class.show]="activeAccordion === 'review'">
+                <div class="accordion-content-inner">
+                  <p>Votre avis compte. Partagez votre expérience pour aider les autres clients à faire leur choix.</p>
+                  <p>Chaque commentaire est vérifié afin de garantir des retours authentiques et utiles.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Promotional Badges -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Related Products Section -->
+  <section class="related-products container" *ngIf="!loading && !error && relatedProducts.length > 0">
+    <h2 class="section-title">Vous pourriez aussi aimer</h2>
+    <div class="row">
+      <div *ngFor="let product of relatedProducts; trackBy: trackByProductId" class="col-md-3 col-sm-6">
+        <app-product-card [produit]="product"></app-product-card>
+      </div>
+    </div>
+  </section>
+  
+  <app-footer></app-footer>
+  
+  <!-- Back to top button -->
+    <button (click)="topFunction()" class="btn btn-danger btn-icon landing-back-top" id="back-to-top">
+        <i class="ri-arrow-up-line"></i>
+    </button>
+</div>

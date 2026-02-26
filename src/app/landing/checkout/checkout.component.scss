@@ -1,0 +1,334 @@
+// ========================================
+// CHECKOUT PAGE TOPBAR STYLING
+// ========================================
+:host ::ng-deep {
+  // Force topbar navigation links to be visible on checkout page
+  .navbar-landing {
+    // Light mode - black links
+    .nav-links-list {
+      .nav-link-item {
+        .nav-link-custom {
+          color: var(--sw-nav-link-scrolled, #000000) !important;
+          
+          &:hover {
+            color: #B5190C !important;
+          }
+        }
+      }
+    }
+    
+    // Target mega menu trigger
+    .mega-menu-trigger {
+      color: var(--sw-nav-link-scrolled, #000000) !important;
+      
+      &:hover {
+        color: #B5190C !important;
+      }
+    }
+    
+    // Icons should be visible - use theme tokens
+    .topbar-action-btn i {
+      color: var(--sw-topbar-icon-scrolled, #000000) !important;
+    }
+
+    // Favorites and account icons - ensure visibility
+    .header-item {
+      .btn-topbar,
+      .topbar-action-btn {
+        i {
+          color: var(--sw-topbar-icon-scrolled, #000000) !important;
+          transition: color 0.3s ease;
+        }
+      }
+    }
+  }
+  
+  // Mobile-specific icon fixes
+  @media (max-width: 768px) {
+    .navbar-landing {
+      .topbar-action-btn i,
+      .btn-topbar i,
+      .header-item i {
+        color: var(--sw-topbar-icon-mobile, #000000) !important;
+      }
+    }
+  }
+}
+
+.spacer {
+  margin-top: 5rem;
+}
+
+// ========================================
+// RED THEME VARIABLES
+// ========================================
+$checkout-primary: #B5190C;
+$checkout-primary-light: rgba(181, 25, 12, 0.1);
+$checkout-primary-lighter: rgba(181, 25, 12, 0.05);
+$checkout-border: rgba(181, 25, 12, 0.2);
+
+// ========================================
+// GLOBAL CHECKOUT STYLING
+// ========================================
+.card {
+  border: 1px solid $checkout-border !important;
+  box-shadow: 0 2px 8px rgba(181, 25, 12, 0.08) !important;
+  
+  .card-header, .card-body {
+    border-color: $checkout-border !important;
+  }
+}
+
+// Form controls with red theme
+.form-control, .form-select {
+  &:focus {
+    border-color: $checkout-primary !important;
+    box-shadow: 0 0 0 0.2rem rgba(181, 25, 12, 0.15) !important;
+  }
+}
+
+// Buttons with red theme
+.btn-primary {
+  background-color: $checkout-primary !important;
+  border-color: $checkout-primary !important;
+  
+  &:hover {
+    background-color: darken(#B5190C, 8%) !important;
+    border-color: darken(#B5190C, 8%) !important;
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(181, 25, 12, 0.25) !important;
+  }
+}
+
+// Navigation tabs
+.nav-pills {
+  .nav-link {
+    &.active {
+      background-color: $checkout-primary !important;
+      
+      .bg-primary-subtle {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      }
+      
+      .text-primary {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+// Table active rows
+.table-active {
+  background-color: $checkout-primary-lighter !important;
+  
+  th, td {
+    color: $checkout-primary !important;
+    font-weight: 600 !important;
+  }
+}
+
+// Credit card form styling
+.credit-card-form {
+  background: $checkout-primary-lighter;
+  border: 1px solid $checkout-border;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+
+  .form-control {
+    border: 1px solid $checkout-border;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    
+    &:focus {
+      border-color: $checkout-primary;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(181, 25, 12, 0.15);
+    }
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: $checkout-primary;
+    margin-bottom: 0.5rem;
+  }
+}
+
+// Custom phone input styling
+.phone-input-group {
+  .input-group {
+    .form-select {
+      border-right: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      background-color: $checkout-primary-lighter;
+      font-size: 0.875rem;
+      border-color: $checkout-border;
+      
+      &:focus {
+        border-color: $checkout-primary;
+        box-shadow: none;
+      }
+    }
+    
+    .form-control {
+      border-left: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-color: $checkout-border;
+      
+      &:focus {
+        border-color: $checkout-primary;
+        box-shadow: 0 0 0 0.2rem rgba(181, 25, 12, 0.15);
+      }
+    }
+  }
+  
+  .form-text {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    color: darken($checkout-primary, 10%);
+  }
+}
+
+// Payment method card styling
+.card-radio {
+  .form-check-input:checked {
+    background-color: $checkout-primary;
+    border-color: $checkout-primary;
+  }
+  
+  .form-check-label {
+    cursor: pointer;
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid $checkout-border;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      border-color: $checkout-primary;
+      background-color: $checkout-primary-lighter;
+    }
+  }
+  
+  .form-check-input:checked + .form-check-label {
+    border-color: $checkout-primary;
+    background-color: $checkout-primary-light;
+  }
+}
+
+.express-delivery-card {
+  border: 1px dashed rgba(181, 25, 12, 0.35);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  background-color: #fff7f6;
+
+  .form-switch {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .form-check-input {
+      width: 3rem;
+      height: 1.4rem;
+      border-color: rgba(181, 25, 12, 0.5);
+      background-color: #fff;
+
+      &:checked {
+        background-color: #B5190C;
+        border-color: #B5190C;
+      }
+    }
+
+    .form-check-label {
+      margin: 0;
+    }
+  }
+
+  .express-note {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+}
+
+// ========================================
+// DARK MODE SUPPORT
+// ========================================
+:host-context(body.dark-mode),
+:host-context([data-sw-theme="dark"]),
+:host-context([data-bs-theme="dark"]) {
+  .card {
+    background-color: var(--sw-card-bg, #1e1e1e) !important;
+    border-color: var(--sw-card-border, #3d3d3d) !important;
+    
+    .card-header {
+      background-color: var(--sw-bg-secondary, #2d2d2d) !important;
+    }
+  }
+  
+  .form-control,
+  .form-select {
+    background-color: var(--sw-input-bg, #2d2d2d) !important;
+    border-color: var(--sw-input-border, #3d3d3d) !important;
+    color: var(--sw-text-primary, #f5f5f5) !important;
+    
+    &::placeholder {
+      color: var(--sw-input-placeholder, #666666) !important;
+    }
+  }
+  
+  .table {
+    color: var(--sw-text-primary, #f5f5f5) !important;
+    
+    th, td {
+      border-color: var(--sw-border-secondary, #3d3d3d) !important;
+    }
+    
+    &.table-light th,
+    .table-light td {
+      background-color: var(--sw-bg-secondary, #2d2d2d) !important;
+      color: var(--sw-text-secondary, #a0a0a0) !important;
+    }
+  }
+  
+  .table-active {
+    background-color: rgba(181, 25, 12, 0.2) !important;
+  }
+  
+  .credit-card-form {
+    background-color: var(--sw-bg-secondary, #2d2d2d) !important;
+    border-color: var(--sw-border-primary, #3d3d3d) !important;
+  }
+  
+  .express-delivery-card {
+    background-color: rgba(181, 25, 12, 0.1) !important;
+    border-color: rgba(181, 25, 12, 0.3) !important;
+  }
+  
+  .card-radio .form-check-label {
+    background-color: var(--sw-bg-surface, #1e1e1e) !important;
+    border-color: var(--sw-border-primary, #3d3d3d) !important;
+    color: var(--sw-text-primary, #f5f5f5) !important;
+    
+    &:hover {
+      border-color: var(--sw-primary, #B5190C) !important;
+    }
+  }
+  
+  .text-muted {
+    color: var(--sw-text-muted, #666666) !important;
+  }
+  
+  h5, h6 {
+    color: var(--sw-text-primary, #f5f5f5) !important;
+  }
+  
+  label,
+  .form-label {
+    color: var(--sw-text-primary, #f5f5f5) !important;
+  }
+}

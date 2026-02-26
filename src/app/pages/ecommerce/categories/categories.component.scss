@@ -1,0 +1,111 @@
+.btn-custom {
+  background-color: #6b0673; /* Couleur de fond */
+  border-color: #6b0673; /* Bordure */
+  color: white; /* Texte */
+}
+
+// === IMAGE UPLOAD STYLES ===
+.image-upload-container {
+  .upload-placeholder {
+    border: 2px dashed #e9ecef;
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+
+    &:hover {
+      border-color: #007bff;
+      background-color: #f0f8ff;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: #6c757d;
+      margin-bottom: 1rem;
+    }
+
+    .upload-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.image-preview-container {
+  .image-preview {
+    position: relative;
+    display: inline-block;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .preview-img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover .image-overlay {
+      opacity: 1;
+    }
+  }
+}
+
+// === FORM VALIDATION STYLES ===
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.is-valid {
+  border-color: #198754 !important;
+}
+
+.form-text {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+// === MODAL ENHANCEMENTS ===
+.modal-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 1.5rem;
+
+  .modal-title {
+    font-weight: 600;
+    color: #495057;
+  }
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1rem 2rem;
+}

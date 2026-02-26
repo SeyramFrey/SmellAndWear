@@ -1,0 +1,20 @@
+<div class="video-hero">
+  <video 
+    class="video-hero__video" 
+    [src]="videoSrc" 
+    autoplay 
+    muted 
+    loop 
+    playsinline
+  ></video>
+  
+  <div class="video-hero__overlay" *ngIf="overlayText">
+    <div class="video-hero__content">
+      <h2 class="video-hero__title" *ngIf="title">{{ title }}</h2>
+      <p class="video-hero__text">{{ overlayText }}</p>
+      <button *ngIf="buttonText" class="btn btn-primary video-hero__button" (click)="onButtonClick()">
+        {{ buttonText }}
+      </button>
+    </div>
+  </div>
+</div> 

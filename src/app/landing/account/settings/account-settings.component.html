@@ -1,0 +1,87 @@
+<div class="account-section">
+  <div class="section-header">
+    <a routerLink="/account" class="back-link">
+      <i class="ri-arrow-left-line"></i> Back to Account
+    </a>
+    <h2>Account Settings</h2>
+    <p class="text-muted">Manage your account information and security</p>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Settings Form -->
+  <div *ngIf="!loading" class="settings-form">
+    <!-- Personal Information -->
+    <div class="form-section">
+      <h5>Personal Information</h5>
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">First Name *</label>
+            <input type="text" class="form-control" formControlName="prenom" 
+                   [class.is-invalid]="profileForm.get('prenom')?.touched && profileForm.get('prenom')?.invalid">
+            <div class="invalid-feedback">First name is required</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Last Name *</label>
+            <input type="text" class="form-control" formControlName="nom"
+                   [class.is-invalid]="profileForm.get('nom')?.touched && profileForm.get('nom')?.invalid">
+            <div class="invalid-feedback">Last name is required</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" [value]="client?.email || ''" disabled>
+          <small class="text-muted">Email cannot be changed</small>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-control" formControlName="telephone" placeholder="Enter your phone number">
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="saving || profileForm.invalid">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+          {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Change Password -->
+    <div class="form-section">
+      <h5>Change Password</h5>
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <div class="mb-3">
+          <label class="form-label">New Password *</label>
+          <input type="password" class="form-control" formControlName="newPassword"
+                 [class.is-invalid]="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid">
+          <div class="invalid-feedback">Password must be at least 6 characters</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Confirm New Password *</label>
+          <input type="password" class="form-control" formControlName="confirmPassword"
+                 [class.is-invalid]="passwordForm.get('confirmPassword')?.touched && passwordForm.get('confirmPassword')?.invalid">
+          <div class="invalid-feedback">Please confirm your password</div>
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="savingPassword || passwordForm.invalid">
+          <span *ngIf="savingPassword" class="spinner-border spinner-border-sm me-2"></span>
+          {{ savingPassword ? 'Changing...' : 'Change Password' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+

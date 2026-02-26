@@ -1,0 +1,116 @@
+<div class="orders-page">
+  <!-- Header Section -->
+  <div class="orders-header">
+    <button class="back-btn" (click)="goBack()" aria-label="Go back">
+      <i class="ri-arrow-left-line"></i>
+      <span>Back</span>
+    </button>
+    <div class="header-content">
+      <h1 class="page-title">My Orders</h1>
+      <p class="page-subtitle" *ngIf="!loading && !error && orders.length > 0">
+        {{ orders.length }} {{ orders.length === 1 ? 'order' : 'orders' }} in your history
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading State with Skeleton -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="skeleton-list">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+        <div class="skeleton-header">
+          <div class="skeleton-line skeleton-line--short"></div>
+          <div class="skeleton-badge"></div>
+        </div>
+        <div class="skeleton-body">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line skeleton-line--medium"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!loading && error">
+    <div class="error-content">
+      <div class="error-icon">
+        <i class="ri-error-warning-line"></i>
+      </div>
+      <h2 class="error-title">Something went wrong</h2>
+      <p class="error-text">{{ error }}</p>
+      <button class="retry-btn" (click)="loadOrders()">
+        <i class="ri-refresh-line"></i>
+        Try Again
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && !error && orders.length === 0">
+    <div class="empty-content">
+      <div class="empty-icon">
+        <i class="ri-shopping-bag-line"></i>
+      </div>
+      <h2 class="empty-title">No orders yet</h2>
+      <p class="empty-text">
+        Once you place an order, it will appear here for you to track.
+      </p>
+      <a routerLink="/" class="browse-btn">
+        <i class="ri-store-line"></i>
+        Start Shopping
+      </a>
+    </div>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-content" *ngIf="!loading && !error && orders.length > 0">
+    <div class="orders-list">
+      <div 
+        *ngFor="let order of orders; trackBy: trackByOrderId" 
+        class="order-card"
+        [class.order-card--shipped]="order.statut === 'Expédiée' || order.statut === 'expedie'"
+        [class.order-card--delivered]="order.statut === 'Livrée' || order.statut === 'livree'">
+        
+        <!-- Order Header -->
+        <div class="order-header">
+          <div class="order-meta">
+            <span class="order-number">Order #{{ order.id.substring(0, 8).toUpperCase() }}</span>
+            <span class="order-date">{{ order.created_at | date:'mediumDate' }}</span>
+          </div>
+          <span class="status-badge" [ngClass]="getStatusBadgeClass(order.statut || '')">
+            {{ getStatusLabel(order.statut || '') }}
+          </span>
+        </div>
+        
+        <!-- Order Body -->
+        <div class="order-body">
+          <div class="order-details">
+            <div class="detail-row">
+              <span class="detail-label">Total</span>
+              <span class="detail-value detail-value--price">{{ order.total | currency:'EUR':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="detail-row" *ngIf="order.payment_reference">
+              <span class="detail-label">Payment</span>
+              <span class="detail-value">{{ order.payment_reference.substring(0, 12) }}...</span>
+            </div>
+          </div>
+          
+          <!-- Tracking Info (if shipped) -->
+          <div class="tracking-info" *ngIf="order.tracking_code && (order.statut === 'Expédiée' || order.statut === 'expedie')">
+            <div class="tracking-badge">
+              <i class="ri-truck-line"></i>
+              <span>Tracking: {{ order.tracking_code }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Order Footer -->
+        <div class="order-footer">
+          <button class="view-details-btn" (click)="viewOrderDetails(order.id)">
+            View Details
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

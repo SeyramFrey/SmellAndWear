@@ -1,0 +1,657 @@
+<!-- Start Breadcrumbs -->
+<app-breadcrumbs title="Media Management" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<!-- End Breadcrumbs -->
+
+<!-- All Categorie Video (Landing Page) -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header border-0">
+                <h5 class="card-title mb-0">
+                    <i class="ri-video-line me-2"></i>All Categorie Video
+                </h5>
+                <small class="text-muted">Vidéo affichée sur la page All Categorie</small>
+            </div>
+            <div class="card-body">
+                <div *ngIf="allCategorieVideoLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted mt-2 mb-0">Chargement...</p>
+                </div>
+                <div *ngIf="!allCategorieVideoLoading" class="row align-items-center">
+                    <div class="col-md-6">
+                        <div *ngIf="allCategorieVideo?.url; else noVideoPlaceholder" class="ratio ratio-16x9 rounded overflow-hidden bg-dark">
+                            <video [src]="allCategorieVideo!.url" controls muted class="w-100 h-100 object-fit-cover"></video>
+                        </div>
+                        <ng-template #noVideoPlaceholder>
+                            <div class="ratio ratio-16x9 rounded bg-light d-flex align-items-center justify-content-center">
+                                <div class="text-center text-muted">
+                                    <i class="ri-video-off-line fs-1"></i>
+                                    <p class="mb-0 mt-2">Aucune vidéo configurée</p>
+                                    <small>Utilise la vidéo par défaut (tshirts-hero.mp4)</small>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column gap-2">
+                            <input type="file" #allCategorieVideoInput class="d-none" 
+                                   accept="video/*" 
+                                   (change)="onAllCategorieVideoSelected($event)">
+                            <button class="btn btn-primary" 
+                                    (click)="allCategorieVideoInput.click()"
+                                    [disabled]="allCategorieVideoUploading">
+                                <i class="ri-upload-2-line me-1"></i>
+                                {{ allCategorieVideo ? 'Remplacer la vidéo' : 'Uploader une vidéo' }}
+                            </button>
+                            <div *ngIf="allCategorieVideoFile" class="d-flex align-items-center gap-2 p-2 border rounded">
+                                <i class="ri-file-video-line fs-4 text-primary"></i>
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium small">{{ allCategorieVideoFile.file.name }}</div>
+                                    <div class="text-muted small">{{ formatFileSize(allCategorieVideoFile.file.size) }}</div>
+                                </div>
+                                <button class="btn btn-success btn-sm" 
+                                        (click)="uploadAllCategorieVideo()"
+                                        [disabled]="allCategorieVideoUploading">
+                                    {{ allCategorieVideoUploading ? 'Upload...' : 'Enregistrer' }}
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" 
+                                        (click)="clearAllCategorieVideoSelection()"
+                                        [disabled]="allCategorieVideoUploading">
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="d-flex align-items-center">
+                    <h5 class="card-title mb-0 flex-grow-1">Media Library</h5>
+                    <div class="d-flex gap-2">
+                        <div class="d-flex align-items-center">
+                            <input type="file" id="fileInput" class="d-none" (change)="onFileSelected($event)" 
+                                   accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.zip,.rar" multiple>
+                            <button class="btn btn-primary btn-sm" (click)="document.getElementById('fileInput')?.click()" 
+                                    [disabled]="uploadingFiles">
+                                <i class="ri-upload-2-line me-1"></i>
+                                Select Files
+                            </button>
+                            <button *ngIf="uploadedFiles.length > 0" class="btn btn-success btn-sm ms-2" 
+                                    (click)="uploadFiles()" [disabled]="uploadingFiles">
+                                <i class="ri-check-line me-1"></i>
+                                {{uploadingFiles ? 'Uploading...' : 'Upload ' + uploadedFiles.length + ' file(s)'}}
+                            </button>
+                            <button *ngIf="uploadedFiles.length > 0" class="btn btn-outline-secondary btn-sm ms-1" 
+                                    (click)="clearUploadedFiles()" [disabled]="uploadingFiles">
+                                <i class="ri-close-line me-1"></i>
+                                Clear
+                            </button>
+                        </div>
+                        <a class="btn btn-success btn-sm" data-bs-toggle="collapse" href="javascript:void(0);" (click)="collapse.toggle()" [attr.aria-expanded]="!isCollapsed">
+                            <i class="ri-filter-2-line align-bottom"></i> Filters
+                        </a>
+                    </div>
+                </div>
+                <div class="collaps show" id="collapseExample" #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed">
+                    <div class="row row-cols-xxl-5 row-cols-lg-3 row-cols-md-2 row-cols-1 mt-3 g-3">
+                        <div class="col">
+                            <h6 class="text-uppercase fs-12 mb-2">Search</h6>
+                            <input type="text" class="form-control search" placeholder="Search media files..." autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
+                        </div>
+                        <div class="col">
+                            <h6 class="text-uppercase fs-12 mb-2">File Type</h6>
+                            <select class="form-control" name="file-type" id="file-type" [(ngModel)]="type" (ngModelChange)="typeFilter()">
+                                <option value="">All Types</option>
+                                <option value="image">Images</option>
+                                <option value="video">Videos</option>
+                                <option value="audio">Audio</option>
+                                <option value="pdf">PDF</option>
+                                <option value="document">Documents</option>
+                                <option value="archive">Archives</option>
+                                <option value="file">Other Files</option>
+                            </select>
+                        </div>
+                        <div class="col" *ngIf="uploadedFiles.length > 0">
+                            <h6 class="text-uppercase fs-12 mb-2">Selected Files</h6>
+                            <div class="alert alert-info mb-0">
+                                <small>{{uploadedFiles.length}} file(s) selected</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drag and Drop Zone -->
+                <div class="card-body border-top" 
+                     (dragover)="onDragOver($event)" 
+                     (drop)="onDrop($event)"
+                     [class.drag-active]="false">
+                    <div class="text-center py-3 border border-dashed rounded">
+                        <i class="ri-upload-cloud-2-line fs-1 text-muted"></i>
+                        <h6 class="mt-2 mb-1">Drag and drop files here</h6>
+                        <p class="text-muted small mb-2">or click the button above to select files</p>
+                        <small class="text-muted">Supports images, videos, audio, documents and archives</small>
+                    </div>
+                </div>
+
+                <!-- Upload Preview Section -->
+                <div *ngIf="uploadedFiles.length > 0" class="card-body border-top">
+                    <h6 class="mb-3">
+                        <i class="ri-upload-cloud-2-line me-1"></i>
+                        Files to Upload ({{uploadedFiles.length}})
+                    </h6>
+                    
+                    <!-- Media Name Input -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="uploadMediaName" class="form-label">Media Name (optional)</label>
+                            <input type="text" 
+                                   id="uploadMediaName" 
+                                   class="form-control" 
+                                   [(ngModel)]="uploadMediaName" 
+                                   placeholder="Enter media name (leave empty to use filename)"
+                                   [disabled]="uploadingFiles">
+                            <small class="form-text text-muted">
+                                If specified, this name will be used for all uploaded files. 
+                                Leave empty to use original filenames.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-12" *ngFor="let file of uploadedFiles; let i = index">
+                            <div class="upload-preview">
+                                <div class="d-flex align-items-center p-2 border rounded">
+                                    <!-- Preview Image -->
+                                    <img [src]="createFilePreview(file.file)" 
+                                         alt="Preview" 
+                                         class="img-thumbnail me-2"
+                                         style="width: 60px; height: 60px; object-fit: cover;"
+                                         *ngIf="isImageFile(file.file)"
+                                         (error)="onImageLoadError($event)">
+                                    
+                                    <!-- File Icon for non-images -->
+                                    <div *ngIf="!isImageFile(file.file)" class="d-flex align-items-center justify-content-center me-2 bg-light" 
+                                         style="width: 60px; height: 60px;">
+                                        <i [class]="getFileTypeIcon(getFileType(file.file.name))" class="fs-3 text-muted"></i>
+                                    </div>
+                                    
+                                    <div class="flex-grow-1">
+                                        <div class="fw-medium">{{ file.file.name }}</div>
+                                        <div class="text-muted small">{{ formatFileSize(file.file.size) }}</div>
+                                        
+                                        <!-- Progress bar -->
+                                        <div *ngIf="file.uploading" class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar" 
+                                                 [style.width.%]="file.progress"
+                                                 role="progressbar"></div>
+                                        </div>
+                                        
+                                        <!-- Upload status -->
+                                        <div *ngIf="file.error" class="text-danger small">
+                                            <i class="ri-error-warning-line me-1"></i>{{ file.error }}
+                                        </div>
+                                        <div *ngIf="file.url && !file.uploading" class="text-success small">
+                                            <i class="ri-check-line me-1"></i>Uploaded successfully
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Remove button -->
+                                    <button class="btn btn-outline-danger btn-sm" 
+                                            (click)="removeFile(i)" 
+                                            [disabled]="file.uploading"
+                                            title="Remove file">
+                                        <i class="ri-close-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="d-flex align-items-center mb-4">
+            <div class="flex-grow-1">
+                <p class="text-muted fs-14 mb-0">
+                    {{loading ? 'Loading...' : 'Results: ' + totalMedias}}
+                    <span *ngIf="searchTerm.trim()" class="ms-2">
+                        <i class="ri-search-line"></i> "{{searchTerm}}"
+                    </span>
+                </p>
+            </div>
+            <div class="flex-shrink-0">
+                <button class="btn btn-outline-secondary btn-sm" (click)="loadMedias()" [disabled]="loading">
+                    <i class="ri-refresh-line me-1"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end row -->
+
+<!-- Loading state -->
+<div *ngIf="loading && basicData.length === 0" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted mt-2">Loading media files...</p>
+</div>
+
+<!-- Empty state -->
+<div *ngIf="!loading && basicData.length === 0" class="text-center py-5">
+    <div class="empty-state">
+        <i class="ri-folder-open-line fs-1 text-muted"></i>
+        <h5 class="mt-3">No media files found</h5>
+        <p class="text-muted">Upload your first media file to get started</p>
+        <button class="btn btn-primary" (click)="document.getElementById('fileInput')?.click()">
+            <i class="ri-upload-2-line me-1"></i>
+            Upload File
+        </button>
+    </div>
+</div>
+
+<!-- Media Grid -->
+<div class="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-1 g-3" id="media-list" *ngIf="basicData.length > 0">
+    @for (media of basicData; track media.id) {
+        <div class="col">
+            <div class="card media-card h-100">
+                <div class="media-preview position-relative">
+                    <!-- Image Preview -->
+                    <div *ngIf="isImageMedia(media)" class="media-image">
+                        <img *ngIf="media.url; else imagePlaceholder"
+                             [src]="media.url"
+                             [alt]="media.media_name || 'Media file'" 
+                             class="card-img-top" 
+                             style="height: 200px; object-fit: cover; cursor: pointer;"
+                             loading="lazy"
+                             (click)="openPreviewModal(media, previewModal)"
+                             (error)="onImageError($event, media)">
+                        <ng-template #imagePlaceholder>
+                            <div class="d-flex align-items-center justify-content-center bg-light" 
+                                 style="height: 200px; cursor: pointer;"
+                                 (click)="openPreviewModal(media, previewModal)">
+                                <div class="text-center">
+                                    <i class="ri-image-line fs-1 text-muted mb-2"></i>
+                                    <p class="text-muted small mb-0">No Image</p>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                    
+                    <!-- Video Preview -->
+                    <div *ngIf="isVideoMedia(media)" class="media-video position-relative">
+                        <div *ngIf="getMediaUrl(media); else videoPlaceholder">
+                            <video class="card-img-top" 
+                                   style="height: 200px; object-fit: cover; cursor: pointer;"
+                                   [poster]="getVideoThumbnail(media) || ''"
+                                   (click)="openPreviewModal(media, previewModal)"
+                                   muted
+                                   preload="metadata">
+                                <source [src]="getMediaUrl(media)" type="video/mp4">
+                                <source [src]="getMediaUrl(media)" type="video/webm">
+                                <source [src]="getMediaUrl(media)" type="video/ogg">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <i class="ri-play-circle-fill fs-1 text-white opacity-75"></i>
+                            </div>
+                        </div>
+                        <ng-template #videoPlaceholder>
+                            <div class="d-flex align-items-center justify-content-center bg-light" 
+                                 style="height: 200px; cursor: pointer;"
+                                 (click)="openPreviewModal(media, previewModal)">
+                                <div class="text-center">
+                                    <i class="ri-video-line fs-1 text-muted mb-2"></i>
+                                    <p class="text-muted small mb-0">No Video</p>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                    
+                    <!-- File Type Icon for other files -->
+                    <div *ngIf="!isImageMedia(media) && !isVideoMedia(media)" 
+                         class="media-icon d-flex align-items-center justify-content-center bg-light" 
+                         style="height: 200px; cursor: pointer;"
+                         (click)="openPreviewModal(media, previewModal)">
+                        <div class="text-center">
+                            <i [class]="getFileTypeIcon(media.type || 'file')" class="fs-1 text-muted mb-2"></i>
+                            <p class="text-muted small mb-0">{{media.type || 'File'}}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- File type badge -->
+                    <span class="position-absolute top-0 start-0 m-2 badge bg-primary">
+                        {{media.type || 'file'}}
+                    </span>
+                    
+                    <!-- Actions -->
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <div class="btn-group-vertical" role="group">
+                            <!-- View/Download -->
+                            <a *ngIf="getMediaUrl(media)" [href]="getMediaUrl(media)" target="_blank" 
+                               class="btn btn-sm btn-light" title="View/Download">
+                                <i class="ri-external-link-line"></i>
+                            </a>
+                            <!-- Edit -->
+                            <button class="btn btn-sm btn-primary" 
+                                    (click)="openEditModal(media, editModal)" 
+                                    title="Edit">
+                                <i class="ri-edit-line"></i>
+                            </button>
+                            <!-- Delete -->
+                            <button class="btn btn-sm btn-danger" 
+                                    (click)="deleteMedia(media)" 
+                                    title="Delete">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <h6 class="card-title mb-1" [title]="media.media_name || 'Unnamed file'">
+                        {{media.media_name || 'Unnamed file'}}
+                    </h6>
+                    <p class="text-muted small mb-2">
+                        <span *ngIf="media.media_path; else noFilePath">{{media.media_path}}</span>
+                        <ng-template #noFilePath>
+                            <span class="text-warning">
+                                <i class="ri-alert-line me-1"></i>No file uploaded
+                            </span>
+                        </ng-template>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            ID: {{media.id}}
+                        </small>
+                        <small class="text-muted" *ngIf="media.created_at">
+                            {{media.created_at | date:'short'}}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Load More Button -->
+<div class="text-center mt-4" *ngIf="hasMoreMedias()">
+    <button class="btn btn-outline-primary" (click)="loadMore()" [disabled]="loading">
+        <i class="ri-arrow-down-line me-1" [class.ri-loader-4-line]="loading" [class.spinner-border-sm]="loading"></i>
+        {{loading ? 'Loading...' : 'Load More'}}
+    </button>
+</div>
+
+<!-- Edit Media Modal -->
+<ng-template #editModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Edit Media</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="editingMedia">
+            <!-- Current Media Preview -->
+            <div class="mb-4">
+                <h6>Current Media</h6>
+                <div class="border rounded p-3 bg-light">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <!-- Current Image Preview -->
+                            <div *ngIf="isImageMedia(editingMedia)" class="current-preview">
+                                <img *ngIf="getMediaUrl(editingMedia); else currentImagePlaceholder" 
+                                     [src]="getMediaUrl(editingMedia)" 
+                                     [alt]="editingMedia.media_name || 'Current media'" 
+                                     style="width: 80px; height: 80px; object-fit: cover;" 
+                                     class="rounded"
+                                     (error)="onImageError($event, editingMedia)">
+                                <ng-template #currentImagePlaceholder>
+                                    <div class="d-flex align-items-center justify-content-center bg-light rounded" 
+                                         style="width: 80px; height: 80px;">
+                                        <i class="ri-image-line fs-3 text-muted"></i>
+                                    </div>
+                                </ng-template>
+                            </div>
+                            
+                            <!-- Current Video Preview -->
+                            <div *ngIf="isVideoMedia(editingMedia)" class="current-preview">
+                                <div *ngIf="getMediaUrl(editingMedia); else currentVideoPlaceholder" class="position-relative">
+                                    <video style="width: 80px; height: 80px; object-fit: cover;" 
+                                           class="rounded" muted preload="metadata">
+                                        <source [src]="getMediaUrl(editingMedia)" type="video/mp4">
+                                        <source [src]="getMediaUrl(editingMedia)" type="video/webm">
+                                        <source [src]="getMediaUrl(editingMedia)" type="video/ogg">
+                                    </video>
+                                    <div class="position-absolute top-50 start-50 translate-middle">
+                                        <i class="ri-play-circle-fill text-white"></i>
+                                    </div>
+                                </div>
+                                <ng-template #currentVideoPlaceholder>
+                                    <div class="d-flex align-items-center justify-content-center bg-light rounded" 
+                                         style="width: 80px; height: 80px;">
+                                        <i class="ri-video-line fs-3 text-muted"></i>
+                                    </div>
+                                </ng-template>
+                            </div>
+                            
+                            <!-- Current File Icon -->
+                            <div *ngIf="!isImageMedia(editingMedia) && !isVideoMedia(editingMedia)" 
+                                 class="current-preview d-flex align-items-center justify-content-center bg-secondary rounded" 
+                                 style="width: 80px; height: 80px;">
+                                <i [class]="getFileTypeIcon(editingMedia.type || 'file')" class="fs-3 text-white"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h6 class="mb-1">{{editingMedia.media_name || 'Unnamed file'}}</h6>
+                            <small class="text-muted">{{editingMedia.media_path}}</small>
+                            <br>
+                            <small class="text-muted">Type: {{editingMedia.type || 'unknown'}}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Media Name -->
+            <div class="mb-3">
+                <label for="editMediaName" class="form-label">Media Name</label>
+                <input type="text" 
+                       id="editMediaName" 
+                       class="form-control" 
+                       [(ngModel)]="editMediaName" 
+                       placeholder="Enter media name"
+                       [disabled]="editUploading">
+            </div>
+
+            <!-- Upload New File (Optional) -->
+            <div class="mb-3">
+                <label class="form-label">Replace File (Optional)</label>
+                <div class="border border-dashed rounded p-3">
+                    <input type="file" 
+                           id="editFileInput" 
+                           class="d-none" 
+                           (change)="onEditFileSelected($event)" 
+                           accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.zip,.rar"
+                           [disabled]="editUploading">
+                    
+                    <div *ngIf="!editUploadedFile" class="text-center">
+                        <i class="ri-upload-2-line fs-2 text-muted"></i>
+                        <p class="mb-2">Click to select a new file</p>
+                        <button type="button" 
+                                class="btn btn-outline-primary btn-sm" 
+                                (click)="document.getElementById('editFileInput')?.click()"
+                                [disabled]="editUploading">
+                            <i class="ri-folder-open-line me-1"></i>
+                            Choose File
+                        </button>
+                        <p class="text-muted small mt-2 mb-0">Leave empty to keep current file</p>
+                    </div>
+
+                    <!-- New File Preview -->
+                    <div *ngIf="editUploadedFile" class="new-file-preview">
+                        <div class="d-flex align-items-center p-2 border rounded bg-white">
+                            <!-- Preview Image -->
+                            <img *ngIf="isImageFile(editUploadedFile.file)" 
+                                 [src]="createFilePreview(editUploadedFile.file)" 
+                                 alt="New file preview" 
+                                 class="me-2 rounded"
+                                 style="width: 60px; height: 60px; object-fit: cover;"
+                                 (error)="onImageLoadError($event)">
+                            
+                            <!-- File Icon for non-images -->
+                            <div *ngIf="!isImageFile(editUploadedFile.file)" 
+                                 class="d-flex align-items-center justify-content-center me-2 bg-light rounded" 
+                                 style="width: 60px; height: 60px;">
+                                <i [class]="getFileTypeIcon(getFileType(editUploadedFile.file.name))" class="fs-3 text-muted"></i>
+                            </div>
+                            
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{editUploadedFile.file.name}}</h6>
+                                <small class="text-muted">{{formatFileSize(editUploadedFile.file.size)}}</small>
+                                <div *ngIf="editUploadedFile.uploading" class="progress mt-1" style="height: 4px;">
+                                    <div class="progress-bar" [style.width.%]="editUploadedFile.progress"></div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger" 
+                                    (click)="removeEditFile()"
+                                    [disabled]="editUploading">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Cancel')" [disabled]="editUploading">
+            Cancel
+        </button>
+        <button type="button" 
+                class="btn btn-primary" 
+                (click)="saveMediaChanges()" 
+                [disabled]="editUploading || !hasChangesToSave()">
+            <i class="ri-save-line me-1" [class.ri-loader-4-line]="editUploading"></i>
+            {{editUploading ? 'Saving...' : 'Save Changes'}}
+        </button>
+    </div>
+</ng-template>
+
+<!-- Preview Modal -->
+<ng-template #previewModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Media Preview</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body text-center">
+        <div *ngIf="previewingMedia">
+            <!-- Image Preview -->
+            <div *ngIf="isImageMedia(previewingMedia)">
+                <div *ngIf="getMediaUrl(previewingMedia); else noImagePreview">
+                    <img [src]="getMediaUrl(previewingMedia)" 
+                         [alt]="previewingMedia.media_name || 'Media preview'" 
+                         class="img-fluid rounded"
+                         style="max-height: 70vh; max-width: 100%;"
+                         (error)="onImageError($event, previewingMedia)">
+                </div>
+                <ng-template #noImagePreview>
+                    <div class="text-center py-5">
+                        <i class="ri-image-line fs-1 text-muted mb-3"></i>
+                        <h5>{{previewingMedia.media_name || 'Unnamed Image'}}</h5>
+                        <p class="text-muted">No image file uploaded</p>
+                        <p class="text-muted small">Use the edit button to upload an image file</p>
+                    </div>
+                </ng-template>
+            </div>
+            
+            <!-- Video Preview -->
+            <div *ngIf="isVideoMedia(previewingMedia)">
+                <div *ngIf="getMediaUrl(previewingMedia); else noVideoPreview">
+                    <video controls 
+                           class="img-fluid rounded"
+                           style="max-height: 70vh; max-width: 100%;"
+                           preload="metadata">
+                        <source [src]="getMediaUrl(previewingMedia)" type="video/mp4">
+                        <source [src]="getMediaUrl(previewingMedia)" type="video/webm">
+                        <source [src]="getMediaUrl(previewingMedia)" type="video/ogg">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <ng-template #noVideoPreview>
+                    <div class="text-center py-5">
+                        <i class="ri-video-line fs-1 text-muted mb-3"></i>
+                        <h5>{{previewingMedia.media_name || 'Unnamed Video'}}</h5>
+                        <p class="text-muted">No video file uploaded</p>
+                        <p class="text-muted small">Use the edit button to upload a video file</p>
+                    </div>
+                </ng-template>
+            </div>
+            
+            <!-- File Info for non-previewable files -->
+            <div *ngIf="!isImageMedia(previewingMedia) && !isVideoMedia(previewingMedia)" class="text-center py-5">
+                <i [class]="getFileTypeIcon(previewingMedia.type || 'file')" class="fs-1 text-muted mb-3"></i>
+                <h5>{{previewingMedia.media_name || 'Unnamed file'}}</h5>
+                <p class="text-muted">{{previewingMedia.type || 'unknown'}} file</p>
+                <div *ngIf="getMediaUrl(previewingMedia); else noFileUploaded">
+                    <a [href]="getMediaUrl(previewingMedia)" 
+                       target="_blank" 
+                       class="btn btn-primary">
+                        <i class="ri-download-line me-1"></i>
+                        Download File
+                    </a>
+                </div>
+                <ng-template #noFileUploaded>
+                    <p class="text-muted small">No file uploaded</p>
+                    <p class="text-muted small">Use the edit button to upload a file</p>
+                </ng-template>
+            </div>
+            
+            <!-- Media Info -->
+            <div class="mt-3 pt-3 border-top">
+                <h6>{{previewingMedia.media_name || 'Unnamed file'}}</h6>
+                <div class="row text-start">
+                    <div class="col-sm-6">
+                        <small class="text-muted">
+                            <strong>Path:</strong> {{previewingMedia.media_path}}
+                        </small>
+                    </div>
+                    <div class="col-sm-6">
+                        <small class="text-muted">
+                            <strong>Type:</strong> {{previewingMedia.type || 'unknown'}}
+                        </small>
+                    </div>
+                    <div class="col-sm-6" *ngIf="previewingMedia.created_at">
+                        <small class="text-muted">
+                            <strong>Created:</strong> {{previewingMedia.created_at | date:'medium'}}
+                        </small>
+                    </div>
+                    <div class="col-sm-6">
+                        <small class="text-muted">
+                            <strong>ID:</strong> {{previewingMedia.id}}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a *ngIf="previewingMedia && getMediaUrl(previewingMedia)" 
+           [href]="getMediaUrl(previewingMedia!) || '#'" 
+           target="_blank" 
+           class="btn btn-outline-primary me-auto">
+            <i class="ri-external-link-line me-1"></i>
+            Open in New Tab
+        </a>
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Close')">
+            Close
+        </button>
+    </div>
+</ng-template>

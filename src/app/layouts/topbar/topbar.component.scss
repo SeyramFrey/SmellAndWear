@@ -1,0 +1,86 @@
+// Admin Topbar Mobile Responsiveness Fixes
+
+// Logo and flag spacing on mobile
+@media (max-width: 768px) {
+  .navbar-header {
+    .navbar-brand-box {
+      margin-right: 0.5rem;
+      
+      .logo {
+        img {
+          height: 18px; // Slightly smaller on mobile
+        }
+      }
+    }
+    
+    // Spacing between logo and flag dropdown
+    .topbar-head-dropdown {
+      margin-left: 0.5rem !important;
+      
+      .btn-icon {
+        padding: 0.375rem;
+      }
+    }
+  }
+  
+  // Ensure logo is clickable and not blocked
+  .navbar-brand-box {
+    z-index: 1050;
+    position: relative;
+    
+    .logo {
+      display: inline-block;
+      text-decoration: none;
+      
+      &:focus {
+        outline: 2px solid #007bff;
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+  
+  // Prevent horizontal scrolling
+  .layout-width {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+  
+  // Table responsive improvements
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    .table {
+      min-width: 600px; // Ensure table doesn't break layout
+    }
+  }
+}
+
+// Ensure forms stack properly on mobile
+@media (max-width: 576px) {
+  .row {
+    .col-md-6,
+    .col-md-4,
+    .col-md-3 {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }
+  
+  // Larger tap targets
+  .btn {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  .form-control,
+  .form-select {
+    min-height: 44px;
+    font-size: 16px; // Prevent iOS zoom
+  }
+}

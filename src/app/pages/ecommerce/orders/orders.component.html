@@ -838,7 +838,7 @@
         <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
           <button class="btn btn-link link-success fw-medium text-decoration-none" data-bs-dismiss="modal" id="deleteRecord-close" (click)="modal.close('Close click')"><i class="ri-close-line me-1 align-middle"></i>
             Close</button>
-          <button type="button" class="btn w-sm btn-danger " id="delete-product" (click)="deleteData(deleteId)" (click)="modal.close('Close click')">Yes, Delete It!</button>
+          <button type="button" class="btn w-sm btn-danger " id="delete-product" (click)="deleteData(deleteId!)" (click)="modal.close('Close click')">Yes, Delete It!</button>
         </div>
       </div>
     </div><!-- /.modal-content -->

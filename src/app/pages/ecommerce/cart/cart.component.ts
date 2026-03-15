@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { cartData } from 'src/app/core/data';
 import { CartModel } from 'src/app/store/Ecommerce/ecommerce_model';
 
 @Component({
@@ -41,7 +40,6 @@ export class CartComponent implements OnInit {
    * Cart data fetch
    */
   private _fetchData() {
-    this.cartData = cartData;
     this.dataCount = this.cartData.length
   }
 

@@ -1,14 +1,25 @@
 /**
- * Paystack Initialize Edge Function
+ * Paystack Initialize Edge Function  (v2 – server-side totals)
  *
- * Handles payment initialization for SmellAndWear:
- * - France (FR): EUR → XOF conversion with live FX, card-only, sends XOF to Paystack
- * - Côte d'Ivoire (CI): XOF passed through (no conversion), card + mobile_money
+ * The client sends: order_id, email, locale (FR|CI),
+ *   shipping_zone_code, express_delivery.
+ * This function:
+ *   1. Fetches order items + canonical product prices from DB
+ *   2. Fetches shipping tariff from livraison_tarifs
+ *   3. Computes the total deterministically
+ *   4. Converts to XOF (Paystack's currency for this account)
+ *   5. Calls Paystack /transaction/initialize
+ *   6. Persists payment metadata back to the order
  *
- * Paystack API rules (per docs):
- * - amount: MUST be in subunits. XOF is zero-decimal: 19800 = 19,800 XOF (no *100)
- * - currency: XOF supported for West Africa
- * - channels: France=card only; CI=card+mobile_money
+ * Currency rules (Paystack):
+ *   Paystack ALWAYS expects amounts as major × 100, for ALL currencies.
+ *   This applies to XOF and XAF too — even though ISO 4217 defines them as
+ *   zero-decimal (no real subunits), Paystack still divides by 100 to display.
+ *
+ *   Example: 19 023 XOF (major) → send 1 902 300 → Paystack shows 19 023 XOF
+ *
+ *   This is the opposite of Stripe's "zero-decimal" convention.
+ *   See docs/payments.md § "Paystack Subunit Rule".
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -18,453 +29,364 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const SUPPORTED_CURRENCIES = ['XOF', 'NGN', 'GHS', 'ZAR', 'KES', 'USD', 'XAF', 'EGP', 'RWF', 'TZS', 'UGX']
-
-// Zero-decimal: amount IS the subunit. 19800 = 19,800 XOF (per Paystack docs)
-const ZERO_DECIMAL_CURRENCIES = ['XOF', 'XAF', 'RWF', 'UGX', 'JPY', 'KRW']
-
-interface FxRate {
-  rate: number
-  asOf: string
-  provider: string
-  cachedAt: number
+/**
+ * Convert a human-readable (major-unit) amount to the integer Paystack expects.
+ *
+ * Paystack always uses major × 100 for ALL currencies, including XOF/XAF.
+ * ISO 4217 defines XOF as zero-decimal, but Paystack ignores this convention:
+ * their API divides by 100 before displaying to the customer.
+ *
+ *   19 023 XOF (major) → 1 902 300 (Paystack subunit) → displayed as 19 023 XOF
+ *   43.80 EUR (major)  →     4 380 (Paystack subunit) → displayed as 43.80 EUR
+ */
+function toPaystackAmount(amountMajor: number, currency: string): number {
+  if (!Number.isFinite(amountMajor) || amountMajor <= 0) {
+    throw new Error(`Invalid amount ${amountMajor} for ${currency}`)
+  }
+  const result = Math.round(amountMajor * 100)
+  if (!Number.isInteger(result) || result <= 0) {
+    throw new Error(
+      `Computed Paystack amount ${result} is not a valid positive integer ` +
+      `(input: ${amountMajor} ${currency.toUpperCase()})`
+    )
+  }
+  return result
 }
-
-let fxRateCache: { [key: string]: FxRate } = {}
-const FX_CACHE_TTL_MS = 30 * 60 * 1000 // 30 minutes
 
 /**
- * Fetch live EUR/XOF rate. XOF is pegged ~655.957; API may vary. Cached 30 min.
+ * Reverse of toPaystackAmount: convert Paystack subunit back to major unit.
+ * Paystack always uses ×100 convention for all currencies.
  */
-async function getEurXofRate(): Promise<FxRate> {
-  const cacheKey = 'EUR_XOF'
-  const now = Date.now()
-
-  if (fxRateCache[cacheKey] && (now - fxRateCache[cacheKey].cachedAt) < FX_CACHE_TTL_MS) {
-    console.log('[fx] Using cached EUR/XOF rate:', fxRateCache[cacheKey].rate)
-    return fxRateCache[cacheKey]
-  }
-
-  try {
-    const apiKey = Deno.env.get('EXCHANGERATE_API_KEY')
-    const apiUrl = apiKey
-      ? `https://v6.exchangerate-api.com/v6/${apiKey}/latest/EUR`
-      : 'https://api.exchangerate-api.com/v4/latest/EUR'
-
-    console.log('[fx] Fetching live EUR/XOF rate...')
-    const response = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } })
-
-    if (!response.ok) {
-      throw new Error(`FX API returned ${response.status}`)
-    }
-
-    const data = await response.json()
-    const xofRate = data.rates?.XOF || data.conversion_rates?.XOF
-
-    if (!xofRate || typeof xofRate !== 'number' || xofRate <= 0) {
-      throw new Error('Invalid XOF rate in API response')
-    }
-
-    const fxRate: FxRate = {
-      rate: xofRate,
-      asOf: data.time_last_update_utc || data.date || new Date().toISOString(),
-      provider: 'exchangerate-api.com',
-      cachedAt: now,
-    }
-
-    fxRateCache[cacheKey] = fxRate
-    console.log(`[fx] Fetched live rate: 1 EUR = ${xofRate} XOF (as of ${fxRate.asOf})`)
-    return fxRate
-  } catch (error) {
-    console.warn('[fx] Failed to fetch live rate:', (error as Error).message)
-    const fallbackRate = Number(Deno.env.get('EUR_XOF_FALLBACK_RATE')) || 655.957
-    console.log(`[fx] Using fallback rate: 1 EUR = ${fallbackRate} XOF`)
-    return {
-      rate: fallbackRate,
-      asOf: new Date().toISOString(),
-      provider: 'fallback',
-      cachedAt: now,
-    }
-  }
+function fromPaystackAmount(subunitAmount: number): number {
+  return subunitAmount / 100
 }
 
-function jsonResponse(data: Record<string, unknown>, status = 200): Response {
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+function json(data: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
 }
 
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+function isValidEmail(e: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
 }
 
-function round2(n: number): number {
-  return Math.round(n * 100) / 100
+// ─── FX cache ───────────────────────────────────────────────────────────────
+
+interface FxRate { rate: number; asOf: string; provider: string; cachedAt: number }
+let fxCache: Record<string, FxRate> = {}
+const FX_TTL = 30 * 60 * 1000
+
+async function getEurXofRate(): Promise<FxRate> {
+  const k = 'EUR_XOF'
+  const now = Date.now()
+  if (fxCache[k] && now - fxCache[k].cachedAt < FX_TTL) return fxCache[k]
+
+  try {
+    const apiKey = Deno.env.get('EXCHANGERATE_API_KEY')
+    const url = apiKey
+      ? `https://v6.exchangerate-api.com/v6/${apiKey}/latest/EUR`
+      : 'https://api.exchangerate-api.com/v4/latest/EUR'
+    const res = await fetch(url, { headers: { Accept: 'application/json' } })
+    if (!res.ok) throw new Error(`FX API ${res.status}`)
+    const d = await res.json()
+    const xof = d.rates?.XOF || d.conversion_rates?.XOF
+    if (!xof || typeof xof !== 'number' || xof <= 0) throw new Error('bad rate')
+    const r: FxRate = { rate: xof, asOf: d.time_last_update_utc || new Date().toISOString(), provider: 'exchangerate-api', cachedAt: now }
+    fxCache[k] = r
+    console.log(`[fx] 1 EUR = ${xof} XOF (live)`)
+    return r
+  } catch (e) {
+    const fb = Number(Deno.env.get('EUR_XOF_FALLBACK_RATE')) || 655.957
+    console.warn(`[fx] fallback ${fb}:`, (e as Error).message)
+    const r: FxRate = { rate: fb, asOf: new Date().toISOString(), provider: 'fallback', cachedAt: now }
+    fxCache[k] = r
+    return r
+  }
 }
+
+// ─── main ───────────────────────────────────────────────────────────────────
 
 serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
-
-  if (req.method !== 'POST') {
-    return jsonResponse({ error: 'Method not allowed' }, 405)
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 
   try {
     const PAYSTACK_SECRET_KEY = Deno.env.get('PAYSTACK_SECRET_KEY')
-    if (!PAYSTACK_SECRET_KEY) {
-      console.error('[paystack-init] PAYSTACK_SECRET_KEY is not set')
-      return jsonResponse({ error: 'Payment service is not configured. Contact support.' }, 500)
-    }
+    if (!PAYSTACK_SECRET_KEY) return json({ error: 'Payment service not configured' }, 500)
 
-    let body: Record<string, unknown>
-    try {
-      body = await req.json()
-    } catch (_e) {
-      return jsonResponse({ error: 'Invalid JSON body' }, 400)
-    }
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
+    const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+    const body = await req.json().catch(() => null)
+    if (!body) return json({ error: 'Invalid JSON' }, 400)
 
     const {
-      amount,
-      currency,
-      email,
-      reference,
-      metadata,
-      channels,
-      callback_url,
       order_id,
-      country,
+      email,
+      locale,            // 'FR' | 'CI'
+      shipping_zone_code,
+      express_delivery,
+      callback_url,
     } = body as {
-      amount?: number
-      currency?: string
-      email?: string
-      reference?: string
-      metadata?: Record<string, unknown>
-      channels?: string[]
-      callback_url?: string
       order_id?: string
-      country?: string
+      email?: string
+      locale?: string
+      shipping_zone_code?: string
+      express_delivery?: boolean
+      callback_url?: string
     }
 
-    if (!email || typeof email !== 'string' || !isValidEmail(email)) {
-      return jsonResponse({
-        error: 'A valid email address is required',
-        field: 'email',
-        received: email ?? null,
-      }, 400)
+    // ── validate inputs ─────────────────────────────────────────────────
+    if (!order_id) return json({ error: 'order_id is required' }, 400)
+    if (!email || !isValidEmail(email)) return json({ error: 'Valid email is required' }, 400)
+    if (!locale || !['FR', 'CI'].includes(locale.toUpperCase())) {
+      return json({ error: 'locale must be FR or CI' }, 400)
+    }
+    const loc = locale.toUpperCase()
+    const isCI = loc === 'CI'
+    const isFR = loc === 'FR'
+
+    // ── fetch order ─────────────────────────────────────────────────────
+    const { data: order, error: orderErr } = await supabase
+      .from('commande')
+      .select('id, statut, payment_reference, total')
+      .eq('id', order_id)
+      .single()
+
+    if (orderErr || !order) return json({ error: 'Order not found', order_id }, 404)
+    if (order.statut === 'PAID') return json({ error: 'Order already paid', order_id }, 409)
+
+    // ── fetch order items + canonical product prices ────────────────────
+    const { data: items, error: itemsErr } = await supabase
+      .from('commande_item')
+      .select(`
+        quantite,
+        produit_variation_id,
+        variant:produit_variation_id (
+          produit_id,
+          produit:produit_id ( prix )
+        )
+      `)
+      .eq('commande_id', order_id)
+
+    if (itemsErr || !items || items.length === 0) {
+      return json({ error: 'No order items found', order_id }, 400)
     }
 
-    if (!reference || typeof reference !== 'string' || reference.length < 3) {
-      return jsonResponse({
-        error: 'A payment reference (min 3 chars) is required',
-        field: 'reference',
-        received: reference ?? null,
-      }, 400)
-    }
-
-    if (amount === undefined || amount === null || typeof amount !== 'number' || !isFinite(amount) || amount <= 0) {
-      return jsonResponse({
-        error: 'Amount must be a positive finite number',
-        field: 'amount',
-        received: amount ?? null,
-      }, 400)
-    }
-
-    // ----------------------------------------------------------------------
-    // Country-based currency logic
-    // Both France and Côte d'Ivoire charge in XOF
-    // France: frontend sends EUR → we convert to XOF
-    // CI: frontend sends XOF → pass through
-    // ----------------------------------------------------------------------
-    let finalCurrency: string
-    let xofTotal: number
-    let paystackAmount: number
-    let conversionMeta: Record<string, unknown> = {}
-    let paymentChannels: string[]
-
-    const selectedCountry = (country || '').toUpperCase()
-
-    if (selectedCountry === 'FR' || selectedCountry === 'FRANCE') {
-      // FRANCE: EUR → XOF conversion. Card only (per Paystack channels).
-      const eurTotal = round2(amount)
-      const inputCurrency = ((currency as string) || 'EUR').toUpperCase()
-
-      if (inputCurrency !== 'EUR') {
-        return jsonResponse({
-          error: `For France, amount must be sent in EUR. Received: ${inputCurrency}`,
-          field: 'currency',
-          received: inputCurrency,
-        }, 400)
+    // ── compute subtotal in EUR (canonical prices) ──────────────────────
+    let subtotalEur = 0
+    const breakdown: { qty: number; unit_price_eur: number }[] = []
+    for (const item of items) {
+      const prix = (item as any).variant?.produit?.prix
+      if (typeof prix !== 'number' || prix < 0) {
+        return json({ error: 'Product price missing or invalid', order_id }, 500)
       }
+      subtotalEur += prix * item.quantite
+      breakdown.push({ qty: item.quantite, unit_price_eur: prix })
+    }
+    subtotalEur = Math.round(subtotalEur * 100) / 100
 
-      const fxRate = await getEurXofRate()
-      xofTotal = Math.round(eurTotal * fxRate.rate)
-      // XOF is zero-decimal: paystack_amount = xofTotal (no *100)
-      paystackAmount = xofTotal
-      finalCurrency = 'XOF'
-      paymentChannels = ['card']
-
-      conversionMeta = {
-        country: 'FR',
-        displayed_currency: 'EUR',
-        displayed_amount: eurTotal,
-        pay_currency: 'XOF',
-        pay_amount: xofTotal,
-        paystack_amount_subunits: paystackAmount,
-        fx_rate: fxRate.rate,
-        fx_as_of: fxRate.asOf,
-        fx_provider: fxRate.provider,
-        conversion_applied: true,
-      }
-
-      console.log(
-        JSON.stringify({
-          event: 'paystack_init_france',
-          eur_total: eurTotal,
-          fx_rate_used: fxRate.rate,
-          xof_total: xofTotal,
-          paystack_amount: paystackAmount,
-          currency: finalCurrency,
-          channels: paymentChannels,
-          reference,
-          order_id: order_id ?? null,
-        })
-      )
-    } else if (selectedCountry === 'CI' || selectedCountry === 'COTE D\'IVOIRE') {
-      // CÔTE D'IVOIRE: XOF pass-through. Amount already in XOF (integer).
-      // Ensure we send integer: 19800 XOF = amount 19800 (NOT 198)
-      xofTotal = Math.round(amount)
-      paystackAmount = xofTotal
-      finalCurrency = 'XOF'
-      paymentChannels = channels && Array.isArray(channels) && channels.length > 0
-        ? channels
-        : ['mobile_money', 'card']
-
-      conversionMeta = {
-        country: 'CI',
-        displayed_currency: 'XOF',
-        displayed_amount: xofTotal,
-        pay_currency: 'XOF',
-        pay_amount: xofTotal,
-        conversion_applied: false,
-      }
-
-      console.log(
-        JSON.stringify({
-          event: 'paystack_init_ci',
-          eur_total: null,
-          fx_rate_used: null,
-          xof_total: xofTotal,
-          paystack_amount: paystackAmount,
-          currency: finalCurrency,
-          channels: paymentChannels,
-          reference,
-          order_id: order_id ?? null,
-        })
-      )
-    } else {
-      console.warn(`[paystack-init] Unknown country: ${selectedCountry}. Defaulting to XOF.`)
-      xofTotal = Math.round(amount)
-      paystackAmount = xofTotal
-      finalCurrency = 'XOF'
-      paymentChannels = ['card', 'mobile_money']
-      conversionMeta = {
-        country: selectedCountry || 'unknown',
-        displayed_currency: 'XOF',
-        displayed_amount: xofTotal,
-        pay_currency: 'XOF',
-        pay_amount: xofTotal,
-        conversion_applied: false,
-      }
+    // Overwrite client-supplied prix_unitaire with canonical product prices from DB.
+    // The frontend writes item.price (client-controlled) into commande_item at order
+    // creation time. Overwriting here ensures invoice generation and all downstream
+    // reads always use server-verified prices, regardless of what the client sent.
+    const priceOverwrites = items.map(item =>
+      supabase.from('commande_item')
+        .update({ prix_unitaire: (item as any).variant?.produit?.prix })
+        .eq('commande_id', order_id)
+        .eq('produit_variation_id', item.produit_variation_id)
+    )
+    const overwriteResults = await Promise.all(priceOverwrites)
+    const overwriteFailures = overwriteResults.filter(r => r.error)
+    if (overwriteFailures.length > 0) {
+      console.error('[paystack-init] Failed to canonicalize item prices:', overwriteFailures.map(r => r.error?.message))
     }
 
-    if (!SUPPORTED_CURRENCIES.includes(finalCurrency)) {
-      return jsonResponse({
-        error: `Currency '${finalCurrency}' is not supported by Paystack`,
-        supported_currencies: SUPPORTED_CURRENCIES,
-        field: 'currency',
-      }, 400)
-    }
+    // ── fetch shipping cost ─────────────────────────────────────────────
+    let shippingCost = 0
+    let shippingCurrency = isCI ? 'XOF' : 'EUR'
 
-    // XOF: amount is already in subunits (zero-decimal). No *100.
-    if (ZERO_DECIMAL_CURRENCIES.includes(finalCurrency)) {
-      paystackAmount = Math.round(paystackAmount)
-    } else {
-      paystackAmount = Math.round(paystackAmount * 100)
-    }
-
-    if (paystackAmount < 100) {
-      return jsonResponse({
-        error: `Amount too low: ${paystackAmount} ${finalCurrency} (smallest unit). Minimum is 100.`,
-        field: 'amount',
-        received_amount: amount,
-        converted_amount: paystackAmount,
-        currency: finalCurrency,
-      }, 400)
-    }
-
-    // ----------------------------------------------------------------------
-    // Idempotency check
-    // ----------------------------------------------------------------------
-    let supabase: ReturnType<typeof createClient> | null = null
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-    const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-
-    if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
-      supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-    }
-
-    if (order_id && supabase) {
-      const { data: existingOrder } = await supabase
-        .from('commande')
-        .select('id, payment_reference, statut, payment_data')
-        .eq('id', order_id)
+    if (shipping_zone_code) {
+      const { data: tariff } = await supabase
+        .from('livraison_tarifs')
+        .select('price, currency')
+        .eq('country_code', loc)
+        .eq('zone_code', shipping_zone_code)
+        .eq('is_express', false)
+        .eq('is_active', true)
         .single()
 
-      if (existingOrder) {
-        if (existingOrder.statut === 'PAID') {
-          return jsonResponse({
-            error: 'This order has already been paid',
-            order_id,
-          }, 409)
-        }
-
-        const allowedReInitStatuses = ['Nouvelle', 'en_attente', 'PENDING', 'FAILED']
-        if (
-          existingOrder.payment_reference &&
-          existingOrder.payment_reference !== reference &&
-          !allowedReInitStatuses.includes(existingOrder.statut)
-        ) {
-          return jsonResponse({
-            error: 'Order already has an active payment session.',
-            order_id,
-            current_status: existingOrder.statut,
-          }, 409)
-        }
+      if (tariff) {
+        shippingCost = Number(tariff.price)
+        shippingCurrency = tariff.currency || shippingCurrency
       }
     }
 
-    // ----------------------------------------------------------------------
-    // Call Paystack
-    // ----------------------------------------------------------------------
-    console.log(
-      `[paystack-init] Initializing: email=${email}, ref=${reference}, ` +
-      `amount=${paystackAmount} XOF (subunits), channels=${paymentChannels.join(',')}, order=${order_id ?? 'n/a'}`
-    )
+    // ── fetch express cost ──────────────────────────────────────────────
+    let expressCost = 0
+    if (express_delivery && shipping_zone_code) {
+      const { data: expressTariff } = await supabase
+        .from('livraison_tarifs')
+        .select('price, currency')
+        .eq('country_code', loc)
+        .eq('zone_code', shipping_zone_code)
+        .eq('is_express', true)
+        .eq('is_active', true)
+        .single()
 
-    const paystackPayload = {
-      email,
-      amount: paystackAmount,
-      currency: finalCurrency,
-      reference,
-      metadata: {
-        ...(metadata || {}),
-        ...conversionMeta,
-      },
-      channels: paymentChannels,
-      ...(callback_url ? { callback_url } : {}),
-    }
-
-    const paystackResponse = await fetch(
-      'https://api.paystack.co/transaction/initialize',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(paystackPayload),
-      },
-    )
-
-    const paystackData = await paystackResponse.json()
-
-    if (!paystackResponse.ok || !paystackData.status) {
-      const paystackMessage = paystackData.message || 'Unknown error'
-
-      const isCurrencyNotSupported =
-        typeof paystackMessage === 'string' &&
-        (paystackMessage.toLowerCase().includes('currency not supported') ||
-         paystackMessage.toLowerCase().includes('currency not supported by merchant'))
-
-      const isChannelError =
-        typeof paystackMessage === 'string' &&
-        paystackMessage.toLowerCase().includes('channel')
-
-      if (isCurrencyNotSupported) {
-        return jsonResponse({
-          error: 'La devise XOF n\'est pas activée pour ce compte Paystack. Veuillez contacter le support.',
-          field: 'currency',
-          paystack_message: paystackMessage,
-          hint: 'Vérifiez les paramètres Paystack Dashboard → Settings → Business.',
-        }, 400)
+      if (expressTariff && Number(expressTariff.price) > 0) {
+        expressCost = Number(expressTariff.price)
       }
-
-      if (isChannelError) {
-        return jsonResponse({
-          error: paystackMessage || 'Le canal de paiement demandé n\'est pas disponible.',
-          field: 'channels',
-          paystack_message: paystackMessage,
-        }, 400)
-      }
-
-      console.error(
-        `[paystack-init] Paystack API error (HTTP ${paystackResponse.status}):`,
-        paystackMessage,
-      )
-
-      return jsonResponse({
-        error: paystackMessage || 'Échec de l\'initialisation du paiement Paystack.',
-        paystack_status: paystackResponse.status,
-        details: typeof paystackData.data === 'object' ? paystackData.data : null,
-        hint: paystackResponse.status === 400
-          ? 'Vérifiez le montant, la devise et l\'email. Paystack peut ne pas prendre en charge cette devise.'
-          : undefined,
-      }, paystackResponse.status >= 400 && paystackResponse.status < 500 ? 400 : 502)
     }
+    // FR without zone but with express: try generic express
+    if (express_delivery && !shipping_zone_code && isFR) {
+      const { data: frExpress } = await supabase
+        .from('livraison_tarifs')
+        .select('price')
+        .eq('country_code', 'FR')
+        .eq('is_express', true)
+        .eq('is_active', true)
+        .limit(1)
+        .single()
 
-    // ----------------------------------------------------------------------
-    // Persist payment data
-    // ----------------------------------------------------------------------
-    if (order_id && supabase) {
-      const { error: updateError } = await supabase
-        .from('commande')
-        .update({
-          payment_reference: paystackData.data.reference,
-          payment_data: {
-            access_code: paystackData.data.access_code,
-            authorization_url: paystackData.data.authorization_url,
-            currency: finalCurrency,
-            amount_paystack: paystackAmount,
-            ...conversionMeta,
-            initialized_at: new Date().toISOString(),
-          },
-        })
-        .eq('id', order_id)
-
-      if (updateError) {
-        console.error('[paystack-init] Failed to update order:', updateError.message)
-      } else {
-        console.log(`[paystack-init] Order ${order_id} updated with payment reference`)
+      if (frExpress && Number(frExpress.price) > 0) {
+        expressCost = Number(frExpress.price)
       }
     }
 
-    console.log(`[paystack-init] Success: ref=${paystackData.data.reference}`)
+    // ── compute final total ─────────────────────────────────────────────
+    const fxRate = await getEurXofRate()
+    let totalXof: number
+    let displayedTotal: number
+    let displayedCurrency: string
 
-    return jsonResponse({
-      authorization_url: paystackData.data.authorization_url,
-      reference: paystackData.data.reference,
-      access_code: paystackData.data.access_code,
+    if (isCI) {
+      // CI: product prices (EUR) → XOF, shipping already in XOF
+      const subtotalXof = Math.round(subtotalEur * fxRate.rate)
+      const shippingXof = Math.round(shippingCost)
+      const expressXof = Math.round(expressCost)
+      totalXof = subtotalXof + shippingXof + expressXof
+      displayedTotal = totalXof
+      displayedCurrency = 'XOF'
+    } else {
+      // FR: everything in EUR, then convert final total to XOF for Paystack
+      const totalEur = subtotalEur + shippingCost + expressCost
+      displayedTotal = Math.round(totalEur * 100) / 100
+      displayedCurrency = 'EUR'
+      totalXof = Math.round(totalEur * fxRate.rate)
+    }
+
+    const paystackAmount = toPaystackAmount(totalXof, 'XOF')
+
+    if (paystackAmount < 1) {
+      return json({ error: `Total too low: ${totalXof} XOF (min 1 XOF)` }, 400)
+    }
+
+    // ── generate reference ──────────────────────────────────────────────
+    const reference = `SW_${Date.now()}_${Math.floor(Math.random() * 10000)}`
+
+    const conversionMeta = {
+      locale: loc,
+      subtotal_eur: subtotalEur,
+      shipping_cost: shippingCost,
+      shipping_currency: shippingCurrency,
+      express_cost: expressCost,
+      express_delivery: !!express_delivery,
+      fx_rate: fxRate.rate,
+      fx_provider: fxRate.provider,
+      displayed_total: displayedTotal,
+      displayed_currency: displayedCurrency,
+      total_xof_major: totalXof,
+      paystack_amount_subunit: paystackAmount,
+      items_breakdown: breakdown,
+    }
+
+    console.log(JSON.stringify({
+      event: 'paystack_init',
+      order_id,
       ...conversionMeta,
-      amount_minor_units: paystackAmount,
+      reference,
+    }))
+
+    // ── persist computed data on order ───────────────────────────────────
+    const { error: updateErr } = await supabase.from('commande').update({
+      locale: loc,
+      country_code: loc,
+      shipping_zone_code: shipping_zone_code || null,
+      shipping_cost: shippingCost,
+      express_delivery: !!express_delivery,
+      express_cost: expressCost,
+      server_computed_total: paystackAmount,
+      currency: displayedCurrency,
+      total: displayedTotal,
+      exchange_rate_eur_to_xof: fxRate.rate,
+      payment_reference: reference,
+      statut: 'PENDING',
+    }).eq('id', order_id)
+
+    if (updateErr) {
+      console.error('[paystack-init] Order update failed:', updateErr.message)
+    }
+
+    // ── call Paystack ───────────────────────────────────────────────────
+    const channels = isCI ? ['mobile_money', 'card'] : ['card']
+
+    const psRes = await fetch('https://api.paystack.co/transaction/initialize', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        amount: paystackAmount,
+        currency: 'XOF',
+        reference,
+        channels,
+        metadata: { order_id, ...conversionMeta },
+        ...(callback_url ? { callback_url } : {}),
+      }),
     })
 
-  } catch (error) {
-    console.error('[paystack-init] Unhandled error:', (error as Error).message)
-    return jsonResponse({
-      error: (error as Error).message || 'Internal server error',
-    }, 500)
+    const psData = await psRes.json()
+
+    if (!psRes.ok || !psData.status) {
+      console.error('[paystack-init] Paystack error:', psData.message)
+      return json({
+        error: psData.message || 'Paystack initialization failed',
+        paystack_status: psRes.status,
+      }, psRes.status >= 400 && psRes.status < 500 ? 400 : 502)
+    }
+
+    // persist payment session data
+    await supabase.from('commande').update({
+      payment_data: {
+        access_code: psData.data.access_code,
+        authorization_url: psData.data.authorization_url,
+        initialized_at: new Date().toISOString(),
+        ...conversionMeta,
+      },
+    }).eq('id', order_id)
+
+    console.log(`[paystack-init] OK ref=${psData.data.reference}`)
+
+    return json({
+      authorization_url: psData.data.authorization_url,
+      reference: psData.data.reference,
+      access_code: psData.data.access_code,
+      displayed_total: displayedTotal,
+      displayed_currency: displayedCurrency,
+      total_xof_major: totalXof,
+      paystack_amount_subunit: paystackAmount,
+      fx_rate: fxRate.rate,
+    })
+  } catch (e) {
+    console.error('[paystack-init] unhandled:', (e as Error).message)
+    return json({ error: (e as Error).message || 'Internal error' }, 500)
   }
 })

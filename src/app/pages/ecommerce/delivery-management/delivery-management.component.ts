@@ -42,6 +42,7 @@ export class DeliveryManagementComponent implements OnInit {
       country_code: ['CI', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
       zone_code: ['', [Validators.required]],
       label: ['', [Validators.required]],
+      description: [null],
       price: [0, [Validators.required, Validators.min(0)]],
       currency: ['XOF', [Validators.required]],
       is_express: [false],
@@ -95,7 +96,29 @@ export class DeliveryManagementComponent implements OnInit {
     }
     
     const formData: DeliveryPriceRequest = this.priceForm.value;
-    
+
+    // Warn admin when an express delivery is saved with price = 0:
+    // it will be invisible to customers at checkout.
+    if (formData.is_express && formData.price === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Express à 0',
+        text: 'Ce tarif express a un prix de 0. Il ne sera pas affiché aux clients sur la page de paiement. Augmentez le prix si vous souhaitez qu\'il soit visible.',
+        confirmButtonText: 'Continuer quand même',
+        showCancelButton: true,
+        cancelButtonText: 'Corriger le prix',
+        confirmButtonColor: '#f06548',
+        cancelButtonColor: '#405189'
+      }).then(result => {
+        if (result.isConfirmed) {
+          this.isEditing && this.editingId
+            ? this.updatePrice(this.editingId, formData)
+            : this.createPrice(formData);
+        }
+      });
+      return;
+    }
+
     if (this.isEditing && this.editingId) {
       this.updatePrice(this.editingId, formData);
     } else {
@@ -162,6 +185,7 @@ export class DeliveryManagementComponent implements OnInit {
       country_code: price.country_code,
       zone_code: price.zone_code,
       label: price.label,
+      description: price.description,
       price: price.price,
       currency: price.currency,
       is_express: price.is_express,
@@ -250,6 +274,7 @@ export class DeliveryManagementComponent implements OnInit {
     this.priceForm.reset({
       country_code: 'CI',
       currency: 'XOF',
+      description: null,
       is_express: false,
       is_active: true,
       display_order: 0,

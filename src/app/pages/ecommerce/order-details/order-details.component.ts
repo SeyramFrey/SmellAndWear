@@ -6,6 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 import { CommandeService, OrderWithItems } from '../../../core/services/commande.service';
+import { InvoiceService } from '../../../core/services/invoice.service';
 
 /**
  * Order Details Component for Admin
@@ -56,6 +57,10 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
     { value: 'other', label: 'Autre' }
   ];
   
+  // Invoice
+  sendingInvoice = false;
+  generatingInvoice = false;
+
   private destroy$ = new Subject<void>();
   
   constructor(
@@ -63,6 +68,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilder: FormBuilder,
     private commandeService: CommandeService,
+    private invoiceService: InvoiceService,
     private cdr: ChangeDetectorRef
   ) {}
   
@@ -190,18 +196,19 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
   }
   
   /**
-   * Update order status manually
+   * Update order status manually and notify customer by email
    */
   updateStatus(newStatus: string): void {
     if (!this.order) return;
     
     Swal.fire({
       title: 'Confirmer le changement de statut',
-      text: `Voulez-vous changer le statut de la commande en "${newStatus}" ?`,
+      html: `Voulez-vous changer le statut de la commande en "<strong>${newStatus}</strong>" ?<br><small class="text-muted">Un email de notification sera envoyé au client.</small>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Oui, changer',
-      cancelButtonText: 'Annuler'
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: '#B5190C',
     }).then((result) => {
       if (result.isConfirmed) {
         this.commandeService.updateOrderStatus(this.orderId, newStatus)
@@ -210,7 +217,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             next: () => {
               Swal.fire({
                 title: 'Statut mis à jour',
-                text: `La commande est maintenant "${newStatus}".`,
+                html: `La commande est maintenant "<strong>${newStatus}</strong>".<br>Un email de notification a été envoyé au client.`,
                 icon: 'success',
                 confirmButtonText: 'OK'
               });
@@ -296,12 +303,19 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
   }
   
   /**
-   * Format currency
+   * Format currency using the order's stored currency
    */
-  formatCurrency(amount: number): string {
+  formatCurrency(amount: number, currency?: string): string {
+    const cur = (currency || this.order?.currency || 'EUR').toUpperCase();
+    if (cur === 'XOF') {
+      return new Intl.NumberFormat('fr-FR', {
+        style: 'decimal',
+        maximumFractionDigits: 0
+      }).format(Math.round(amount)) + ' FCFA';
+    }
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: cur === 'USD' ? 'USD' : 'EUR'
     }).format(amount);
   }
   
@@ -326,6 +340,95 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
   getCarrierLabel(carrier: string): string {
     const found = this.carrierOptions.find(c => c.value === carrier);
     return found ? found.label : carrier;
+  }
+
+  /**
+   * Generate & send invoice email to customer
+   */
+  sendInvoice(regenerate: boolean): void {
+    if (!this.order) return;
+
+    const action = regenerate ? 'Régénérer et envoyer' : 'Renvoyer';
+    Swal.fire({
+      title: `${action} la facture`,
+      text: `La facture sera envoyée par email à ${this.order.client?.email || 'l\'adresse du client'}.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: `Oui, ${action.toLowerCase()}`,
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: '#B5190C',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.sendingInvoice = true;
+        this.cdr.detectChanges();
+
+        this.invoiceService.sendInvoice(this.orderId, regenerate)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (res) => {
+              this.sendingInvoice = false;
+              Swal.fire({
+                title: 'Facture envoyée !',
+                text: `Email envoyé à ${res.email_sent_to}`,
+                icon: 'success',
+                confirmButtonText: 'OK',
+              });
+              this.loadOrderDetails();
+            },
+            error: (err) => {
+              this.sendingInvoice = false;
+              console.error('Invoice send error:', err);
+              Swal.fire({
+                title: 'Erreur',
+                text: err.message || 'Impossible d\'envoyer la facture.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+              });
+              this.cdr.detectChanges();
+            }
+          });
+      }
+    });
+  }
+
+  /**
+   * Download invoice PDF (generate if needed)
+   */
+  downloadInvoice(): void {
+    if (!this.order) return;
+
+    this.generatingInvoice = true;
+    this.cdr.detectChanges();
+
+    this.invoiceService.generateInvoice(this.orderId, false)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.generatingInvoice = false;
+          if (res.signed_url) {
+            window.open(res.signed_url, '_blank');
+          } else {
+            Swal.fire({
+              title: 'Erreur',
+              text: 'Impossible de générer le lien de téléchargement.',
+              icon: 'error',
+              confirmButtonText: 'OK',
+            });
+          }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.generatingInvoice = false;
+          console.error('Invoice download error:', err);
+          Swal.fire({
+            title: 'Erreur',
+            text: err.message || 'Impossible de générer la facture.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+          this.cdr.detectChanges();
+        }
+      });
   }
 }
 

@@ -38,6 +38,8 @@ export interface CreateOrderRequest {
   adresse_livraison_id?: string;
   adresse_facturation_id?: string;
   total: number;
+  country_code: string;  // 'FR' | 'CI'
+  currency: string;      // 'EUR' | 'XOF'
   items: {
     produit_variation_id: string;
     quantite: number;
@@ -233,6 +235,9 @@ export class CommandeService {
           adresse_livraison_id: orderRequest.adresse_livraison_id,
           adresse_facturation_id: orderRequest.adresse_facturation_id,
           total: orderRequest.total,
+          country_code: orderRequest.country_code,
+          currency: orderRequest.currency,
+          locale: orderRequest.country_code,
           statut: 'Nouvelle',
           ...(orderRequest.payment_reference
             ? { payment_reference: orderRequest.payment_reference }
@@ -269,12 +274,11 @@ export class CommandeService {
   }
 
   /**
-   * Update order status
+   * Update order status and send notification email to customer
    */
   updateOrderStatus(orderId: string, newStatus: string): Observable<Commande> {
     return from(this.performUpdateOrderStatus(orderId, newStatus)).pipe(
       tap(() => {
-        // Refresh the orders list
         this.refreshCommandes();
       }),
       catchError(error => {
@@ -285,6 +289,9 @@ export class CommandeService {
   }
 
   private async performUpdateOrderStatus(orderId: string, newStatus: string): Promise<Commande> {
+    const currentOrder = await this.fetchCommandeById(orderId);
+    const oldStatus = currentOrder?.statut;
+
     const { data, error } = await this.supabaseService.getClient()
       .from(this.tableName)
       .update({ statut: newStatus })
@@ -293,7 +300,74 @@ export class CommandeService {
       .single();
 
     if (error) throw error;
+
+    this.sendStatusNotificationEmail(orderId, newStatus, oldStatus);
+
     return data as Commande;
+  }
+
+  /**
+   * Send status change notification email via Edge Function (non-blocking)
+   */
+  private async sendStatusNotificationEmail(
+    orderId: string,
+    newStatus: string,
+    oldStatus?: string,
+  ): Promise<void> {
+    try {
+      const { data, error } = await this.supabaseService.getClient()
+        .functions.invoke('send-order-status-notification', {
+          body: { order_id: orderId, new_status: newStatus, old_status: oldStatus },
+        });
+
+      if (error) {
+        console.error('Status notification email failed:', error);
+      } else {
+        console.log('Status notification sent:', data);
+      }
+    } catch (err) {
+      console.error('Failed to invoke status notification function:', err);
+    }
+  }
+
+  /**
+   * Delete an order and its related items from Supabase.
+   * Deletes commande_item rows first (FK dependency), then the commande row.
+   */
+  deleteCommande(orderId: string): Observable<void> {
+    return from(this.performDeleteCommande(orderId)).pipe(
+      catchError(error => {
+        console.error('Error deleting order:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private async performDeleteCommande(orderId: string): Promise<void> {
+    const client = this.supabaseService.getClient();
+
+    // 1) Delete child rows (commande_item) — FK constraint requires this first
+    const { error: itemsError } = await client
+      .from(this.itemsTableName)
+      .delete()
+      .eq('commande_id', orderId);
+
+    if (itemsError) {
+      console.warn('Error deleting order items (may be cascade):', itemsError.message);
+    }
+
+    // 2) Delete order_events if the table exists (best-effort)
+    try {
+      await client.from('order_events').delete().eq('order_id', orderId);
+    } catch { /* table may not exist — ignore */ }
+
+    // 3) Delete the commande itself
+    const { error } = await client
+      .from(this.tableName)
+      .delete()
+      .eq('id', orderId);
+
+    if (error) throw error;
   }
 
   /**
@@ -349,7 +423,7 @@ export class CommandeService {
 
     doc.setFontSize(12);
     doc.text(`Commande N°: ${order.id}`, 20, 50);
-    doc.text(`Date: ${new Date(order.created_at!).toLocaleDateString('fr-FR')}`, 20, 60);
+    doc.text(`Date: ${new Date(order.created_at!).toLocaleDateString('fr-FR').replace(/\u202F/g, ' ')}`, 20, 60);
 
     // Client information
     if (order.client) {

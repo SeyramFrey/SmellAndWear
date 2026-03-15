@@ -74,6 +74,17 @@
                 <small class="text-muted">Nom affiché aux clients</small>
               </div>
 
+              <!-- Description -->
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea
+                  class="form-control"
+                  formControlName="description"
+                  rows="2"
+                  placeholder="Ex : Livraison en 24h dans toute la région, du lundi au samedi..."></textarea>
+                <small class="text-muted">Information complémentaire affichée aux clients (délai, conditions, zone couverte…)</small>
+              </div>
+
               <!-- Price -->
               <div class="col-md-2">
                 <label class="form-label">Prix <span class="text-danger">*</span></label>
@@ -221,6 +232,7 @@
                   <th scope="col">Pays</th>
                   <th scope="col">Zone</th>
                   <th scope="col">Libellé</th>
+                  <th scope="col">Description</th>
                   <th scope="col">Prix</th>
                   <th scope="col">Type</th>
                   <th scope="col">Statut</th>
@@ -247,6 +259,14 @@
                     <strong>{{ price.label }}</strong>
                   </td>
 
+                  <!-- Description -->
+                  <td style="max-width: 220px;">
+                    <span *ngIf="price.description" class="text-muted small" style="white-space: normal;">
+                      {{ price.description }}
+                    </span>
+                    <span *ngIf="!price.description" class="text-muted fst-italic small">—</span>
+                  </td>
+
                   <!-- Price -->
                   <td>
                     <span class="fw-semibold text-success fs-15">
@@ -264,6 +284,12 @@
                       [class.text-info]="!price.is_express">
                       <i [class]="price.is_express ? 'ri-flashlight-fill' : 'ri-truck-line'"></i>
                       {{ price.is_express ? 'Express' : 'Standard' }}
+                    </span>
+                    <!-- Warning: express at price 0 is invisible to customers -->
+                    <span *ngIf="price.is_express && price.price === 0"
+                          class="badge bg-danger-subtle text-danger ms-1"
+                          title="Prix à 0 — cette option express ne sera pas affichée aux clients">
+                      <i class="ri-eye-off-line"></i> Masqué client
                     </span>
                   </td>
 

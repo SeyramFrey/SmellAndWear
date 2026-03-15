@@ -119,16 +119,34 @@ export interface Commande {
     client_id?: string;
     adresse_livraison_id?: string;
     adresse_facturation_id?: string;
-    statut?: string; // 'Nouvelle' | 'En cours' | 'Expédiée' | 'Livrée' | 'Annulée'
+    statut?: string; // 'Nouvelle' | 'PENDING' | 'PAID' | 'FAILED' | 'En cours' | 'Expédiée' | 'Livrée' | 'Annulée'
     total: number;
     created_at?: Date;
     payment_reference?: string;
+    payment_data?: any;
+    // Order number (generated on payment success, e.g. S&M-FR-00000001)
+    order_number?: string;
+    locale?: string;
+    // Country / currency (persisted at order creation)
+    country_code?: string; // 'FR' | 'CI'
+    currency?: string;     // 'EUR' | 'XOF' | 'USD'
+    exchange_rate_eur_to_xof?: number;
+    // Shipping / delivery
+    shipping_zone_code?: string;
+    shipping_cost?: number;
+    express_delivery?: boolean;
+    express_cost?: number;
+    server_computed_total?: number;
+    // Invoice
+    invoice_pdf_path?: string;
+    invoice_last_sent_at?: string;
     // Shipping/Tracking info
     tracking_code?: string;
     shipping_carrier?: string;
     shipped_at?: Date | string;
     // Relations (joined data)
     client?: Client;
+    items?: CommandeItem[];
 }
 
 

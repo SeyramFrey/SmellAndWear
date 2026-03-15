@@ -20,7 +20,7 @@ The system uses the following Supabase tables:
 - `statut` (TEXT) - Order status: 'Nouvelle' | 'En cours' | 'Expédiée' | 'Livrée' | 'Annulée'
 - `total` (NUMERIC) - Order total amount
 - `created_at` (TIMESTAMP) - Order creation date
-- `payment_reference` (TEXT) - CinetPay payment reference
+- `payment_reference` (TEXT) - Paystack payment reference
 
 #### `commande_item` table
 - `id` (UUID, Primary Key)
@@ -50,7 +50,7 @@ The system uses the following Supabase tables:
 
 **Location**: `src/app/landing/checkout/checkout.component.ts`
 
-When CinetPay payment is successful:
+When Paystack payment is successful:
 
 ```typescript
 private saveOrder(paymentData: any): Promise<void> {
@@ -166,7 +166,7 @@ A test order has been created in the database:
 
 ### For Customers (Checkout)
 1. Complete checkout form
-2. Proceed with CinetPay payment
+2. Proceed with Paystack payment
 3. Upon successful payment, order is automatically created
 4. Order appears in admin interface with status "Nouvelle"
 

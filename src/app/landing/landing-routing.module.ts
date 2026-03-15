@@ -16,6 +16,7 @@ import { AllCategorieComponent } from "./all-categorie/all-categorie.component";
 import { NewsComponent } from "./news/news.component";
 import { BestsellersComponent } from "./bestsellers/bestsellers.component";
 import { AllProductsComponent } from "./all-products/all-products.component";
+import { OrderSuccessComponent } from "./order-success/order-success.component";
 
 const routes: Routes = [
   // Public routes
@@ -47,6 +48,10 @@ const routes: Routes = [
   {
     path: "checkout",
     component: CheckoutComponent
+  },
+  {
+    path: "checkout/success",
+    component: OrderSuccessComponent
   },
   {
     path: "subcategory-products/:id",

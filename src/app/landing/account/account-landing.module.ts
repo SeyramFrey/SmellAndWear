@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { NgbNavModule, NgbModalModule, NgbPaginationModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 
 import { AccountDashboardComponent } from './dashboard/account-dashboard.component';
 import { AccountOrdersComponent } from './orders/account-orders.component';
@@ -53,7 +54,8 @@ const routes: Routes = [
     NgbModalModule,
     NgbPaginationModule,
     NgbTooltipModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    ProductCardComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

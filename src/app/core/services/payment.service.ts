@@ -1,23 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-export interface PaymentInitiationRequest {
-  amount: number;
-  currency: string;
-  orderId: string;
-  transactionId: string;
-  customer: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    phone: string;
-    address?: string;
-    city?: string;
-    country: string;
-  };
-  metadata?: any;
-}
-
 export interface PaymentInitiationResponse {
   authorizationUrl?: string;
   authorization_url?: string;
@@ -39,11 +22,6 @@ export interface PaymentInitiationResponse {
 }
 
 export interface PaymentProvider {
-  /**
-   * Initialize payment and return redirect URL or session info
-   */
-  initiatePayment(request: PaymentInitiationRequest): Observable<PaymentInitiationResponse>;
-  
   /**
    * Handle payment return/callback
    */
@@ -75,16 +53,6 @@ export class PaymentService {
    */
   getProvider(): PaymentProvider | null {
     return this.provider;
-  }
-
-  /**
-   * Initialize payment using the configured provider
-   */
-  initiatePayment(request: PaymentInitiationRequest): Observable<PaymentInitiationResponse> {
-    if (!this.provider) {
-      throw new Error('Payment provider not configured');
-    }
-    return this.provider.initiatePayment(request);
   }
 
   /**

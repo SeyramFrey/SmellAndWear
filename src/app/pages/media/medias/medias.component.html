@@ -2,71 +2,6 @@
 <app-breadcrumbs title="Media Management" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
 <!-- End Breadcrumbs -->
 
-<!-- All Categorie Video (Landing Page) -->
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header border-0">
-                <h5 class="card-title mb-0">
-                    <i class="ri-video-line me-2"></i>All Categorie Video
-                </h5>
-                <small class="text-muted">Vidéo affichée sur la page All Categorie</small>
-            </div>
-            <div class="card-body">
-                <div *ngIf="allCategorieVideoLoading" class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="text-muted mt-2 mb-0">Chargement...</p>
-                </div>
-                <div *ngIf="!allCategorieVideoLoading" class="row align-items-center">
-                    <div class="col-md-6">
-                        <div *ngIf="allCategorieVideo?.url; else noVideoPlaceholder" class="ratio ratio-16x9 rounded overflow-hidden bg-dark">
-                            <video [src]="allCategorieVideo!.url" controls muted class="w-100 h-100 object-fit-cover"></video>
-                        </div>
-                        <ng-template #noVideoPlaceholder>
-                            <div class="ratio ratio-16x9 rounded bg-light d-flex align-items-center justify-content-center">
-                                <div class="text-center text-muted">
-                                    <i class="ri-video-off-line fs-1"></i>
-                                    <p class="mb-0 mt-2">Aucune vidéo configurée</p>
-                                    <small>Utilise la vidéo par défaut (tshirts-hero.mp4)</small>
-                                </div>
-                            </div>
-                        </ng-template>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex flex-column gap-2">
-                            <input type="file" #allCategorieVideoInput class="d-none" 
-                                   accept="video/*" 
-                                   (change)="onAllCategorieVideoSelected($event)">
-                            <button class="btn btn-primary" 
-                                    (click)="allCategorieVideoInput.click()"
-                                    [disabled]="allCategorieVideoUploading">
-                                <i class="ri-upload-2-line me-1"></i>
-                                {{ allCategorieVideo ? 'Remplacer la vidéo' : 'Uploader une vidéo' }}
-                            </button>
-                            <div *ngIf="allCategorieVideoFile" class="d-flex align-items-center gap-2 p-2 border rounded">
-                                <i class="ri-file-video-line fs-4 text-primary"></i>
-                                <div class="flex-grow-1">
-                                    <div class="fw-medium small">{{ allCategorieVideoFile.file.name }}</div>
-                                    <div class="text-muted small">{{ formatFileSize(allCategorieVideoFile.file.size) }}</div>
-                                </div>
-                                <button class="btn btn-success btn-sm" 
-                                        (click)="uploadAllCategorieVideo()"
-                                        [disabled]="allCategorieVideoUploading">
-                                    {{ allCategorieVideoUploading ? 'Upload...' : 'Enregistrer' }}
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm" 
-                                        (click)="clearAllCategorieVideoSelection()"
-                                        [disabled]="allCategorieVideoUploading">
-                                    <i class="ri-close-line"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-lg-12">
@@ -259,7 +194,113 @@
 </div>
 
 <!-- Media Grid -->
-<div class="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-1 g-3" id="media-list" *ngIf="basicData.length > 0">
+<div class="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-1 g-3" id="media-list">
+    <!-- All Categorie Video – pinned card -->
+    <div class="col">
+        <div class="card media-card h-100">
+            <div class="media-preview position-relative">
+                <!-- Loading -->
+                <div *ngIf="allCategorieVideoLoading"
+                     class="d-flex align-items-center justify-content-center bg-light"
+                     style="height: 200px;">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+
+                <!-- Video preview -->
+                <div *ngIf="!allCategorieVideoLoading && allCategorieVideo?.url"
+                     class="media-video position-relative">
+                    <video class="card-img-top"
+                           style="height: 200px; object-fit: cover;"
+                           muted preload="metadata">
+                        <source [src]="allCategorieVideo!.url" type="video/mp4">
+                        <source [src]="allCategorieVideo!.url" type="video/webm">
+                    </video>
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="ri-play-circle-fill fs-1 text-white opacity-75"></i>
+                    </div>
+                </div>
+
+                <!-- No video placeholder -->
+                <div *ngIf="!allCategorieVideoLoading && !allCategorieVideo?.url"
+                     class="d-flex align-items-center justify-content-center bg-light"
+                     style="height: 200px;">
+                    <div class="text-center text-muted">
+                        <i class="ri-video-off-line fs-1"></i>
+                        <p class="mb-0 mt-2 small">Aucune vidéo configurée</p>
+                        <small>Utilise la vidéo par défaut</small>
+                    </div>
+                </div>
+
+                <!-- Page badge -->
+                <span class="position-absolute top-0 start-0 m-2 badge bg-warning text-dark">
+                    All Categorie
+                </span>
+
+                <!-- Type badge -->
+                <span class="position-absolute top-0 start-0 m-2 mt-5 badge bg-primary">
+                    video
+                </span>
+
+                <!-- Actions -->
+                <div class="position-absolute top-0 end-0 m-2">
+                    <div class="btn-group-vertical" role="group">
+                        <a *ngIf="allCategorieVideo?.url"
+                           [href]="allCategorieVideo!.url" target="_blank"
+                           class="btn btn-sm btn-light" title="Voir">
+                            <i class="ri-external-link-line"></i>
+                        </a>
+                        <input type="file" #allCategorieVideoInput class="d-none"
+                               accept="video/*"
+                               (change)="onAllCategorieVideoSelected($event)">
+                        <button class="btn btn-sm btn-primary"
+                                (click)="allCategorieVideoInput.click()"
+                                [disabled]="allCategorieVideoUploading"
+                                title="{{ allCategorieVideo ? 'Remplacer' : 'Uploader' }}">
+                            <i class="ri-upload-2-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <h6 class="card-title mb-1">All Categorie Video</h6>
+
+                <!-- Selected file – save / cancel row -->
+                <div *ngIf="allCategorieVideoFile"
+                     class="d-flex align-items-center gap-1 mb-2 p-2 border rounded bg-light">
+                    <i class="ri-file-video-line text-primary"></i>
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="fw-medium small text-truncate">{{ allCategorieVideoFile.file.name }}</div>
+                        <div class="text-muted" style="font-size: 0.7rem;">{{ formatFileSize(allCategorieVideoFile.file.size) }}</div>
+                    </div>
+                    <button class="btn btn-success btn-sm"
+                            (click)="uploadAllCategorieVideo()"
+                            [disabled]="allCategorieVideoUploading">
+                        <i class="ri-check-line"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm"
+                            (click)="clearAllCategorieVideoSelection()"
+                            [disabled]="allCategorieVideoUploading">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+
+                <p class="text-muted small mb-2">
+                    <span *ngIf="allCategorieVideo?.media_path; else noPinnedPath">{{ allCategorieVideo!.media_path }}</span>
+                    <ng-template #noPinnedPath>
+                        <span class="text-warning">
+                            <i class="ri-alert-line me-1"></i>No file uploaded
+                        </span>
+                    </ng-template>
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted" *ngIf="allCategorieVideo?.id">ID: {{ allCategorieVideo!.id }}</small>
+                    <small class="text-muted fst-italic">Page All Categorie</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @for (media of basicData; track media.id) {
         <div class="col">
             <div class="card media-card h-100">

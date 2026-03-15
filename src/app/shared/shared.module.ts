@@ -19,22 +19,6 @@ import { FooterComponent } from './landing/index/footer/footer.component';
 import { ScrollspyDirective } from './scrollspy.directive';
 import { LandingScrollspyDirective } from './landingscrollspy.directive';
 
-// NFT Landing 
-import { MarketPlaceComponent } from './landing/nft/market-place/market-place.component';
-import { WalletComponent } from './landing/nft/wallet/wallet.component';
-import { FeaturesComponent } from './landing/nft/features/features.component';
-import { CategoriesComponent } from './landing/nft/categories/categories.component';
-import { DiscoverComponent } from './landing/nft/discover/discover.component';
-import { TopCreatorComponent } from './landing/nft/top-creator/top-creator.component';
-
-// Job Landing 
-import { ProcessComponent } from './landing/job/process/process.component';
-import { FindjobsComponent } from './landing/job/findjobs/findjobs.component';
-import { CandidatesComponent } from './landing/job/candidates/candidates.component';
-import { BlogComponent } from './landing/job/blog/blog.component';
-import { JobcategoriesComponent } from './landing/job/jobcategories/jobcategories.component';
-import { JobFooterComponent } from './landing/job/job-footer/job-footer.component';
-
 
 @NgModule({
   declarations: [
@@ -46,18 +30,6 @@ import { JobFooterComponent } from './landing/job/job-footer/job-footer.componen
     WorkProcessComponent,
     ContactComponent,
     FooterComponent,
-    MarketPlaceComponent,
-    WalletComponent,
-    FeaturesComponent,
-    CategoriesComponent,
-    DiscoverComponent,
-    TopCreatorComponent,
-    ProcessComponent,
-    FindjobsComponent,
-    CandidatesComponent,
-    BlogComponent,
-    JobcategoriesComponent,
-    JobFooterComponent,
     ScrollspyDirective,
     LandingScrollspyDirective
   ],
@@ -71,7 +43,7 @@ import { JobFooterComponent } from './landing/job/job-footer/job-footer.componen
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   exports: [BreadcrumbsComponent, ClientLogoComponent, ServicesComponent, FaqsComponent, CounterComponent, WorkProcessComponent, ContactComponent, FooterComponent,
-    WalletComponent, MarketPlaceComponent, FeaturesComponent, CategoriesComponent, DiscoverComponent, TopCreatorComponent,   ScrollspyDirective,
-    LandingScrollspyDirective, ProcessComponent, FindjobsComponent, CandidatesComponent, BlogComponent, JobcategoriesComponent, JobFooterComponent]
+    ScrollspyDirective,
+    LandingScrollspyDirective]
 })
 export class SharedModule { }

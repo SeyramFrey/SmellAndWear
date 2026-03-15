@@ -5,19 +5,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { FavoritesService, FavoriteItem } from '../../../core/services/favorites.service';
-import { ImageService, IMAGE_SIZES } from '../../../core/services/image.service';
+import { Produit, ProduitPhoto } from '../../../core/models/models';
 
-/**
- * Account Favorites Component
- * 
- * Displays the user's favorite products in a modern, responsive grid layout.
- * Features:
- * - Full viewport height layout
- * - Responsive grid (1-4 columns based on screen size)
- * - Empty state with CTA
- * - Dynamic back navigation
- * - Remove/unfavorite functionality
- */
 @Component({
   selector: 'app-account-favorites',
   templateUrl: './account-favorites.component.html',
@@ -31,7 +20,6 @@ export class AccountFavoritesComponent implements OnInit, OnDestroy {
 
   constructor(
     private favoritesService: FavoritesService,
-    private imageService: ImageService,
     private router: Router,
     private location: Location
   ) {}
@@ -45,9 +33,12 @@ export class AccountFavoritesComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Load favorites from service
-   */
+  /** Returns only favorites that have resolved product data */
+  get validFavorites(): FavoriteItem[] {
+    return this.favorites.filter(f => !!f.product);
+  }
+
+  /** Load favorites from service */
   private loadFavorites(): void {
     this.favoritesService.getFavoritesWithProducts().pipe(
       takeUntil(this.destroy$)
@@ -62,52 +53,33 @@ export class AccountFavoritesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Remove product from favorites
-   */
-  async removeFavorite(event: Event, productId: string, productName?: string): Promise<void> {
-    event.stopPropagation();
-    event.preventDefault();
-    await this.favoritesService.removeFromFavorites(productId, productName);
+  /** Navigate to product detail page */
+  onProductClick(product: Produit | ProduitPhoto): void {
+    const productId = 'produit_id' in product ? product.produit_id : product.id;
+    this.router.navigate(['/product-detail', productId]).then(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    });
+  }
+
+  /** Called when add-to-cart succeeds inside the product card modal */
+  onAddToCartSuccess(result: unknown): void {
+    // Toast or feedback is handled inside CartService / ProductModalComponent
+    console.log('Product added to cart from favorites:', result);
   }
 
   /**
-   * Navigate to product detail page
-   */
-  navigateToProduct(productId: string): void {
-    this.router.navigate(['/product-detail', productId]);
-  }
-
-  /**
-   * Go back to previous page dynamically
-   * Falls back to /account if no history exists
+   * Go back to previous page dynamically.
+   * Falls back to /account if no history exists.
    */
   goBack(): void {
-    // Check if there's navigation history
     if (window.history.length > 1) {
       this.location.back();
     } else {
-      // Fallback to account dashboard
       this.router.navigate(['/account']);
     }
   }
 
-  /**
-   * Get public URL for image
-   */
-  getImageUrl(imagePath?: string): string {
-    return this.imageService.resolveImageUrl(
-      imagePath,
-      IMAGE_SIZES.PRODUCT_CARD,
-      75,
-      'public-images',
-      '/assets/images/products/placeholder.jpg'
-    );
-  }
-
-  /**
-   * TrackBy function for ngFor optimization
-   */
+  /** TrackBy function for ngFor */
   trackByProductId(index: number, item: FavoriteItem): string {
     return item.produit_id;
   }

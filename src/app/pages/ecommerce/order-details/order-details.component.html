@@ -44,6 +44,10 @@
             <h6 class="fw-semibold text-uppercase mb-3">Informations de la commande</h6>
             <table class="table table-borderless mb-0">
               <tbody>
+                <tr *ngIf="order.order_number">
+                  <td class="text-muted">N° Commande:</td>
+                  <td class="fw-medium text-primary">{{ order.order_number }}</td>
+                </tr>
                 <tr>
                   <td class="text-muted">ID Commande:</td>
                   <td class="fw-medium">{{ order.id }}</td>
@@ -254,6 +258,46 @@
       </div>
     </div>
     
+    <!-- Invoice Card -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="ri-file-text-line me-2"></i>Facture
+        </h5>
+      </div>
+      <div class="card-body">
+        <div *ngIf="order?.invoice_last_sent_at" class="mb-3">
+          <span class="text-muted small">Dernier envoi :</span>
+          <p class="fw-medium mb-0">{{ formatDate(order.invoice_last_sent_at) }}</p>
+        </div>
+        <div class="d-grid gap-2">
+          <button
+            class="btn btn-primary btn-sm"
+            (click)="sendInvoice(true)"
+            [disabled]="sendingInvoice || generatingInvoice">
+            <span *ngIf="sendingInvoice" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!sendingInvoice" class="ri-mail-send-line me-1"></i>
+            {{ order?.invoice_pdf_path ? 'Régénérer et envoyer' : 'Générer et envoyer' }}
+          </button>
+          <button
+            *ngIf="order?.invoice_pdf_path"
+            class="btn btn-soft-info btn-sm"
+            (click)="sendInvoice(false)"
+            [disabled]="sendingInvoice">
+            <i class="ri-mail-line me-1"></i>Renvoyer (sans régénérer)
+          </button>
+          <button
+            class="btn btn-soft-secondary btn-sm"
+            (click)="downloadInvoice()"
+            [disabled]="generatingInvoice || sendingInvoice">
+            <span *ngIf="generatingInvoice" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!generatingInvoice" class="ri-download-line me-1"></i>
+            Télécharger PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Status Update Card -->
     <div class="card">
       <div class="card-header">

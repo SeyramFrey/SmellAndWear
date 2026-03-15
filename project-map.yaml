@@ -6,7 +6,7 @@ project:
   version: "4.3.0"
   framework: Angular 18.0.4
   backend: Supabase
-  payment: CinetPay
+  payment: Paystack
 
 folders:
   # Root Configuration
@@ -20,24 +20,6 @@ folders:
     keyFiles:
       - config.toml
       - seed.sql
-    relatedRoutes: []
-
-  - path: supabase/functions/cinetpay-notification/
-    purpose: CinetPay payment webhook handler
-    responsibilities:
-      - Receive payment status updates
-      - Update order status in database
-    keyFiles:
-      - index.ts
-    relatedRoutes: []
-
-  - path: supabase/functions/cinetpay-return/
-    purpose: CinetPay payment return handler
-    responsibilities:
-      - Handle customer return from payment gateway
-      - Redirect to success/failure page
-    keyFiles:
-      - index.ts
     relatedRoutes: []
 
   - path: supabase/functions/invite-admin/
@@ -184,7 +166,7 @@ folders:
       - Cart display and management
       - Delivery address selection
       - Shipping cost calculation
-      - CinetPay payment integration
+      - Paystack payment integration
       - Order creation
     keyFiles:
       - checkout.component.ts

@@ -15,7 +15,6 @@ import { VerticalComponent } from './vertical/vertical.component';
 import { TopbarComponent } from './topbar/topbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { FooterComponent } from './footer/footer.component';
-import { RightsidebarComponent } from './rightsidebar/rightsidebar.component';
 import { HorizontalComponent } from './horizontal/horizontal.component';
 import { HorizontalTopbarComponent } from './horizontal-topbar/horizontal-topbar.component';
 import { TwoColumnComponent } from './two-column/two-column.component';
@@ -30,7 +29,6 @@ import { TwoColumnSidebarComponent } from './two-column-sidebar/two-column-sideb
         TopbarComponent,
         SidebarComponent,
         FooterComponent,
-        RightsidebarComponent,
         HorizontalComponent,
         HorizontalTopbarComponent,
         TwoColumnComponent,

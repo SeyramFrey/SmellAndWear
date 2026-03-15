@@ -4,7 +4,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { LayoutComponent } from './layouts/layout.component';
 
 // Auth Guards
-import { AuthGuard } from './core/guards/auth.guard';
 import { AdminGuard } from './core/guards/admin.guard';
 
 const routes: Routes = [
@@ -16,7 +15,6 @@ const routes: Routes = [
     canActivateChild: [AdminGuard]
   },
   { path: 'auth', loadChildren: () => import('./account/account.module').then(m => m.AccountModule)  },
-  { path: 'account', loadChildren: () => import('./account/account.module').then(m => m.AccountModule)  },
   { path: 'pages', loadChildren: () => import('./extraspages/extraspages.module').then(m => m.ExtraspagesModule)},
   { path: '', loadChildren: () => import('./landing/landing.module').then(m => m.LandingModule)},
 ];

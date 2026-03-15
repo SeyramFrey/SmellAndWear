@@ -73,8 +73,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   isLoadingDeliveryPrices: boolean = false;
   
   // Express delivery prices from database (by country)
+  // Start at 0: the express section is hidden until a price > 0 is confirmed from DB
   franceExpressPrice: number = 0;
-  ciExpressPrice: number = 5000; // Default fallback
+  ciExpressPrice: number = 0;
   
   // Form data
   checkoutForm!: FormGroup;
@@ -173,7 +174,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
   
   /**
-   * Handle payment return from Paystack redirect
+   * Handle legacy payment return query params (from old paystack-return Edge Function).
+   * New flow redirects directly to /checkout/success with ?reference=.
    */
   private handlePaymentReturn(): void {
     this.route.queryParams.subscribe(params => {
@@ -181,41 +183,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       const reference = params['reference'];
       
       if (paymentStatus && reference) {
-        if (paymentStatus === 'success') {
-          // Verify payment and show success
-          this.paymentService.verifyPayment(reference).subscribe({
-            next: (verificationResult) => {
-              if (verificationResult.status === 'success') {
-                const orderId = verificationResult.data?.metadata?.orderId || this.orderId;
-                this.handleSuccessfulPayment({
-                  reference: reference,
-                  status: 'success',
-                  orderId: orderId
-                });
-              } else {
-                this.handleFailedPayment({ reference, status: 'failed' });
-              }
-            },
-            error: (error) => {
-              console.error('Payment verification error:', error);
-              // Show pending message - webhook will update status
-              Swal.fire({
-                title: 'Vérification en cours',
-                text: 'Votre paiement est en cours de vérification. Nous vous contacterons dès que celui-ci sera validé.',
-                icon: 'info',
-                confirmButtonText: 'OK'
-              });
-            }
-          });
-        } else if (paymentStatus === 'failed') {
-          this.handleFailedPayment({ reference, status: 'failed' });
-        }
-        
-        // Clean up URL
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: {},
-          replaceUrl: true
+        // Redirect to the dedicated success page for proper verification
+        this.router.navigate(['/checkout/success'], {
+          queryParams: { reference },
+          replaceUrl: true,
         });
       }
     });
@@ -626,20 +597,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       .getExpressDeliveryPrices(countryCode)
       .subscribe({
         next: (expressPrices) => {
-          if (expressPrices.length > 0) {
-            // Store the express price for this country
-            const expressPrice = expressPrices[0].price;
-            if (countryCode === 'FR') {
-              this.franceExpressPrice = expressPrice;
-              this.expressDeliveryCurrency = 'EUR';
-              console.log('Loaded France express price from DB:', expressPrice, 'EUR');
-            } else if (countryCode === 'CI') {
-              // For CI, we might have different zones with different express prices
-              // Use the first one as default, or find by zone
-              this.ciExpressPrice = expressPrice;
-              this.expressDeliveryCurrency = 'XOF';
-              console.log('Loaded CI express price from DB:', expressPrice, 'XOF');
-            }
+          // Only store the price when it exists AND is strictly greater than 0.
+          // A price of 0 (or no entry at all) means express is not available:
+          // the section will remain hidden from the customer.
+          const activeExpress = expressPrices.find(p => p.price > 0);
+          if (countryCode === 'FR') {
+            this.franceExpressPrice = activeExpress?.price ?? 0;
+            this.expressDeliveryCurrency = 'EUR';
+          } else if (countryCode === 'CI') {
+            this.ciExpressPrice = activeExpress?.price ?? 0;
+            this.expressDeliveryCurrency = 'XOF';
           }
         },
         error: (error) => {
@@ -757,12 +724,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   getExpressFeeBaseAmount(): number {
     if (this.isFranceSelected()) {
-      // Use price from database, fallback to 0 if not loaded yet
-      return this.franceExpressPrice || 0;
+      return this.franceExpressPrice;
     }
     if (this.isCoteIvoireSelected()) {
-      // Use price from database, fallback to default
-      return this.ciExpressPrice || 5000;
+      return this.ciExpressPrice;
     }
     return 0;
   }
@@ -963,129 +928,44 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
   
   /**
-   * Initialize Paystack payment.
+   * Initialize Paystack payment (v2 – server-side totals).
    *
    * Flow:
-   * 1. Generate a fresh transaction reference
-   * 2. Create the order in DB (with payment_reference pre-set)
-   * 3. Call the Edge Function (paystack-initialize) which:
-   *    - Validates inputs
-   *    - Converts EUR → XOF if needed (Paystack doesn't support EUR)
-   *    - Calls Paystack API
-   *    - Persists payment_data back to the order
-   * 4. Redirect user to Paystack authorization URL
+   * 1. Create the order in DB (items + client)
+   * 2. Call paystack-initialize Edge Function with ONLY:
+   *    order_id, email, locale, shipping_zone_code, express_delivery
+   *    → The Edge Function fetches prices from DB and computes totals
+   * 3. Redirect user to Paystack authorization URL
+   * 4. On return, Paystack redirects to /checkout/success?reference=XXX
    */
   private initiatePaystackPayment(formData: any): void {
     try {
-      console.log('[Checkout] Starting Paystack payment flow…');
+      const locale = this.isFranceSelected() ? 'FR' : 'CI';
+      const shippingZone = formData.shippingZone || undefined;
+      const expressDelivery = !!formData.expressDelivery;
 
-      // Always generate a fresh reference for each attempt
-      this.transactionId = 'SW_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-      this.orderId = this.transactionId; // Will be replaced by the real DB order ID
-
-      // Format phone
-      let phoneNumber = formData.phone || '';
-      if (phoneNumber && !phoneNumber.startsWith('+')) {
-        phoneNumber = '+' + phoneNumber;
-      }
-
-      // Determine currency and amount based on selected country.
-      // The Edge Function handles EUR→XOF conversion, so we send the
-      // amount in the user's natural currency.
-      let paymentAmount = this.cartTotal;
-      let paymentCurrency = 'XOF';
-      let customerCountry = 'CI';
-      let customerCity = 'Autre';
-
-      if (this.isFranceSelected()) {
-        // France: send EUR total only. Edge Function converts EUR→USD with live FX.
-        paymentAmount = Math.round(this.cartTotal * 100) / 100;
-        paymentCurrency = 'EUR';
-        customerCountry = 'FR';
-        customerCity = formData.city || 'Paris';
-        console.log(`[Checkout] France order: ${paymentAmount} EUR (Edge Function will convert to XOF)`);
-
-        if (paymentAmount < 1) {
-          Swal.close();
-          Swal.fire({
-            title: 'Montant insuffisant',
-            text: 'Le montant minimum pour un paiement est de 1 €.',
-            icon: 'warning',
-            confirmButtonText: 'OK'
-          });
-          return;
-        }
-      } else if (this.isCoteIvoireSelected()) {
-        // CI: total is already converted to XOF
-        paymentAmount = Math.round(this.cartTotal);
-        paymentCurrency = 'XOF';
-        customerCountry = 'CI';
-        customerCity = formData.shippingZone === 'abidjan_nord' ? 'Abidjan Nord' :
-                       formData.shippingZone === 'abidjan_sud' ? 'Abidjan Sud' : 'Autre';
-        console.log(`[Checkout] CI order: ${paymentAmount} XOF`);
-
-        if (paymentAmount < 100) {
-          Swal.close();
-          Swal.fire({
-            title: 'Montant insuffisant',
-            text: 'Le montant minimum est de 100 XOF.',
-            icon: 'warning',
-            confirmButtonText: 'OK'
-          });
-          return;
-        }
-      }
-
-      console.log(`[Checkout] Payment: ${paymentAmount} ${paymentCurrency}, ref=${this.transactionId}`);
-
-      // Step 1: Create order in DB with payment_reference pre-set
-      this.saveOrder({ reference: this.transactionId, status: 'PENDING' })
+      // Step 1: Create order in DB
+      this.saveOrder({ reference: `pending_${Date.now()}`, status: 'Nouvelle' })
         .then((createdOrder) => {
-          // Use the real DB order ID for the Edge Function
-          const dbOrderId = createdOrder?.id || this.orderId;
+          const dbOrderId = createdOrder?.id;
+          if (!dbOrderId) throw new Error('Order creation returned no ID');
           this.orderId = dbOrderId;
 
-          console.log(`[Checkout] Order saved with id=${dbOrderId}`);
-
-          // Step 2: Call paystack-initialize Edge Function
-          const paymentRequest = {
-            amount: paymentAmount,
-            currency: paymentCurrency,
-            orderId: dbOrderId,
-            transactionId: this.transactionId,
-            customer: {
-              email: formData.email,
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              phone: phoneNumber,
-              address: formData.address,
-              city: customerCity,
-              country: customerCountry
-            },
-            metadata: {
-              orderId: dbOrderId,
-              transactionId: this.transactionId,
-              country: customerCountry,
-              currency: paymentCurrency,
-            }
-          };
-
-          this.paymentService.initiatePayment(paymentRequest).subscribe({
+          // Step 2: Call paystack-initialize (server computes the total)
+          this.paystackService.initiateServerSidePayment({
+            order_id: dbOrderId,
+            email: formData.email,
+            locale,
+            shipping_zone_code: shippingZone,
+            express_delivery: expressDelivery,
+            callback_url: `${window.location.origin}/checkout/success`,
+          }).subscribe({
             next: (response) => {
               Swal.close();
 
-              // Log conversion details if available
-              if (response.pay_currency && response.pay_amount) {
-                console.log(
-                  `[Checkout] Payment initialized: ${response.displayed_amount} ${response.displayed_currency} ` +
-                  `→ ${response.pay_amount} ${response.pay_currency}` +
-                  (response.fx_rate ? ` (rate: ${response.fx_rate})` : '')
-                );
-              }
-
-              if (response.authorizationUrl) {
-                console.log('[Checkout] Redirecting to Paystack…');
-                window.location.href = response.authorizationUrl;
+              const url = response.authorizationUrl || response.authorization_url;
+              if (url) {
+                window.location.href = url;
               } else {
                 throw new Error('No authorization URL received from Paystack');
               }
@@ -1094,31 +974,23 @@ export class CheckoutComponent implements OnInit, OnDestroy {
               console.error('[Checkout] Paystack init error:', error);
               Swal.close();
 
-              // Build a user-friendly error message
-              let title = 'Erreur de paiement';
               let text = 'Impossible d\'initialiser le paiement. Veuillez réessayer.';
-
               if (error instanceof PaystackInitError) {
-                // We have detailed info from the Edge Function
                 text = error.message;
-                if (error.details?.hint) {
-                  text += '\n\n' + error.details.hint;
-                }
+                if (error.details?.hint) text += '\n\n' + error.details.hint;
               } else if (error?.message) {
                 text = error.message;
               }
 
               Swal.fire({
-                title,
+                title: 'Erreur de paiement',
                 text,
                 icon: 'error',
                 confirmButtonText: 'Réessayer',
                 showCancelButton: true,
                 cancelButtonText: 'Annuler'
               }).then((result) => {
-                if (result.isConfirmed) {
-                  this.proceedToPayment();
-                }
+                if (result.isConfirmed) this.proceedToPayment();
               });
             }
           });
@@ -1146,61 +1018,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
   
-  /**
-   * Handle successful payment
-   */
-  private handleSuccessfulPayment(paymentData: any): void {
-    console.log('Paiement réussi - Données complètes:', paymentData);
-    
-    // Order should already be saved (created before payment initiation)
-    // Just update the status and clear cart
-    this.cartService.clearCart();
-    
-    // Navigate to success tab
-    this.changeActiveTab(4);
-    
-    // Show success message
-    Swal.fire({
-      title: 'Paiement réussi!',
-      text: 'Votre commande a été enregistrée avec succès.',
-      icon: 'success',
-      confirmButtonText: 'OK'
-    });
-  }
-  
-  /**
-   * Handle failed payment
-   */
-  private handleFailedPayment(paymentData: any): void {
-    console.error('Paiement échoué - Données complètes:', paymentData);
-    
-    // Extract error information
-    let errorMessage = 'Votre paiement n\'a pas pu être traité.';
-    let errorDetails = '';
-    
-    if (paymentData && paymentData.message) {
-      errorDetails = paymentData.message;
-    } else if (paymentData && paymentData.gateway_response) {
-      errorDetails = paymentData.gateway_response;
-    }
-    
-    // Log failed payment
-    console.log('Enregistrement de l\'échec de paiement:', paymentData);
-    
-    Swal.fire({
-      title: 'Paiement échoué',
-      text: errorDetails ? `${errorMessage} ${errorDetails}` : errorMessage,
-      icon: 'error',
-      confirmButtonText: 'Réessayer',
-      showCancelButton: true,
-      cancelButtonText: 'Annuler'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // User wants to retry
-        this.proceedToPayment();
-      }
-    });
-  }
+  // Payment success and failure are now handled by OrderSuccessComponent
+  // at the /checkout/success route.
   
   /**
    * Save order data to Supabase.
@@ -1214,13 +1033,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     try {
       // Ensure client exists (creates guest client if needed)
       const clientId = await this.ensureClientExists();
-      
-      console.log('[Checkout] Creating order for client:', clientId);
 
-      // Prepare order request
+      // Persist country + currency from the topbar selection at creation time
+      const country = this.countryCurrencyService.getCurrentCountry();
+
       const orderRequest: CreateOrderRequest = {
         client_id: clientId,
         total: this.cartTotal,
+        country_code: country.code,
+        currency: country.currency,
         items: this.cartItems.map(item => ({
           produit_variation_id: item.variantId,
           quantite: item.quantity,
@@ -1233,7 +1054,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return new Promise<Commande>((resolve, reject) => {
         this.commandeService.createOrder(orderRequest).subscribe({
           next: (createdOrder) => {
-            console.log('[Checkout] Order created:', createdOrder?.id);
             resolve(createdOrder);
           },
           error: (error) => {

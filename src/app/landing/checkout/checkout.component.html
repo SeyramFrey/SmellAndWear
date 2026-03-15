@@ -218,7 +218,8 @@
                                     </div>
 
                                     <!-- Express Delivery Option -->
-                                    <div class="mt-4" *ngIf="isFranceSelected() || isCoteIvoireSelected()">
+                                    <!-- Hidden when no express price is configured or price = 0 -->
+                                    <div class="mt-4" *ngIf="(isFranceSelected() || isCoteIvoireSelected()) && getExpressFeeBaseAmount() > 0">
                                         <h5 class="fs-15 mb-2">Livraison express</h5>
                                         <div class="express-delivery-card">
                                             <div class="form-check form-switch">

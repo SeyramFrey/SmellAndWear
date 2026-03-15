@@ -133,17 +133,20 @@ export class OrdersComponent implements OnInit, OnDestroy {
       created_at: order.created_at,
       payment_reference: order.payment_reference,
       client: order.client,
+      currency: order.currency,
+      country_code: order.country_code,
+      exchange_rate_eur_to_xof: order.exchange_rate_eur_to_xof,
       
       // Template compatibility fields
-      _id: order.id, // For checkboxes and IDs
-      orderId: order.id, // For order ID display
+      _id: order.id,
+      orderId: order.id,
       customer: order.client ? `${order.client.prenom} ${order.client.nom}` : 'Client inconnu',
-      product: this.getProductSummary(order), // Show product summary
+      product: this.getProductSummary(order),
       orderDate: order.created_at,
-      amount: this.formatCurrency(order.total),
+      amount: this.formatCurrency(order.total, order.currency),
       payment: order.payment_reference || 'N/A',
       status: order.statut,
-      state: false // For checkbox selection
+      state: false
     }));
   }
 
@@ -360,28 +363,40 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Delete order
+   * Delete order by Supabase ID
    */
-  deleteData(id: any) {
-    const orderToDelete = this.allorderes[id];
-    if (orderToDelete) {
-      Swal.fire({
-        title: 'Êtes-vous sûr?',
-        text: 'Cette action ne peut pas être annulée!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui, supprimer!',
-        cancelButtonText: 'Annuler'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // TODO: Implement order deletion
-          console.log('Delete order:', orderToDelete.id);
-          Swal.fire('Supprimé!', 'La commande a été supprimée.', 'success');
-        }
-      });
-    }
+  deleteData(orderId: string) {
+    if (!orderId) return;
+
+    Swal.fire({
+      title: 'Êtes-vous sûr?',
+      text: 'Cette action ne peut pas être annulée!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Oui, supprimer!',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({ title: 'Suppression...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        this.commandeService.deleteCommande(orderId)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              this.allorderes = this.allorderes.filter(o => o.id !== orderId);
+              this.orderes = this.service.changePage(this.allorderes);
+              this.cdr.detectChanges();
+              Swal.fire('Supprimé!', 'La commande a été supprimée.', 'success');
+            },
+            error: (err) => {
+              console.error('Delete failed:', err);
+              Swal.fire('Erreur', 'Impossible de supprimer la commande. Vérifiez vos permissions.', 'error');
+            }
+          });
+      }
+    });
   }
 
   /**
@@ -525,6 +540,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
       'ID': order.id,
       'Client': order.client ? `${order.client.prenom} ${order.client.nom}` : '',
       'Email': order.client?.email || '',
+      'Country': order.country_code || '',
+      'Currency': order.currency || '',
       'Total': order.total,
       'Status': order.statut,
       'Date': new DatePipe('en-US').transform(order.created_at, 'medium')
@@ -539,16 +556,54 @@ export class OrdersComponent implements OnInit, OnDestroy {
       title: 'Orders Export',
       useBom: true,
       noDownload: false,
-      headers: ['ID', 'Client', 'Email', 'Total', 'Status', 'Date']
+      headers: ['ID', 'Client', 'Email', 'Country', 'Currency', 'Total', 'Status', 'Date']
     });
   }
 
   /**
-   * Delete multiple orders
+   * Delete all selected orders
    */
   deleteMultiple(deleteModel: any): void {
-    // TODO: Implement multiple deletion
-    console.log('Delete multiple orders');
+    const selected = this.allorderes.filter(o => o.state);
+    if (selected.length === 0) return;
+
+    Swal.fire({
+      title: 'Êtes-vous sûr?',
+      text: `Supprimer ${selected.length} commande(s) ? Cette action est irréversible.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Oui, tout supprimer!',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({ title: 'Suppression...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        const ids = selected.map(o => o.id);
+        let completed = 0;
+        let failed = 0;
+
+        ids.forEach(id => {
+          this.commandeService.deleteCommande(id)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: () => { completed++; this.checkBatchDone(completed, failed, ids.length); },
+              error: () => { failed++; this.checkBatchDone(completed, failed, ids.length); }
+            });
+        });
+      }
+    });
+  }
+
+  private checkBatchDone(completed: number, failed: number, total: number): void {
+    if (completed + failed < total) return;
+    this.loadOrders();
+    if (failed === 0) {
+      Swal.fire('Supprimé!', `${completed} commande(s) supprimée(s).`, 'success');
+    } else {
+      Swal.fire('Attention', `${completed} supprimée(s), ${failed} en erreur.`, 'warning');
+    }
   }
 
   /**
@@ -559,12 +614,11 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Confirm delete action (legacy method for compatibility)
+   * Confirm delete action — directly triggers deletion by Supabase ID
    */
   confirm(deleteModel: any, orderId: string): void {
-    const orderIndex = this.allorderes.findIndex(order => order.id === orderId);
-    if (orderIndex !== -1) {
-      this.deleteData(orderIndex);
+    if (orderId) {
+      this.deleteData(orderId);
     }
   }
 
@@ -610,12 +664,19 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Format currency
+   * Format currency using the order's stored currency (not hardcoded EUR)
    */
-  formatCurrency(amount: number): string {
+  formatCurrency(amount: number, currency?: string): string {
+    const cur = (currency || 'EUR').toUpperCase();
+    if (cur === 'XOF') {
+      return new Intl.NumberFormat('fr-FR', {
+        style: 'decimal',
+        maximumFractionDigits: 0
+      }).format(Math.round(amount)) + ' FCFA';
+    }
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: cur === 'USD' ? 'USD' : 'EUR'
     }).format(amount);
   }
 

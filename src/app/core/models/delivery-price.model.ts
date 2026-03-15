@@ -7,6 +7,7 @@ export interface DeliveryPrice {
   country_code: string;
   zone_code: string;
   label: string;
+  description: string | null;
   price: number;
   currency: string;
   is_express: boolean;
@@ -23,6 +24,7 @@ export interface DeliveryPriceRequest {
   country_code: string;
   zone_code: string;
   label: string;
+  description?: string | null;
   price: number;
   currency: string;
   is_express: boolean;

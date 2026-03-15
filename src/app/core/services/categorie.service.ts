@@ -105,10 +105,11 @@ export class CategorieService {
         .update(updateData)
         .eq('id', id)
         .select()
-        .single()
+        .maybeSingle()
     ).pipe(
       map(({ data, error }) => {
         if (error) throw error;
+        if (!data) throw new Error('Catégorie introuvable ou mise à jour non autorisée');
         return data as Categorie;
       }),
       catchError(error => throwError(() => error))

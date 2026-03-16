@@ -54,7 +54,7 @@ $cart-red-soft: rgba($cart-red, 0.12);
         // Promo badge styles - small red rectangle with white text
         .promo-badge {
           display: inline-block;
-          background-color: #ff0000; // Red background
+          background-color: var(--sw-primary); // Brand red (#B5190C) — phase-0 fix
           color: #ffffff; // White text
           font-size: 10px;
           font-weight: 700; // Bold for better visibility
@@ -78,7 +78,7 @@ $cart-red-soft: rgba($cart-red, 0.12);
           height: 0;
           border-top: 8px solid transparent;     /* height of arrow */
           border-bottom: 8px solid transparent;  /* height of arrow */
-          border-right: 6px solid #ff0000;       /* arrow color */
+          border-right: 6px solid var(--sw-primary);       /* arrow color — phase-0 fix */
         }
 
       }
@@ -236,7 +236,9 @@ $cart-red-soft: rgba($cart-red, 0.12);
 }
 
 .cart-badge {
-  background-color: lighten($cart-red, 5%) !important;
+  // Phase-0 fix: use brand token directly instead of lighten($cart-red, 5%)
+  // which compiled to #CD1C0E (24 units off-brand on the R channel).
+  background-color: var(--sw-primary) !important;
   color: #ffffff !important;
   box-shadow: 0 0 0 2px #ffffff;
 }
@@ -877,7 +879,7 @@ $cart-red-soft: rgba($cart-red, 0.12);
                 position: absolute;
                 top: 8px;
                 left: 8px;
-                background: #ff0000;
+                background: var(--sw-primary); // Brand red — phase-0 fix
                 color: #ffffff;
                 font-size: 10px;
                 font-weight: 600;
@@ -1078,7 +1080,7 @@ $cart-red-soft: rgba($cart-red, 0.12);
             }
             
             .mobile-promo-badge {
-              background: #ff0000;
+              background: var(--sw-primary); // Brand red — phase-0 fix
               color: #ffffff;
               font-size: 10px;
               font-weight: 700;

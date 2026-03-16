@@ -43,6 +43,7 @@
               "node_modules/@ctrl/ngx-emoji-mart/picker.css",
               "src/assets/scss/config/default/bootstrap.scss",
               "src/assets/scss/config/default/app.scss",
+              "src/assets/scss/sw-brand-overrides.scss",
               "src/assets/scss/icons.scss"
             ],
             "scripts":[

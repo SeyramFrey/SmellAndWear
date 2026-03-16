@@ -1,0 +1,127 @@
+// =============================================================================
+// SMELLWEAR — GLOBAL BRAND OVERRIDE LAYER
+// =============================================================================
+// PURPOSE
+//   This file corrects Velzon template token leaks that cause visible color
+//   mismatches on the live SmellAndWear site.
+//
+// LOAD ORDER (angular.json)
+//   Must be inserted AFTER app.scss (the Velzon bundle) so these overrides
+//   win the cascade. Loading before app.scss would be silently overwritten
+//   by _root.scss inside the Velzon bundle.
+//
+//   Correct order:
+//     ...
+//     src/assets/scss/config/default/app.scss   ← Velzon bundle
+//     src/assets/scss/sw-brand-overrides.scss   ← THIS FILE  ✓
+//     src/assets/scss/icons.scss
+//
+// SCOPE STRATEGY
+//   • Global :root overrides: tokens whose Velzon value leaks into the
+//     landing area and is wrong for the brand.
+//   • Admin restore block: undoes global overrides inside .layout-wrapper
+//     that is NOT the landing wrapper, so Admin behaviour is preserved.
+//   • Landing-scoped fixes: overrides for elements that cannot be fixed
+//     at the token level alone (e.g. btn-danger used for back-to-top).
+//
+// DO NOT ADD HERE
+//   • Landing-only component styles (use the component .scss file)
+//   • Full theme centralisation work (that is Phase 5)
+//   • Any changes that alter Admin page layout or Admin shell dimensions
+// =============================================================================
+
+
+// =============================================================================
+// SECTION 1 — Global Velzon token corrections
+// =============================================================================
+// Confirmed leaks identified in the 2026-03-16 color audit:
+//   • --vz-primary (#405189 blue)  → footer social icons, active states
+//   • --vz-link-color (#405189)    → any unstyled <a> on landing, social icons
+// =============================================================================
+
+:root {
+  // ------------------------------------------------------------------
+  // 1a. Primary brand color
+  //     Velzon default: #405189 (admin blue)
+  //     Brand value:    #B5190C (SmellAndWear red)
+  //     Impact:  any component on the landing area that consumed
+  //              var(--vz-primary) now shows brand red instead of blue.
+  // ------------------------------------------------------------------
+  --vz-primary:             #B5190C;
+  --vz-primary-rgb:         181, 25, 12;
+
+  // ------------------------------------------------------------------
+  // 1b. Link color
+  //     Velzon default: #405189 (admin blue)
+  //     Brand value:    #212529 (dark neutral, matches --sw-text-primary approx.)
+  //     Impact:  fixes footer social icon links and any unstyled <a>
+  //              that was inheriting the Velzon blue link color.
+  //     Hover:   brand red on hover — visible feedback without breaking UI.
+  // ------------------------------------------------------------------
+  --vz-link-color:          #212529;
+  --vz-link-color-rgb:      33, 37, 41;
+  --vz-link-hover-color:    #B5190C;
+}
+
+
+// =============================================================================
+// SECTION 2 — Admin layout restore
+// =============================================================================
+// The global :root overrides above would change Admin interactive states
+// (active sidebar items, focus rings on inputs, some button variants) from
+// Velzon blue to brand red.  The admin team expects the original Velzon
+// palette.  Restore inside the Admin layout wrapper to preserve it exactly.
+//
+// Scopes covered:
+//   • .layout-wrapper:not(.landing)  — main admin shell (sidebar + all pages)
+//   • .auth-page-wrapper             — admin auth pages (/auth/login, /auth/invite,
+//                                      /auth/reset-password).  These pages live
+//                                      outside the main layout-wrapper but use
+//                                      var(--vz-primary) via .auth-one-bg.
+//                                      Confirmed: customer landing auth pages at
+//                                      /customer do NOT use .auth-page-wrapper,
+//                                      so this selector exclusively covers admin.
+//
+// NOTE: --vz-link-color is NOT restored here because:
+//   (a) admin nav-links use specific selectors that override link color anyway,
+//   (b) a neutral dark link color (#212529) does not harm admin readability.
+// =============================================================================
+
+.layout-wrapper:not(.landing),
+.auth-page-wrapper {
+  --vz-primary:         #405189;
+  --vz-primary-rgb:     64, 81, 137;
+}
+
+
+// =============================================================================
+// SECTION 3 — Landing-scoped element fixes
+// =============================================================================
+
+// ------------------------------------------------------------------
+// 3a. Back-to-top button
+//
+//     The button uses class="btn btn-danger btn-icon landing-back-top"
+//     across 11 landing page templates.  Velzon's .btn-danger resolves
+//     to #F06548 (coral) via --vz-danger.  We fix it here with a scoped
+//     CSS custom-property override instead of editing all 11 templates.
+//
+//     Scope: .layout-wrapper.landing only — Admin btn-danger (used for
+//     destructive confirmations like "Yes, Delete") keeps coral #F06548.
+// ------------------------------------------------------------------
+
+.layout-wrapper.landing .btn-danger.landing-back-top {
+  --vz-btn-color:                 #ffffff;
+  --vz-btn-bg:                    #B5190C;
+  --vz-btn-border-color:          #B5190C;
+  --vz-btn-hover-color:           #ffffff;
+  --vz-btn-hover-bg:              #8a1309;
+  --vz-btn-hover-border-color:    #8a1309;
+  --vz-btn-focus-shadow-rgb:      181, 25, 12;
+  --vz-btn-active-color:          #ffffff;
+  --vz-btn-active-bg:             #8a1309;
+  --vz-btn-active-border-color:   #7a1108;
+  --vz-btn-disabled-color:        #ffffff;
+  --vz-btn-disabled-bg:           #B5190C;
+  --vz-btn-disabled-border-color: #B5190C;
+}

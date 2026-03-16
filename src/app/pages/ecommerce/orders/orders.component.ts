@@ -11,7 +11,7 @@ import { ngxCsv } from 'ngx-csv/ngx-csv';
 // Sweet Alert
 import Swal from 'sweetalert2';
 
-import { CommandeService, OrderWithItems } from '../../../core/services/commande.service';
+import { OrderService, OrderWithItems } from '../../../core/services/order.service';
 import { Commande } from '../../../core/models/models';
 import { PaginationService } from 'src/app/core/services/pagination.service';
 
@@ -70,7 +70,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   constructor(
     private modalService: NgbModal,
     private formBuilder: UntypedFormBuilder,
-    private commandeService: CommandeService,
+    private commandeService: OrderService,
     public service: PaginationService,
     private cdr: ChangeDetectorRef
   ) {

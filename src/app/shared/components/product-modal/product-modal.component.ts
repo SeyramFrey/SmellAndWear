@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CurrencyConverterPipe } from '../../pipes/currency-converter.pipe';
 import { Produit, Taille, Colors, ProduitVariation } from '../../../core/models/models';
-import { ProduitService } from '../../../core/services/produit.service';
+import { ProductService } from '../../../core/services/product.service';
 import { ProduitVariationService } from '../../../core/services/produit-variation.service';
 
 import { CartService } from '../../../core/services/cart.service';
@@ -70,7 +70,7 @@ export class ProductModalComponent implements OnInit, OnDestroy {
   private variantLookupMap = new Map<string, ProduitVariation>();
   
   constructor(
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private variationService: ProduitVariationService,
     public modal: NgbActiveModal,
     private cartService: CartService,

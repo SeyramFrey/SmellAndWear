@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ToastService } from '../dashboard/toast-service';
 import { ChartType } from '../dashboard/dashboard.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -51,7 +50,6 @@ export class DashboardGeoComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    public toastService: ToastService,
     private dashboardService: DashboardService
   ) {
     // Load saved country preference from localStorage

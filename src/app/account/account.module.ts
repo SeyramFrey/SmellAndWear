@@ -2,13 +2,11 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
-import { NgbToastModule, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 
 // Load Icons
 import { defineElement } from "@lordicon/element";
 import lottie from 'lottie-web';
-
-import { ToastsContainer } from './login/toasts-container.component';
 
 import { AccountRoutingModule } from './account-routing.module';
 import { LoginComponent } from './login/login.component';
@@ -20,7 +18,6 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 @NgModule({
   declarations: [
     LoginComponent,
-    ToastsContainer,
     AuthCallbackComponent,
     AdminInviteComponent,
     ResetPasswordComponent,
@@ -30,7 +27,6 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    NgbToastModule,
     NgbAlertModule,
     AccountRoutingModule,
   ],

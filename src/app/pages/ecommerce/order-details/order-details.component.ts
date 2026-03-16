@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
-import { CommandeService, OrderWithItems } from '../../../core/services/commande.service';
+import { OrderService, OrderWithItems } from '../../../core/services/order.service';
 import { InvoiceService } from '../../../core/services/invoice.service';
 
 /**
@@ -67,7 +67,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder,
-    private commandeService: CommandeService,
+    private commandeService: OrderService,
     private invoiceService: InvoiceService,
     private cdr: ChangeDetectorRef
   ) {}

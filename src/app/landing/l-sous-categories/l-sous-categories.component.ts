@@ -4,7 +4,7 @@ import { Produit, Colors, Taille, ProduitPhoto, ProduitVariation, Categorie } fr
 import { VideoHeroComponent } from '../../shared/components/video-hero/video-hero.component';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { TopbarComponent } from '../../shared/landing/index/topbar/topbar.component';
-import { ProduitService } from '../../core/services/produit.service';
+import { ProductService } from '../../core/services/product.service';
 import { ProduitVariationService } from '../../core/services/produit-variation.service';
 import { CategorieService } from '../../core/services/categorie.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -61,7 +61,7 @@ export class LSousCategoriesComponent {
     private destroy$ = new Subject<void>();
 
     constructor(
-        private produitService: ProduitService,
+        private produitService: ProductService,
         private variationService: ProduitVariationService,
         private categorieService: CategorieService,
         private modalService: NgbModal,

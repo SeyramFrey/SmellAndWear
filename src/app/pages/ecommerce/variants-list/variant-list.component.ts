@@ -7,7 +7,7 @@ import { takeUntil, map, catchError, finalize } from 'rxjs/operators';
 
 // Services
 import { VariantService } from '../../../core/services/variant.service';
-import { ProduitService } from '../../../core/services/produit.service';
+import { ProductService } from '../../../core/services/product.service';
 import { SupabaseService } from '../../../core/services/supabase.service';
 import { ImageService, IMAGE_SIZES } from '../../../core/services/image.service';
 
@@ -154,7 +154,7 @@ export class VariantListComponent implements OnInit, OnDestroy {
     private modalService: NgbModal,
     private route: ActivatedRoute,
     private variantService: VariantService,
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private supabaseService: SupabaseService,
     private imageService: ImageService,
     private fb: FormBuilder,

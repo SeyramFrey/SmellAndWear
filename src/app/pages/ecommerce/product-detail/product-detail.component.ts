@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 // Services
-import { ProduitService } from 'src/app/core/services/produit.service';
+import { ProductService } from 'src/app/core/services/product.service';
 import { VariantService } from 'src/app/core/services/variant.service';
 import { SupabaseService } from 'src/app/core/services/supabase.service';
 import { ImageService, IMAGE_SIZES } from 'src/app/core/services/image.service';
@@ -46,7 +46,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private variantService: VariantService,
     private supabaseService: SupabaseService,
     private imageService: ImageService

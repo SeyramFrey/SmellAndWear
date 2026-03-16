@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil, filter, take } from 'rxjs/operators';
 
 import { AdminAuthService } from '../../core/services/admin-auth.service';
-import { ToastService } from './toast-service';
+import { ToastService } from '../../core/services/toast.service';
 
 /**
  * Admin Login Component
@@ -77,10 +77,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     // Check for signup success message
     const signupStatus = this.route.snapshot.queryParams['signup'];
     if (signupStatus === 'success') {
-      this.toastService.show(
-        'Account created! Please check your email to verify your account.',
-        { classname: 'bg-info text-white', delay: 5000 }
-      );
+      this.toastService.info('Account created! Please check your email to verify your account.');
     }
 
     // Initialize form
@@ -158,19 +155,13 @@ export class LoginComponent implements OnInit, OnDestroy {
         // Log technical error for debugging
         console.error('[LoginComponent] Authentication error:', result.error);
         
-        this.toastService.show(
-          this.error,
-          { classname: 'bg-danger text-white', delay: 5000 }
-        );
+        this.toastService.error(this.error);
         return;
       }
 
       if (result.isAdmin && result.user && result.session) {
         // Success - admin verified from database
-        this.toastService.show(
-          'Welcome back, Administrator!',
-          { classname: 'bg-success text-white', delay: 3000 }
-        );
+        this.toastService.success('Welcome back, Administrator!');
 
         // Navigate to return URL or admin dashboard
         setTimeout(() => {
@@ -181,19 +172,13 @@ export class LoginComponent implements OnInit, OnDestroy {
         // But handle it just in case
         this.error = 'Access denied. You are not authorized as an administrator.';
         
-        this.toastService.show(
-          this.error,
-          { classname: 'bg-warning text-dark', delay: 5000 }
-        );
+        this.toastService.warning(this.error);
       }
     } catch (error) {
       console.error('[LoginComponent] Unexpected error:', error);
       this.error = 'An unexpected error occurred. Please try again.';
       
-      this.toastService.show(
-        this.error,
-        { classname: 'bg-danger text-white', delay: 5000 }
-      );
+      this.toastService.error(this.error);
     } finally {
       this.loading = false;
     }

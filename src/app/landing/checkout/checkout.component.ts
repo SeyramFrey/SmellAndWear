@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import {SharedModule} from "../../shared/shared.module";
 import {TopbarComponent} from "../../shared/landing/index/topbar/topbar.component";
 import { CartService, CartItem } from '../../core/services/cart.service';
-import { CommandeService, CreateOrderRequest } from '../../core/services/commande.service';
+import { OrderService, CreateOrderRequest } from '../../core/services/order.service';
 import { CountryCurrencyService, Country } from '../../core/services/country-currency.service';
 import { CurrencyConverterPipe } from '../../shared/pipes/currency-converter.pipe';
 import { DeliveryPricesService } from '../../core/services/delivery-prices.service';
@@ -120,7 +120,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private router: Router,
     private http: HttpClient,
-    private commandeService: CommandeService,
+    private commandeService: OrderService,
     private countryCurrencyService: CountryCurrencyService,
     private deliveryPricesService: DeliveryPricesService,
     private customerService: CustomerService,

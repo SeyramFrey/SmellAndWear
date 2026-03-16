@@ -5,7 +5,7 @@ import { SectionTitleComponent } from "../../shared/components/section-title/sec
 import { VideoHeroComponent } from "../../shared/components/video-hero/video-hero.component";
 import { CategoryCardComponent } from "../../shared/components/category-card/category-card.component";
 import { ProductCardComponent } from "../../shared/components/product-card/product-card.component";
-import { ProduitService } from "../../core/services/produit.service";
+import { ProductService } from "../../core/services/product.service";
 import { CategorieService } from "../../core/services/categorie.service";
 import { ProduitVariationService } from "../../core/services/produit-variation.service";
 import { TopbarComponent } from "../../shared/landing/index/topbar/topbar.component";
@@ -77,7 +77,7 @@ export class WearMenComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private supabaseService: SupabaseService,
     private imageService: ImageService,
     private categorieService: CategorieService,

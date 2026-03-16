@@ -25,7 +25,7 @@ import { CurrencyService, CurrencyCode } from '../../../../core/services/currenc
 import { CountryCurrencyService, Country } from '../../../../core/services/country-currency.service';
 import { CurrencyConverterPipe } from '../../../pipes/currency-converter.pipe';
 import { CategorieService } from '../../../../core/services/categorie.service';
-import { ProduitService } from '../../../../core/services/produit.service';
+import { ProductService } from '../../../../core/services/product.service';
 import { Categorie, Produit } from '../../../../core/models/models';
 import { SupabaseService } from '../../../../core/services/supabase.service';
 import { ImageService, IMAGE_SIZES } from '../../../../core/services/image.service';
@@ -169,7 +169,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     private currencyService: CurrencyService, 
     private countryCurrencyService: CountryCurrencyService,
     private categorieService: CategorieService, 
-    private produitService: ProduitService, 
+    private produitService: ProductService, 
     private supabaseService: SupabaseService,
     private imageService: ImageService,
     private cdr: ChangeDetectorRef,

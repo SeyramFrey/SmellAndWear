@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ProduitVariation, Produit } from '../models/models';
-import { ProduitService } from './produit.service';
+import { ProductService } from './product.service';
 
 export interface CartItem {
   id: string; // Identifiant unique pour cet item de panier
@@ -37,7 +37,7 @@ export class CartService {
   private cartTotalSubject = new BehaviorSubject<number>(0);
   public cartTotal$: Observable<number> = this.cartTotalSubject.asObservable();
 
-  constructor(private produitService: ProduitService) {
+  constructor(private produitService: ProductService) {
     this.loadCartFromStorage();
   }
 

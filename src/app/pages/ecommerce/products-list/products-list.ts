@@ -7,7 +7,7 @@ import { DropzoneModule, DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
 import { PaginationService } from 'src/app/core/services/pagination.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CategorieService } from 'src/app/core/services/categorie.service';
-import { ProduitService } from 'src/app/core/services/produit.service';
+import { ProductService } from 'src/app/core/services/product.service';
 import { SupabaseService } from 'src/app/core/services/supabase.service';
 import { ImageService, IMAGE_SIZES } from 'src/app/core/services/image.service';
 import { Categorie, Produit } from 'src/app/core/models/models';
@@ -160,7 +160,7 @@ export class ProductsList implements OnInit, OnDestroy {
     public service: PaginationService,
     private route: ActivatedRoute,
     private categorieService: CategorieService,
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private supabaseService: SupabaseService,
     private imageService: ImageService,
     private modalService: NgbModal,

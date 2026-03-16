@@ -1,8 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  NgbToastModule
-} from '@ng-bootstrap/ng-bootstrap';
 import { NgbPaginationModule, NgbTypeaheadModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -35,7 +32,6 @@ import { DashboardGeoComponent } from './dashboard-geo/dashboard-geo.component';
   ],
   imports: [
     CommonModule,
-    NgbToastModule,
     FeatherModule.pick(allIcons),
     CountUpModule,
     LeafletModule,

@@ -8,7 +8,7 @@ import {
   Taille, 
   Colors
 } from '../../core/models/models';
-import { ProduitService } from '../../core/services/produit.service';
+import { ProductService } from '../../core/services/product.service';
 import { ProductRedirectService } from '../../core/services/product-redirect.service';
 import { ProduitVariationService } from '../../core/services/produit-variation.service';
 import { CartService } from '../../core/services/cart.service';
@@ -93,7 +93,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private variationService: ProduitVariationService,
     private productRedirectService: ProductRedirectService,
     private cartService: CartService,

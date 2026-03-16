@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProduitService } from '../../core/services/produit.service';
+import { ProductService } from '../../core/services/product.service';
 import { Produit } from '../../core/models/models';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { TopbarComponent } from '../../shared/landing/index/topbar/topbar.component';
@@ -18,7 +18,7 @@ export class AllProductsComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
 
-  constructor(private produitService: ProduitService) {}
+  constructor(private produitService: ProductService) {}
 
   ngOnInit(): void {
     this.loadAllProducts();

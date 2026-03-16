@@ -5,7 +5,7 @@ import { CurrencyConverterPipe } from '../../pipes/currency-converter.pipe';
 import { FavoritesService } from '../../../core/services/favorites.service';
 import { catchError, tap } from 'rxjs/operators';
 import { EMPTY, Subscription } from 'rxjs';
-import { ProduitService } from "../../../core/services/produit.service";
+import { ProductService } from "../../../core/services/product.service";
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
@@ -58,7 +58,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
 
   constructor(
     private favoritesService: FavoritesService,
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private imageService: ImageService,
     private supabaseService: SupabaseService,
     private router: Router,

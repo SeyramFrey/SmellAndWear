@@ -8,7 +8,7 @@ import { Produit, Colors, Taille, ProduitVariation, Categorie } from '../../core
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { TopbarComponent } from '../../shared/landing/index/topbar/topbar.component';
 import { SharedModule } from '../../shared/shared.module';
-import { ProduitService } from '../../core/services/produit.service';
+import { ProductService } from '../../core/services/product.service';
 import { ProduitVariationService } from '../../core/services/produit-variation.service';
 import { CategorieService } from '../../core/services/categorie.service';
 
@@ -48,7 +48,7 @@ export class SCProductsComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private variationService: ProduitVariationService,
     private categorieService: CategorieService
   ) {}

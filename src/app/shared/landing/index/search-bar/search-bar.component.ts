@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ProduitService } from '../../../../core/services/produit.service';
+import { ProductService } from '../../../../core/services/product.service';
 import { Produit } from '../../../../core/models/models';
 import { ProductCardComponent } from '../../../components/product-card/product-card.component';
 import { Subject } from 'rxjs';
@@ -25,7 +25,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   isActive: boolean = false; // For animation
   private destroy$ = new Subject<void>();
 
-  constructor(private produitService: ProduitService) {}
+  constructor(private produitService: ProductService) {}
 
   ngOnInit(): void {
     // Trigger animation after component loads

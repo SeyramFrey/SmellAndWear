@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProduitService } from '../../core/services/produit.service';
+import { ProductService } from '../../core/services/product.service';
 import { ProduitVariationService } from '../../core/services/produit-variation.service';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Produit, ProduitVariation, Colors } from '../../core/models/models';
@@ -30,7 +30,7 @@ export class NewsComponent implements OnInit {
   error: string | null = null;
 
   constructor(
-    private produitService: ProduitService,
+    private produitService: ProductService,
     private produitVariationService: ProduitVariationService,
     private supabaseService: SupabaseService
   ) {}

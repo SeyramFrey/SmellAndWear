@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild, OnDestroy } from '@angular/core';
-import { ToastService } from './toast-service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 import { circle, latLng, tileLayer } from 'leaflet';
 
@@ -78,7 +78,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ];
 
     if (sessionStorage.getItem('toast')) {
-      this.toastService.show('Logged in Successfull.', { classname: 'bg-success text-center text-white', delay: 5000 });
+      this.toastService.success('Logged in successfully.');
       sessionStorage.removeItem('toast');
     }
 

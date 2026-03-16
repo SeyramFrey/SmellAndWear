@@ -77,6 +77,56 @@
   --sw-warning: #f59e0b;
   --sw-error: #ef4444;
   --sw-info: #3b82f6;
+
+  // === TYPOGRAPHY ===
+  // Font family tokens. Never repeat the raw stack — reference these vars.
+  --sw-font-heading: 'Bebas Neue', 'Arial Black', sans-serif;
+  --sw-font-body:    'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --sw-font-ui:      'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --sw-font-mono:    'Courier New', Courier, monospace;
+
+  // === SPACING SCALE ===
+  // 4-point grid. Use these in landing components.
+  --sw-space-1:  0.25rem;  //  4px
+  --sw-space-2:  0.5rem;   //  8px
+  --sw-space-3:  0.75rem;  // 12px
+  --sw-space-4:  1rem;     // 16px  (step 5 / 20px intentionally omitted)
+  --sw-space-6:  1.5rem;   // 24px
+  --sw-space-8:  2rem;     // 32px
+  --sw-space-12: 3rem;     // 48px
+  --sw-space-16: 4rem;     // 64px
+
+  // === BORDER RADIUS SCALE ===
+  --sw-radius-sm:   0.25rem;  //  4px
+  --sw-radius-md:   0.5rem;   //  8px
+  --sw-radius-lg:   0.75rem;  // 12px
+  --sw-radius-xl:   1rem;     // 16px
+  --sw-radius-full: 9999px;
+
+  // === MOTION ===
+  // Use these in transition: declarations on landing components.
+  --sw-transition-fast:   150ms ease;
+  --sw-transition-base:   300ms ease;
+  --sw-transition-slow:   500ms ease;
+
+  // === Z-INDEX ===
+  --sw-z-base:     1;
+  --sw-z-dropdown: 100;
+  --sw-z-sticky:   200;
+  --sw-z-overlay:  300;
+  --sw-z-modal:    400;
+  --sw-z-toast:    500;
+}
+
+// === ACCESSIBILITY — Reduced Motion ===
+// Honour the user's operating system setting to reduce motion.
+// Set all SW transition tokens to instant when reduced motion is requested.
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sw-transition-fast: 0ms;
+    --sw-transition-base: 0ms;
+    --sw-transition-slow: 0ms;
+  }
 }
 
 // === DARK THEME ===

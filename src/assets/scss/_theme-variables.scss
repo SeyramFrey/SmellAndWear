@@ -8,6 +8,7 @@
 :root {
   // === BRAND COLORS ===
   --sw-primary: #B5190C;
+  --sw-primary-rgb: 181, 25, 12;      // RGB components of --sw-primary (for rgba() usage)
   --sw-primary-dark: #8a1309;
   --sw-primary-light: #d41e10;
   --sw-primary-soft: rgba(181, 25, 12, 0.12);

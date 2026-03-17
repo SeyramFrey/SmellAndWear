@@ -1,18 +1,16 @@
-$brand-red: #B5190C;
-
 .account-wrapper {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--sw-bg-secondary);
 }
 
 .account-header {
   padding-bottom: 20px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--sw-border-primary);
 }
 
 // Sidebar
 .account-sidebar {
-  background: #ffffff;
+  background: var(--sw-bg-surface);
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -29,10 +27,10 @@ $brand-red: #B5190C;
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  color: #495057;
+  color: var(--sw-text-secondary);
   text-decoration: none;
   border-radius: 8px;
-  transition: all 0.2s ease;
+  transition: all var(--sw-transition-fast);
   font-weight: 500;
 
   i {
@@ -41,8 +39,8 @@ $brand-red: #B5190C;
   }
 
   &:hover {
-    background-color: rgba($brand-red, 0.05);
-    color: $brand-red;
+    background-color: rgba(var(--sw-primary-rgb), 0.05);
+    color: var(--sw-primary);
 
     i {
       opacity: 1;
@@ -50,8 +48,8 @@ $brand-red: #B5190C;
   }
 
   &.active {
-    background-color: rgba($brand-red, 0.1);
-    color: $brand-red;
+    background-color: rgba(var(--sw-primary-rgb), 0.1);
+    color: var(--sw-primary);
 
     i {
       opacity: 1;
@@ -69,11 +67,11 @@ $brand-red: #B5190C;
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: #ffffff;
+  background: var(--sw-bg-surface);
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--sw-transition-fast);
 
   &:hover {
     transform: translateY(-2px);
@@ -96,8 +94,8 @@ $brand-red: #B5190C;
   }
 
   &.favorites {
-    background-color: rgba($brand-red, 0.1);
-    color: $brand-red;
+    background-color: rgba(var(--sw-primary-rgb), 0.1);
+    color: var(--sw-primary);
   }
 
   &.addresses {
@@ -111,19 +109,19 @@ $brand-red: #B5190C;
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 4px;
-    color: #1a1a1a;
+    color: var(--sw-text-primary);
   }
 
   p {
     margin: 0;
-    color: #6c757d;
+    color: var(--sw-text-muted);
     font-size: 14px;
   }
 }
 
 // Info Cards
 .info-card {
-  background: #ffffff;
+  background: var(--sw-bg-surface);
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   overflow: hidden;
@@ -134,16 +132,16 @@ $brand-red: #B5190C;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background-color: var(--sw-bg-secondary);
+  border-bottom: 1px solid var(--sw-border-primary);
 
   h5 {
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--sw-text-primary);
   }
 
   .btn-link {
-    color: $brand-red;
+    color: var(--sw-primary);
     text-decoration: none;
     font-weight: 500;
 
@@ -163,13 +161,13 @@ $brand-red: #B5190C;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #6c757d;
+  color: var(--sw-text-muted);
   margin-bottom: 4px;
 }
 
 .info-value {
   font-size: 15px;
-  color: #1a1a1a;
+  color: var(--sw-text-primary);
   margin: 0;
 }
 
@@ -177,7 +175,7 @@ $brand-red: #B5190C;
 .orders-list {
   .order-item {
     padding: 16px 0;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--sw-border-primary);
 
     &:last-child {
       border-bottom: none;
@@ -192,22 +190,22 @@ $brand-red: #B5190C;
 
 // Button Styles
 .btn-primary {
-  background-color: $brand-red;
-  border-color: $brand-red;
+  background-color: var(--sw-primary);
+  border-color: var(--sw-primary);
 
   &:hover {
-    background-color: darken($brand-red, 7%);
-    border-color: darken($brand-red, 7%);
+    background-color: var(--sw-primary-dark);
+    border-color: var(--sw-primary-dark);
   }
 }
 
 .btn-outline-danger {
-  color: $brand-red;
-  border-color: $brand-red;
+  color: var(--sw-primary);
+  border-color: var(--sw-primary);
 
   &:hover {
-    background-color: $brand-red;
-    border-color: $brand-red;
+    background-color: var(--sw-primary);
+    border-color: var(--sw-primary);
   }
 }
 
@@ -254,4 +252,3 @@ $brand-red: #B5190C;
     font-size: 24px;
   }
 }
-

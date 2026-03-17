@@ -24,7 +24,7 @@
     color: var(--bs-primary);
     font-weight: 500;
     padding: 0.5rem 1.5rem;
-    transition: all 0.3s ease;
+    transition: all var(--sw-transition-base);
 
     &:hover {
       background-color: var(--bs-primary);
@@ -34,7 +34,7 @@
     }
 
     i {
-      transition: transform 0.3s ease;
+      transition: transform var(--sw-transition-base);
     }
 
     &:hover i {
@@ -149,7 +149,7 @@
       height: 0;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.9);
-      transition: width 0.5s ease, height 0.5s ease;
+      transition: width var(--sw-transition-slow), height var(--sw-transition-slow);
       transform: translate(-50%, -50%);
       z-index: -1;
     }
@@ -157,14 +157,14 @@
     .btn-text {
       position: relative;
       z-index: 1;
-      transition: color 0.3s ease;
+      transition: color var(--sw-transition-base);
       font-size: 0.95rem;
     }
 
     .btn-icon {
       display: flex;
       align-items: center;
-      transition: transform 0.3s ease;
+      transition: transform var(--sw-transition-base);
 
       i {
         font-size: 1.2rem;

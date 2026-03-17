@@ -41,7 +41,7 @@
 }
 
 .product-card-wrapper {
-  transition: transform 0.3s ease;
+  transition: transform var(--sw-transition-base);
   
   &:hover {
     transform: translateY(-5px);

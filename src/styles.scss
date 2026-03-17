@@ -8,7 +8,7 @@
 
 /* Override landing page background to white */
 .layout-wrapper.landing {
-    background-color: #ffffff !important;
+    background-color: var(--sw-bg-primary) !important;
 }
 // Swiper
 .coverflowslide .slide {

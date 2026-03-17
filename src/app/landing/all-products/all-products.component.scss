@@ -36,7 +36,7 @@
     color: white;
 
     .hero-title {
-      font-family: 'Bebas Neue', sans-serif;
+      font-family: var(--sw-font-heading);
       font-size: 4rem;
       font-weight: bold;
       margin-bottom: 1rem;
@@ -49,7 +49,7 @@
     }
 
     .hero-subtitle {
-      font-family: 'Open Sans', sans-serif;
+      font-family: var(--sw-font-body);
       font-size: 1.5rem;
       font-weight: 300;
       margin: 0;
@@ -64,7 +64,7 @@
 
 // Filter Section
 .filter-section {
-  background: white;
+  background: var(--sw-bg-surface);
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
   padding: 1.5rem 0;
   position: sticky;
@@ -149,7 +149,7 @@
   height: 50px;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  transition: all var(--sw-transition-base);
 
   &:hover {
     transform: translateY(-5px);

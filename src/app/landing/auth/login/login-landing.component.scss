@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, var(--sw-bg-secondary) 0%, var(--sw-bg-tertiary) 100%);
   padding: 20px;
 }
 
@@ -16,14 +16,14 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #495057;
+  color: var(--sw-text-secondary);
   text-decoration: none;
   font-size: 14px;
   margin-bottom: 24px;
-  transition: color 0.2s ease;
+  transition: color var(--sw-transition-fast);
 
   &:hover {
-    color: #B5190C;
+    color: var(--sw-primary);
   }
 
   i {
@@ -32,7 +32,7 @@
 }
 
 .auth-card {
-  background: #ffffff;
+  background: var(--sw-bg-surface);
   border-radius: 16px;
   padding: 40px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
@@ -45,12 +45,12 @@
   h2 {
     font-size: 28px;
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--sw-text-primary);
     margin-bottom: 8px;
   }
 
   p {
-    color: #6c757d;
+    color: var(--sw-text-muted);
     font-size: 15px;
     margin: 0;
   }
@@ -63,7 +63,7 @@
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: #374151;
+    color: var(--sw-text-primary);
     margin-bottom: 8px;
   }
 }
@@ -77,7 +77,7 @@
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: var(--sw-text-muted);
     font-size: 18px;
     pointer-events: none;
   }
@@ -86,14 +86,14 @@
     padding-left: 48px;
     padding-right: 48px;
     height: 50px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--sw-border-primary);
     border-radius: 10px;
     font-size: 15px;
-    transition: all 0.2s ease;
+    transition: all var(--sw-transition-fast);
 
     &:focus {
-      border-color: #B5190C;
-      box-shadow: 0 0 0 3px rgba(181, 25, 12, 0.1);
+      border-color: var(--sw-primary);
+      box-shadow: 0 0 0 3px rgba(var(--sw-primary-rgb), 0.10);
     }
 
     &.is-invalid {
@@ -101,7 +101,7 @@
     }
 
     &::placeholder {
-      color: #9ca3af;
+      color: var(--sw-text-muted);
     }
   }
 
@@ -112,11 +112,11 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #9ca3af;
+    color: var(--sw-text-muted);
     cursor: pointer;
     padding: 8px; // Larger click area
     font-size: 18px;
-    transition: color 0.2s ease;
+    transition: color var(--sw-transition-fast);
     z-index: 10; // Ensure it's above the input
 
     i {
@@ -127,14 +127,14 @@
     }
 
     &:hover {
-      color: #6c757d;
+      color: var(--sw-text-muted);
     }
   }
 }
 
 .forgot-link {
   font-size: 13px;
-  color: #B5190C;
+  color: var(--sw-primary);
   text-decoration: none;
   cursor: pointer;
 
@@ -148,22 +148,22 @@
     width: 18px;
     height: 18px;
     border-radius: 4px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--sw-border-primary);
     cursor: pointer;
 
     &:checked {
-      background-color: #B5190C;
-      border-color: #B5190C;
+      background-color: var(--sw-primary);
+      border-color: var(--sw-primary);
     }
 
     &:focus {
-      box-shadow: 0 0 0 3px rgba(181, 25, 12, 0.1);
+      box-shadow: 0 0 0 3px rgba(var(--sw-primary-rgb), 0.10);
     }
   }
 
   .form-check-label {
     font-size: 14px;
-    color: #4b5563;
+    color: var(--sw-text-secondary);
     margin-left: 8px;
     cursor: pointer;
   }
@@ -178,21 +178,21 @@
 }
 
 .btn-primary {
-  background-color: #B5190C;
-  border-color: #B5190C;
+  background-color: var(--sw-primary);
+  border-color: var(--sw-primary);
 
   &:hover:not(:disabled) {
-    background-color: #9a1509;
-    border-color: #9a1509;
+    background-color: var(--sw-primary-dark);
+    border-color: var(--sw-primary-dark);
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px rgba(181, 25, 12, 0.25);
+    box-shadow: 0 0 0 3px rgba(var(--sw-primary-rgb), 0.25);
   }
 
   &:disabled {
-    background-color: #B5190C;
-    border-color: #B5190C;
+    background-color: var(--sw-primary);
+    border-color: var(--sw-primary);
     opacity: 0.7;
   }
 }
@@ -201,15 +201,15 @@
   text-align: center;
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--sw-border-primary);
 
   p {
     margin: 0;
     font-size: 14px;
-    color: #6c757d;
+    color: var(--sw-text-muted);
 
     a {
-      color: #B5190C;
+      color: var(--sw-primary);
       font-weight: 500;
       text-decoration: none;
       cursor: pointer;
@@ -228,7 +228,7 @@
   p {
     margin: 0;
     font-size: 13px;
-    color: #9ca3af;
+    color: var(--sw-text-muted);
   }
 }
 
@@ -261,4 +261,3 @@
     }
   }
 }
-

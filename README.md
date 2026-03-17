@@ -28,6 +28,24 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ---
 
+## Design System
+
+All styling rules for this project are governed by **[`docs/design-system-rules.md`](docs/design-system-rules.md)**.
+
+This document defines:
+
+- The canonical `--sw-*` CSS custom property token system (colors, typography, spacing, motion, shadows, z-index)
+- What must never be hardcoded in component SCSS (brand hex values, raw font stacks, SCSS brand variables)
+- What may remain as intentional literals and how to document exceptions
+- Light / dark mode rules and semantic token consumption
+- The safe migration procedure for converting hardcoded values to tokens
+- Deferred / sensitive zones that must not be touched without a dedicated plan (`checkout.component.scss`, `topbar.component.scss`, `product-detail.component.scss`, `signup-landing.component.scss`, admin template SCSS)
+- The review checklist that must pass before any styling PR is merged
+
+> **Any styling change must comply with `docs/design-system-rules.md` before merge.**
+
+---
+
 ## Paystack Payment Integration
 
 ### Currency Rules

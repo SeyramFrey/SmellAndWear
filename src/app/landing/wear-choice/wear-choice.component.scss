@@ -10,7 +10,7 @@
 
     .navbar-brand {
       img {
-        transition: transform 0.3s ease;
+        transition: transform var(--sw-transition-base);
         &:hover {
           transform: scale(1.1);
         }
@@ -27,7 +27,7 @@
     position: relative;
     height: 100%;
     overflow: hidden;
-    transition: all 0.5s ease;
+    transition: all var(--sw-transition-slow);
     background-size: cover;
     background-position: center;
     display: flex;
@@ -43,7 +43,7 @@
       right: 0;
       bottom: 0;
       background: rgba(0, 0, 0, 0.4);
-      transition: all 0.5s ease;
+      transition: all var(--sw-transition-slow);
     }
 
     &:hover {
@@ -59,7 +59,7 @@
       color: white;
       padding: 2rem;
       transform: translateY(0);
-      transition: all 0.5s ease;
+      transition: all var(--sw-transition-slow);
 
       h1 {
         font-size: 4rem;
@@ -78,7 +78,7 @@
         padding: 1rem 2.5rem;
         font-weight: 500;
         letter-spacing: 1px;
-        transition: all 0.3s ease;
+        transition: all var(--sw-transition-base);
         border: 2px solid white;
         background: transparent;
         color: white;
@@ -96,7 +96,7 @@
   .woman-section, .man-section {
     background-position: center;
     background-size: 100% 100%;
-    transition: background-size 0.5s ease;
+    transition: background-size var(--sw-transition-slow);
 
     &:hover {
       background-size: 110% 110%;

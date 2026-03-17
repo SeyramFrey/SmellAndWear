@@ -1,41 +1,36 @@
 // === Orders Page Styles ===
 // Modern, responsive design with loading skeleton and status badges
 
-$brand-red: #B5190C;
-$brand-red-light: #ff3366;
-$text-primary: #1a1a1a;
-$text-secondary: #6c757d;
-$bg-light: #f8f9fa;
-$border-color: #e9ecef;
-
-// Status colors
+// Status colors — non-brand semantic colors, kept as SCSS variables (no --sw-* token equivalent)
 $status-pending: #ffc107;
 $status-confirmed: #17a2b8;
 $status-processing: #007bff;
 $status-shipped: #6f42c1;
 $status-delivered: #28a745;
 $status-cancelled: #dc3545;
+// Heart/favorite accent — intentionally NOT --sw-primary-light (different hue)
+$color-heart: #ff3366;
 
 .orders-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: $bg-light;
+  background-color: var(--sw-bg-secondary);
 }
 
 // === Header Section ===
 .orders-header {
-  background: #ffffff;
+  background: var(--sw-bg-surface);
   padding: 1.5rem 1.5rem 1rem;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--sw-border-primary);
   position: sticky;
   top: 0;
   z-index: 10;
-  
+
   @media (min-width: 768px) {
     padding: 2rem 2.5rem 1.5rem;
   }
-  
+
   @media (min-width: 1200px) {
     padding: 2rem 4rem 1.5rem;
   }
@@ -48,28 +43,28 @@ $status-cancelled: #dc3545;
   padding: 0.5rem 0;
   background: none;
   border: none;
-  color: $text-secondary;
+  color: var(--sw-text-muted);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color var(--sw-transition-fast);
   margin-bottom: 1rem;
-  
+
   i {
     font-size: 1.125rem;
-    transition: transform 0.2s ease;
+    transition: transform var(--sw-transition-fast);
   }
-  
+
   &:hover {
-    color: $brand-red;
-    
+    color: var(--sw-primary);
+
     i {
       transform: translateX(-4px);
     }
   }
-  
+
   &:focus {
-    outline: 2px solid $brand-red;
+    outline: 2px solid var(--sw-primary);
     outline-offset: 4px;
     border-radius: 4px;
   }
@@ -79,7 +74,7 @@ $status-cancelled: #dc3545;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  
+
   @media (min-width: 768px) {
     flex-direction: row;
     align-items: baseline;
@@ -90,9 +85,9 @@ $status-cancelled: #dc3545;
 .page-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--sw-text-primary);
   margin: 0;
-  
+
   @media (min-width: 768px) {
     font-size: 2rem;
   }
@@ -100,7 +95,7 @@ $status-cancelled: #dc3545;
 
 .page-subtitle {
   font-size: 0.875rem;
-  color: $text-secondary;
+  color: var(--sw-text-muted);
   margin: 0;
 }
 
@@ -108,11 +103,11 @@ $status-cancelled: #dc3545;
 .loading-state {
   flex: 1;
   padding: 1.5rem;
-  
+
   @media (min-width: 768px) {
     padding: 2rem 2.5rem;
   }
-  
+
   @media (min-width: 1200px) {
     padding: 2rem 4rem;
     max-width: 900px;
@@ -128,7 +123,7 @@ $status-cancelled: #dc3545;
 }
 
 .skeleton-card {
-  background: #ffffff;
+  background: var(--sw-bg-surface);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -155,16 +150,16 @@ $status-cancelled: #dc3545;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
   margin-bottom: 0.75rem;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
-  
+
   &--short {
     width: 40%;
     height: 20px;
   }
-  
+
   &--medium {
     width: 60%;
   }
@@ -202,9 +197,9 @@ $status-cancelled: #dc3545;
   text-align: center;
   max-width: 400px;
   padding: 2rem;
-  
+
   @media (min-width: 768px) {
-    background: #ffffff;
+    background: var(--sw-bg-surface);
     border-radius: 16px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
     padding: 3rem;
@@ -220,7 +215,7 @@ $status-cancelled: #dc3545;
   justify-content: center;
   background: linear-gradient(135deg, rgba($status-cancelled, 0.1), rgba($status-cancelled, 0.05));
   border-radius: 50%;
-  
+
   i {
     font-size: 40px;
     color: $status-cancelled;
@@ -230,13 +225,13 @@ $status-cancelled: #dc3545;
 .error-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--sw-text-primary);
   margin: 0 0 0.75rem;
 }
 
 .error-text {
   font-size: 0.9375rem;
-  color: $text-secondary;
+  color: var(--sw-text-muted);
   margin: 0 0 1.5rem;
 }
 
@@ -246,21 +241,21 @@ $status-cancelled: #dc3545;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   background: none;
-  border: 2px solid $brand-red;
-  color: $brand-red;
+  border: 2px solid var(--sw-primary);
+  color: var(--sw-primary);
   font-size: 0.9375rem;
   font-weight: 600;
   border-radius: 50px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  
+  transition: all var(--sw-transition-fast);
+
   &:hover {
-    background-color: $brand-red;
-    color: #ffffff;
+    background-color: var(--sw-primary);
+    color: white;
   }
-  
+
   &:focus {
-    outline: 2px solid $brand-red;
+    outline: 2px solid var(--sw-primary);
     outline-offset: 4px;
   }
 }
@@ -279,9 +274,9 @@ $status-cancelled: #dc3545;
   text-align: center;
   max-width: 400px;
   padding: 2rem;
-  
+
   @media (min-width: 768px) {
-    background: #ffffff;
+    background: var(--sw-bg-surface);
     border-radius: 16px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
     padding: 3rem;
@@ -295,12 +290,12 @@ $status-cancelled: #dc3545;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba($brand-red, 0.1), rgba($brand-red, 0.05));
+  background: linear-gradient(135deg, rgba(var(--sw-primary-rgb), 0.1), rgba(var(--sw-primary-rgb), 0.05));
   border-radius: 50%;
-  
+
   i {
     font-size: 48px;
-    color: $brand-red;
+    color: var(--sw-primary);
     opacity: 0.7;
   }
 }
@@ -308,13 +303,13 @@ $status-cancelled: #dc3545;
 .empty-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--sw-text-primary);
   margin: 0 0 0.75rem;
 }
 
 .empty-text {
   font-size: 0.9375rem;
-  color: $text-secondary;
+  color: var(--sw-text-muted);
   line-height: 1.6;
   margin: 0 0 2rem;
 }
@@ -324,30 +319,30 @@ $status-cancelled: #dc3545;
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 2rem;
-  background-color: $brand-red;
-  color: #ffffff;
+  background-color: var(--sw-primary);
+  color: white;
   font-size: 0.9375rem;
   font-weight: 600;
   text-decoration: none;
   border-radius: 50px;
-  transition: all 0.2s ease;
-  
+  transition: all var(--sw-transition-fast);
+
   i {
     font-size: 1.125rem;
   }
-  
+
   &:hover {
-    background-color: darken($brand-red, 8%);
+    background-color: var(--sw-primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba($brand-red, 0.35);
+    box-shadow: 0 6px 20px rgba(var(--sw-primary-rgb), 0.35);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   &:focus {
-    outline: 2px solid $brand-red;
+    outline: 2px solid var(--sw-primary);
     outline-offset: 4px;
   }
 }
@@ -356,11 +351,11 @@ $status-cancelled: #dc3545;
 .orders-content {
   flex: 1;
   padding: 1.5rem;
-  
+
   @media (min-width: 768px) {
     padding: 2rem 2.5rem;
   }
-  
+
   @media (min-width: 1200px) {
     padding: 2rem 4rem;
     max-width: 900px;
@@ -377,21 +372,21 @@ $status-cancelled: #dc3545;
 
 // === Order Card ===
 .order-card {
-  background: #ffffff;
+  background: var(--sw-bg-surface);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transition: all 0.2s ease;
-  
+  transition: all var(--sw-transition-fast);
+
   &:hover {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
-  
+
   // Special styling for shipped orders
   &--shipped {
     border-left: 4px solid $status-shipped;
   }
-  
+
   // Special styling for delivered orders
   &--delivered {
     border-left: 4px solid $status-delivered;
@@ -403,8 +398,8 @@ $status-cancelled: #dc3545;
   justify-content: space-between;
   align-items: flex-start;
   padding: 1.25rem;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  border-bottom: 1px solid $border-color;
+  background: linear-gradient(135deg, var(--sw-bg-secondary) 0%, var(--sw-bg-surface) 100%);
+  border-bottom: 1px solid var(--sw-border-primary);
   gap: 1rem;
   flex-wrap: wrap;
 }
@@ -418,12 +413,12 @@ $status-cancelled: #dc3545;
 .order-number {
   font-size: 1rem;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--sw-text-primary);
 }
 
 .order-date {
   font-size: 0.8125rem;
-  color: $text-secondary;
+  color: var(--sw-text-muted);
 }
 
 .status-badge {
@@ -435,40 +430,40 @@ $status-cancelled: #dc3545;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-radius: 20px;
-  
+
   &--pending {
     background-color: rgba($status-pending, 0.15);
     color: darken($status-pending, 20%);
   }
-  
+
   &--confirmed {
     background-color: rgba($status-confirmed, 0.15);
     color: darken($status-confirmed, 10%);
   }
-  
+
   &--processing {
     background-color: rgba($status-processing, 0.15);
     color: $status-processing;
   }
-  
+
   &--shipped {
     background-color: rgba($status-shipped, 0.15);
     color: $status-shipped;
   }
-  
+
   &--delivered {
     background-color: rgba($status-delivered, 0.15);
     color: $status-delivered;
   }
-  
+
   &--cancelled {
     background-color: rgba($status-cancelled, 0.15);
     color: $status-cancelled;
   }
-  
+
   &--default {
-    background-color: rgba($text-secondary, 0.15);
-    color: $text-secondary;
+    background-color: rgba(108, 117, 125, 0.15); // #6c757d literal — rgba() needs RGB values, not a CSS var
+    color: var(--sw-text-muted);
   }
 }
 
@@ -490,25 +485,25 @@ $status-cancelled: #dc3545;
 
 .detail-label {
   font-size: 0.875rem;
-  color: $text-secondary;
+  color: var(--sw-text-muted);
 }
 
 .detail-value {
   font-size: 0.875rem;
-  color: $text-primary;
+  color: var(--sw-text-primary);
   font-weight: 500;
-  
+
   &--price {
     font-size: 1.125rem;
     font-weight: 700;
-    color: $brand-red;
+    color: var(--sw-primary);
   }
 }
 
 .tracking-info {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px dashed $border-color;
+  border-top: 1px dashed var(--sw-border-primary);
 }
 
 .tracking-badge {
@@ -521,7 +516,7 @@ $status-cancelled: #dc3545;
   font-size: 0.8125rem;
   color: $status-shipped;
   font-weight: 500;
-  
+
   i {
     font-size: 1rem;
   }
@@ -529,8 +524,8 @@ $status-cancelled: #dc3545;
 
 .order-footer {
   padding: 1rem 1.25rem;
-  background: #f8f9fa;
-  border-top: 1px solid $border-color;
+  background: var(--sw-bg-secondary);
+  border-top: 1px solid var(--sw-border-primary);
   display: flex;
   justify-content: flex-end;
 }
@@ -541,33 +536,33 @@ $status-cancelled: #dc3545;
   gap: 0.25rem;
   padding: 0.5rem 1rem;
   background: none;
-  border: 1px solid $brand-red;
-  color: $brand-red;
+  border: 1px solid var(--sw-primary);
+  color: var(--sw-primary);
   font-size: 0.875rem;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  
+  transition: all var(--sw-transition-fast);
+
   i {
     font-size: 1.125rem;
-    transition: transform 0.2s ease;
+    transition: transform var(--sw-transition-fast);
   }
-  
+
   &:hover {
-    background-color: $brand-red;
-    color: #ffffff;
-    
+    background-color: var(--sw-primary);
+    color: white;
+
     i {
       transform: translateX(4px);
     }
   }
-  
+
   &:focus {
-    outline: 2px solid $brand-red;
+    outline: 2px solid var(--sw-primary);
     outline-offset: 2px;
   }
-  
+
   // Make button full-width on mobile for easier touch
   @media (max-width: 576px) {
     width: 100%;

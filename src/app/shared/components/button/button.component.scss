@@ -9,9 +9,9 @@
 button{
   width:200px;
   height:70px;
-  background: linear-gradient(to left top, #B5190C 50%, #FF0000 50%);
+  background: linear-gradient(to left top, var(--sw-primary) 50%, #FF0000 50%);
   border-style: none;
-  color:#fff;
+  color: var(--sw-text-inverse);
   font-size: 23px;
   letter-spacing: 3px;
   font-weight: 600;

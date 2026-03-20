@@ -167,7 +167,7 @@
       .thumbnail-arrow {
         width: 36px;
         height: 36px;
-        background: #f8f9fa;
+        background: var(--sw-bg-secondary);
         border: 1px solid #dee2e6;
         border-radius: 6px;
         display: flex;
@@ -250,14 +250,14 @@
         overflow-y: hidden;
         // HORIZONTAL SCROLL requirement for mobile
         scrollbar-width: thin;
-        scrollbar-color: #dee2e6 #f8f9fa;
+        scrollbar-color: #dee2e6 var(--sw-bg-secondary);
         
         &::-webkit-scrollbar {
           height: 6px;
         }
         
         &::-webkit-scrollbar-track {
-          background: #f8f9fa;
+          background: var(--sw-bg-secondary);
           border-radius: 3px;
         }
         
@@ -663,12 +663,11 @@
       .chevron-icon {
         font-size: 1.2rem;
         transition: transform var(--sw-transition-base);
-        
+
         &.rotated {
           transform: rotate(90deg);
         }
         font-weight: normal;
-        transition: transform 0.2s;
       }
     }
     

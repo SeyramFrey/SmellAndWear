@@ -11,7 +11,7 @@
   --sw-primary-rgb: 181, 25, 12;      // RGB components of --sw-primary (for rgba() usage)
   --sw-primary-dark: #8a1309;
   --sw-primary-light: #d41e10;
-  --sw-primary-soft: rgba(181, 25, 12, 0.12);
+  --sw-primary-soft: rgba(var(--sw-primary-rgb), 0.12);
   
   // === LIGHT THEME (Default) ===
   --sw-bg-primary: #ffffff;
@@ -210,7 +210,7 @@
 // Topbar icon classes based on scroll state
 .topbar-icon {
   color: var(--sw-topbar-icon-default);
-  transition: color 0.3s ease;
+  transition: color var(--sw-transition-base);
   
   &.scrolled {
     color: var(--sw-topbar-icon-scrolled);
@@ -471,7 +471,7 @@ body.dark-mode {
 
 html {
   // Smooth color transitions when theme changes
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color var(--sw-transition-base), color var(--sw-transition-base);
 }
 
 body,
@@ -481,6 +481,6 @@ body,
 .form-control,
 .form-select,
 .btn {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color var(--sw-transition-base), color var(--sw-transition-base), border-color var(--sw-transition-base);
 }
 

@@ -85,8 +85,8 @@
   border-color: var(--sw-primary) !important;
   
   &:hover {
-    background-color: darken(#B5190C, 8%) !important;
-    border-color: darken(#B5190C, 8%) !important;
+    background-color: var(--sw-primary-dark) !important;
+    border-color: var(--sw-primary-dark) !important;
   }
   
   &:focus {

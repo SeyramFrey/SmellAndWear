@@ -1,12 +1,3 @@
-// Variables
-$primary-color: #000000;
-$blue-color: #0066ff;
-$text-color: #000000;
-$text-muted: #666666;
-$border-color: #e0e0e0;
-$light-gray: #f8f9fa;
-$hover-color: #f5f5f5;
-$red-promo: #ff4444;
 
 // ========================================
 // PRODUCT DETAIL PAGE TOPBAR BLACK LINKS
@@ -21,7 +12,7 @@ $red-promo: #ff4444;
           color: #000000 !important;
           
           &:hover {
-            color: #B5190C !important;
+            color: var(--sw-primary) !important;
           }
         }
       }
@@ -32,7 +23,7 @@ $red-promo: #ff4444;
       color: #000000 !important;
       
       &:hover {
-        color: #B5190C !important;
+        color: var(--sw-primary) !important;
       }
     }
     
@@ -123,7 +114,7 @@ $red-promo: #ff4444;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all var(--sw-transition-base);
       pointer-events: auto;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
       z-index: 15;
@@ -183,7 +174,7 @@ $red-promo: #ff4444;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--sw-transition-fast);
         flex-shrink: 0;
 
         &:hover:not(:disabled) {
@@ -217,7 +208,7 @@ $red-promo: #ff4444;
           overflow: hidden;
           cursor: pointer;
           border: 2px solid transparent;
-          transition: all 0.3s ease;
+          transition: all var(--sw-transition-base);
           background: #fff;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           
@@ -228,7 +219,7 @@ $red-promo: #ff4444;
           }
           
           &.active {
-            border-color: $primary-color;
+            border-color: #000000;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
           }
           
@@ -237,7 +228,7 @@ $red-promo: #ff4444;
             height: 100%;
             object-fit: cover;
             object-position: center;
-            transition: transform 0.3s ease;
+            transition: transform var(--sw-transition-base);
           }
           
           &:hover img {
@@ -288,7 +279,7 @@ $red-promo: #ff4444;
           overflow: hidden;
           cursor: pointer;
           border: 2px solid transparent;
-          transition: all 0.3s ease;
+          transition: all var(--sw-transition-base);
           background: #fff;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           
@@ -297,7 +288,7 @@ $red-promo: #ff4444;
           }
           
           &.active {
-            border-color: $primary-color;
+            border-color: #000000;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
           }
           
@@ -396,7 +387,7 @@ $red-promo: #ff4444;
 .product-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: $primary-color;
+  color: #000000;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -410,7 +401,7 @@ $red-promo: #ff4444;
   margin-bottom: 1.5rem;
   
   .discount-badge {
-    background-color: #B5190C;
+    background-color: var(--sw-primary);
     color: white;
     font-size: 0.75rem;
     font-weight: 700;
@@ -423,8 +414,8 @@ $red-promo: #ff4444;
   .price {
     font-size: 1.5rem;
     font-weight: 700;
-    color: $primary-color;
-    transition: color 0.2s ease;
+    color: #000000;
+    transition: color var(--sw-transition-fast);
   }
   
   .price-original {
@@ -433,14 +424,14 @@ $red-promo: #ff4444;
     color: #8c8c8c;
     text-decoration: line-through;
     text-decoration-thickness: 2px;
-    text-decoration-color: #B5190C;
+    text-decoration-color: var(--sw-primary);
     opacity: 0.8;
   }
   
   // When there's an active discount
   &--has-discount {
     .price {
-      color: #B5190C;
+      color: var(--sw-primary);
       font-weight: 800;
     }
   }
@@ -450,7 +441,7 @@ $red-promo: #ff4444;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: $red-promo;
+  color: #ff4444;
   font-weight: 500;
   font-size: 0.9rem;
   margin-bottom: 2rem;
@@ -467,7 +458,7 @@ $red-promo: #ff4444;
 .selection-label {
   display: block;
   font-weight: 600;
-  color: $primary-color;
+  color: #000000;
   margin-bottom: 1rem;
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -488,11 +479,11 @@ $red-promo: #ff4444;
   
   .size-guide-link {
     font-size: 0.85rem;
-    color: $text-muted;
+    color: var(--sw-text-secondary);
     text-decoration: underline;
     
     &:hover {
-      color: $primary-color;
+      color: #000000;
     }
   }
 }
@@ -509,14 +500,14 @@ $red-promo: #ff4444;
     position: relative;
     transition: transform 0.2s;
     border: 2px solid #ffffff;
-    box-shadow: 0 0 0 1px $border-color;
+    box-shadow: 0 0 0 1px #e0e0e0;
     
     &:hover {
       transform: scale(1.1);
     }
     
     &.selected {
-      box-shadow: 0 0 0 2px $primary-color;
+      box-shadow: 0 0 0 2px #000000;
     }
   }
 }
@@ -529,9 +520,9 @@ $red-promo: #ff4444;
   .size-btn {
     min-width: 50px;
     height: 45px;
-    border: 1px solid $border-color;
+    border: 1px solid #e0e0e0;
     background: white;
-    color: $primary-color;
+    color: #000000;
     font-weight: 500;
     border-radius: 4px;
     cursor: pointer;
@@ -541,14 +532,14 @@ $red-promo: #ff4444;
     justify-content: center;
     
     &:hover {
-      border-color: $primary-color;
-      background: $hover-color;
+      border-color: #000000;
+      background: #f5f5f5;
     }
     
     &.selected {
-      background: $primary-color;
+      background: #000000;
       color: white;
-      border-color: $primary-color;
+      border-color: #000000;
     }
   }
 }
@@ -556,7 +547,7 @@ $red-promo: #ff4444;
 .quantity-selector {
   display: flex;
   align-items: center;
-  border: 1px solid $border-color;
+  border: 1px solid #e0e0e0;
   border-radius: 4px;
   width: fit-content;
   
@@ -565,14 +556,14 @@ $red-promo: #ff4444;
     height: 45px;
     border: none;
     background: white;
-    color: $primary-color;
+    color: #000000;
     font-size: 1.2rem;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
     
     &:hover:not(:disabled) {
-      background: $hover-color;
+      background: #f5f5f5;
     }
     
     &:disabled {
@@ -585,11 +576,11 @@ $red-promo: #ff4444;
     width: 60px;
     height: 45px;
     border: none;
-    border-left: 1px solid $border-color;
-    border-right: 1px solid $border-color;
+    border-left: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
     text-align: center;
     font-weight: 500;
-    color: $primary-color;
+    color: #000000;
     background: white;
     
     &:focus {
@@ -607,7 +598,7 @@ $red-promo: #ff4444;
 .add-to-cart-btn {
   width: 100%;
   height: 50px;
-  background: $primary-color;
+  background: #000000;
   color: white;
   border: none;
   border-radius: 4px;
@@ -620,7 +611,7 @@ $red-promo: #ff4444;
   margin-bottom: 1rem;
   
   &:hover:not(:disabled) {
-    background: darken($primary-color, 10%);
+    background: #000000;
   }
   
   &:disabled {
@@ -644,11 +635,11 @@ $red-promo: #ff4444;
 }
 
 .details-accordion {
-  border-top: 1px solid $border-color;
+  border-top: 1px solid #e0e0e0;
   margin-bottom: 2rem;
   
   .accordion-item {
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid #e0e0e0;
     
     .accordion-header {
       width: 100%;
@@ -661,17 +652,17 @@ $red-promo: #ff4444;
       font-weight: 600;
       font-size: 0.85rem;
       letter-spacing: 0.5px;
-      color: $primary-color;
+      color: #000000;
       cursor: pointer;
       transition: color 0.2s;
       
       &:hover {
-        color: darken($primary-color, 20%);
+        color: #000000;
       }
       
       .chevron-icon {
         font-size: 1.2rem;
-        transition: transform 0.3s ease;
+        transition: transform var(--sw-transition-base);
         
         &.rotated {
           transform: rotate(90deg);
@@ -693,7 +684,7 @@ $red-promo: #ff4444;
       }
       
       .accordion-content-inner {
-        color: $text-muted;
+        color: var(--sw-text-secondary);
         font-size: 0.9rem;
         line-height: 1.6;
         
@@ -704,20 +695,20 @@ $red-promo: #ff4444;
           gap: 0.75rem;
           background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
           border: 1px solid #ffcccc;
-          border-left: 4px solid #B5190C;
+          border-left: 4px solid var(--sw-primary);
           border-radius: 8px;
           padding: 1rem 1.25rem;
           margin-bottom: 1.25rem;
           
           i {
             font-size: 1.25rem;
-            color: #B5190C;
+            color: var(--sw-primary);
             flex-shrink: 0;
           }
           
           span {
             font-weight: 600;
-            color: #B5190C;
+            color: var(--sw-primary);
             font-size: 0.95rem;
           }
         }
@@ -732,7 +723,7 @@ $red-promo: #ff4444;
         
         em {
           font-style: italic;
-          color: darken($text-muted, 10%);
+          color: #4d4d4d;
         }
         
         .care-list {
@@ -749,7 +740,7 @@ $red-promo: #ff4444;
               content: '•';
               position: absolute;
               left: 0;
-              color: $primary-color;
+              color: #000000;
               font-weight: bold;
             }
           }
@@ -776,13 +767,13 @@ $red-promo: #ff4444;
     gap: 0.75rem;
     font-size: 0.8rem;
     font-weight: 500;
-    color: $text-muted;
+    color: var(--sw-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     
     .badge-icon {
       font-size: 1.2rem;
-      color: $primary-color;
+      color: #000000;
     }
   }
 }

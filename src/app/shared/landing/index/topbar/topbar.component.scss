@@ -230,7 +230,7 @@
 }
 
 .cart-badge {
-  // Phase-0 fix: use brand token directly instead of lighten(var(--sw-primary), 5%)
+  // Phase-0 fix: use brand token directly instead of lighten($cart-red, 5%)
   // which compiled to #CD1C0E (24 units off-brand on the R channel).
   background-color: var(--sw-primary) !important;
   color: #ffffff !important;

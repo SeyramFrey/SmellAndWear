@@ -172,7 +172,7 @@
     // When there's an active discount
     &--has-discount {
       .product-card__price-current {
-        color: var(--sw-primary);
+        color: var(--sw-price-discount);  // resolves to var(--sw-primary) in light mode
         font-weight: 800;
       }
     }
@@ -349,7 +349,7 @@
 
       &--has-discount {
         .product-card__price-current {
-          color: #ff3d3d; // Brighter red for dark mode
+          color: var(--sw-price-discount); // resolves to #ff3d3d in dark mode — legible on dark surface
         }
       }
     }

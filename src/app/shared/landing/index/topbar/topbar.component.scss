@@ -82,6 +82,7 @@
 
 // === LOGO CONTAINER - ALL DEVICES ===
 .logo_container {
+  padding-top: var(--sw-topbar-logo-offset); // 0.3rem — moves logo down slightly
   // Center logo in the navbar
   display: flex;
   justify-content: center;
@@ -1817,73 +1818,74 @@
     }
   }
   
-  // Desktop icon styles - white when transparent, black when scrolled
+  // Desktop icon styles - white when transparent, token-driven when scrolled
   .navbar-landing:not(.scrolled):not(.is-sticky) {
     .topbar-action-btn,
     .btn-topbar {
       i.ri {
-        color: rgba(255, 255, 255, 1) !important;
+        color: var(--sw-topbar-icon-default) !important;
         line-height: 30px;
         font-weight: 300;
       }
-      
+
       i.ri-heart-line,
       i.ri-user-line,
       i.ri-search-2-line {
-        color: rgba(255, 255, 255, 1) !important;
+        color: var(--sw-topbar-icon-default) !important;
         font-weight: 300;
         line-height: 30px;
       }
-      
+
       i.bx,
       i.bx-search {
-        color: rgba(255, 255, 255, 1) !important;
+        color: var(--sw-topbar-icon-default) !important;
         font-weight: 300;
       }
-      
+
       i.bx-shopping-bag {
-        color: rgba(255, 255, 255, 1) !important;
+        color: var(--sw-topbar-icon-default) !important;
         font-weight: 300;
       }
-      
+
       span.fs-16 {
-        color: rgba(255, 255, 255, 1) !important;
+        color: var(--sw-topbar-icon-default) !important;
         font-weight: 500;
       }
     }
   }
-  
+
   .navbar-landing.scrolled,
   .navbar-landing.is-sticky {
     .topbar-action-btn,
     .btn-topbar {
       i.ri {
-        color: rgba(0, 0, 0, 1) !important;
+        color: var(--sw-topbar-icon-scrolled) !important;
         line-height: 30px;
         font-weight: 300;
       }
-      
+
       i.ri-heart-line,
       i.ri-user-line,
       i.ri-search-2-line {
-        color: rgba(0, 0, 0, 1) !important;
+        color: var(--sw-topbar-icon-scrolled) !important;
         font-weight: 300;
         line-height: 30px;
       }
-      
+
       i.bx,
       i.bx-search {
-        color: rgba(0, 0, 0, 1) !important;
+        color: var(--sw-topbar-icon-scrolled) !important;
         font-weight: 300;
       }
-      
+
       i.bx-shopping-bag {
-        color: rgba(255, 255, 255, 1) !important;
+        // Always light — sits inside the red cart pill regardless of theme
+        color: var(--sw-topbar-icon-default) !important;
         font-weight: 300;
       }
-      
+
       span.fs-16 {
-        color: rgba(0, 0, 0, 1) !important;
+        color: var(--sw-topbar-icon-scrolled) !important;
         font-weight: 500;
       }
     }
@@ -1904,10 +1906,10 @@
     .nav-links-list {
       .nav-link-item {
         .nav-link-custom {
-          color: #000000;
-          
+          color: var(--sw-nav-link-scrolled);
+
           &:hover {
-            color: #333333;
+            color: var(--sw-nav-link-scrolled);
           }
         }
       }
@@ -1925,15 +1927,15 @@
       .nav-links-list {
         .nav-link-item {
           .nav-link-custom {
-            color: #f5f5f5; // Light text in dark mode
-            
+            // base color handled by var(--sw-nav-link-scrolled) above
+
             &:hover {
-              color: #ffffff; // White on hover
+              color: var(--sw-nav-link-scrolled) !important; // #f5f5f5 in dark — light on black bg
               text-decoration: underline; // Additional visual cue
             }
-            
+
             &.active {
-              color: #ffffff; // White for active state
+              color: var(--sw-nav-link-scrolled) !important; // #f5f5f5 in dark — light on black bg
               font-weight: 800; // Bolder for active
             }
           }

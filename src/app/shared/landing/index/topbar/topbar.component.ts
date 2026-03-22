@@ -267,6 +267,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     this.cartSubscriptions.push(
       this.themeService.isDarkMode$.subscribe(isDark => {
         this.isDarkMode = isDark;
+        this.updateWhiteMode(); // re-evaluate logo immediately when mode changes
       })
     );
 
@@ -274,6 +275,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     this.cartSubscriptions.push(
       this.themeService.isScrolled$.subscribe(isScrolled => {
         this.isScrolled = isScrolled;
+        this.updateWhiteMode(); // belt-and-suspenders (windowScroll also calls this)
       })
     );
   }
@@ -301,28 +303,30 @@ export class TopbarComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Update white mode based on scroll state and current route
-   * 
-   * White mode (white icons + white logo) is ONLY for:
-   * - Desktop (screen width > 991.98px)
-   * - When topbar is transparent (not scrolled)
-   * - When not on exception routes (checkout, product-detail)
-   * 
-   * On mobile/tablet: always use black logo and black icons
+   * Update white mode based on scroll state, theme, and current route.
+   *
+   * White logo/icons are shown when:
+   * (a) Desktop transparent state: ≥1200px wide, not scrolled, not on exception route
+   * (b) Desktop dark mode scrolled: ≥1200px wide, scrolled, dark mode active
+   *     → dark logo on black background would be invisible; show white logo instead
+   *
+   * Mobile/tablet (< 1200px): always use dark logo (solid white background).
    */
   private updateWhiteMode(): void {
-    const isMobile = window.innerWidth <= 991.98;
-    const isExceptionRoute = this.routeExceptions.some(exception => 
+    // Align with CSS breakpoint — desktop starts at 1200px (SCSS uses min-width: 1200px)
+    const isMobile = window.innerWidth < 1200;
+    const isExceptionRoute = this.routeExceptions.some(exception =>
       this.currentRoute.startsWith(exception)
     );
-    
-    // White mode is active when:
-    // - Desktop only (NOT mobile/tablet) AND
-    // - Not scrolled AND
-    // - Not on exception route
-    this.isWhiteMode = !isMobile && !this.isScrolled && !isExceptionRoute;
-    
-    // Detect special pages for icon styling (icons stay black)
+
+    // (a) Transparent state: desktop, not scrolled, not exception route
+    const isTransparentState = !isMobile && !this.isScrolled && !isExceptionRoute;
+    // (b) Dark scrolled: desktop, scrolled, dark mode — white logo needed on black bg
+    const isDarkScrolled = !isMobile && this.isScrolled && this.isDarkMode;
+
+    this.isWhiteMode = isTransparentState || isDarkScrolled;
+
+    // Detect special pages for icon styling
     this.isCheckoutPage = this.currentRoute.startsWith('/checkout');
     this.isProductDetailPage = this.currentRoute.startsWith('/product-detail');
   }
@@ -768,7 +772,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
   windowScroll() {
     const navbar = document.getElementById('navbar');
     const burger = document.getElementById('topnav-hamburger-icon');
-    const isMobile = window.innerWidth <= 991.98;
+    const isMobile = window.innerWidth < 1200;
     const scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
     
     // Update scroll state for color changes

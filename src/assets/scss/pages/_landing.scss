@@ -60,7 +60,9 @@
 
 .navbar-landing {
     padding: 8px 0px; // Reduced from 10px
-    transition: all 0.5s ease;
+    transition:
+      background-color var(--sw-transition-slow),
+      box-shadow var(--sw-transition-slow);
 
     // MOBILE & TABLET: Always solid white background, always fixed
     @media (max-width: 1199.98px) {
@@ -73,6 +75,17 @@
         right: 0;
         width: 100%;
         z-index: 1030;
+    }
+
+    // DESKTOP: Transparent by default, solid on scroll
+    @media (min-width: 1200px) {
+      background: var(--sw-topbar-bg-default);  // transparent in both light & dark
+
+      &.scrolled,
+      &.is-sticky {
+        background: var(--sw-topbar-bg-scrolled);  // #ffffff light / #000000 dark
+        box-shadow: var(--sw-shadow-md);
+      }
     }
 
     .navbar-nav {
@@ -99,8 +112,11 @@
     }
 
     &.is-sticky {
-        background-color: var(--#{$prefix}secondary-bg);
-        box-shadow: 0 1px 16px -2px rgba(56, 65, 74, 0.15);
+        // Mobile/tablet fallback only — desktop is handled above in the @media block
+        @media (max-width: 1199.98px) {
+          background-color: var(--#{$prefix}secondary-bg);
+          box-shadow: 0 1px 16px -2px rgba(56, 65, 74, 0.15);
+        }
     }
 }
 

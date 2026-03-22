@@ -39,8 +39,9 @@ yarn-error.log*
 !.vscode/extensions.json
 .history/*
 
-# Cursor / AI tooling
-.cursor/
+# Cursor / AI tooling — ignore local settings but track shared rules
+.cursor/*
+!.cursor/rules/
 .cursorignore
 .claude/
 

@@ -45,6 +45,8 @@
   --sw-topbar-icon-scrolled: #1a1a1a; // Black after scroll
   --sw-topbar-icon-mobile: #1a1a1a; // Always black on mobile
   --sw-topbar-border: rgba(0, 0, 0, 0.08);
+  --sw-topbar-bg-default: transparent;      // transparent by default on desktop (same for dark mode — not redeclared)
+  --sw-topbar-logo-offset: 0.3rem;          // logo vertical nudge down
   
   // Card/Surface
   --sw-card-bg: #ffffff;
@@ -78,6 +80,9 @@
   --sw-warning: #f59e0b;
   --sw-error: #ef4444;
   --sw-info: #3b82f6;
+
+  // Product card pricing
+  --sw-price-discount: var(--sw-primary);   // discounted price color (light = brand red)
 
   // === TYPOGRAPHY ===
   // Font family tokens. Never repeat the raw stack — reference these vars.
@@ -159,11 +164,14 @@
   
   // Topbar specific (dark mode)
   --sw-topbar-bg: #1e1e1e;
-  --sw-topbar-bg-scrolled: #1e1e1e;
+  --sw-topbar-bg-scrolled: #000000;         // pure black on scroll — editorial dark feel
   --sw-topbar-icon-default: #f5f5f5;
   --sw-topbar-icon-scrolled: #f5f5f5;
   --sw-topbar-icon-mobile: #f5f5f5;
   --sw-topbar-border: rgba(255, 255, 255, 0.1);
+
+  // Product card pricing
+  --sw-price-discount: #ff3d3d;             // brighter red — legible on dark surface
   
   // Card/Surface
   --sw-card-bg: #1e1e1e;

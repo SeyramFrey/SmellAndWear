@@ -1,0 +1,67 @@
+---
+description: Enforce design-token-only colors in all SCSS and component files
+globs: ["src/app/**/*.scss", "src/assets/scss/**/*.scss"]
+alwaysApply: true
+---
+
+# Design Token Rule: No Hardcoded Colors
+
+## Rule
+
+All color values in Angular component SCSS and asset SCSS **must** come from CSS custom property tokens defined in `src/assets/scss/_theme-variables.scss`.
+
+## What Is Forbidden (outside `_theme-variables.scss`)
+
+- Hex literals: `#ffffff`, `#1a1a1a`, `#ff3d3d`, etc.
+- RGB/RGBA with literal values: `rgb(255, 255, 255)`, `rgba(0, 0, 0, 0.5)`
+- Named colors: `color: white`, `color: black`, `background: transparent` (use `var(--sw-topbar-bg-default)`)
+- Bootstrap-prefixed color tokens used for Smell & Wear–specific theming (prefer `--sw-*` over `--bs-*`)
+
+## What Is Allowed
+
+- `var(--sw-*)` tokens: `color: var(--sw-text-primary)`, `background: var(--sw-topbar-bg-scrolled)`
+- `rgba(var(--sw-primary-rgb), 0.15)` — RGB component pattern using token
+- Bootstrap structural tokens like `var(--bs-border-radius)` (non-color structural values)
+- `transparent` keyword only as a value for `--sw-topbar-bg-default` in `_theme-variables.scss`
+
+## Required Workflow for New Colors
+
+1. Check if an existing `--sw-*` token already covers the color.
+2. If no token exists: **add it to `src/assets/scss/_theme-variables.scss` first** (both `:root` light and `[data-bs-theme="dark"]` dark blocks as needed).
+3. Then reference the new token in the component SCSS.
+4. Never define a color value directly in a component SCSS file.
+
+## Token Reference Quick Map
+
+| Need | Token | Notes |
+|---|---|---|
+| Primary text | `var(--sw-text-primary)` | auto dark via dark block |
+| Muted/secondary text | `var(--sw-text-muted)` | auto dark |
+| Inverse text (on dark bg) | `var(--sw-text-inverse)` | ⚠️ resolves to `#1a1a1a` in dark mode — **not** for nav links |
+| Page background | `var(--sw-bg-primary)` | auto dark |
+| Card background | `var(--sw-card-bg)` | auto dark |
+| Topbar default bg | `var(--sw-topbar-bg-default)` | `transparent` in both modes |
+| Topbar scrolled bg | `var(--sw-topbar-bg-scrolled)` | `#ffffff` light / `#000000` dark |
+| Topbar icon (transparent state) | `var(--sw-topbar-icon-default)` | `#ffffff` light / `#f5f5f5` dark |
+| Topbar icon (scrolled state) | `var(--sw-topbar-icon-scrolled)` | `#1a1a1a` light / `#f5f5f5` dark |
+| Nav link (transparent state) | `var(--sw-nav-link)` | `#ffffff` light / `#f5f5f5` dark |
+| Nav link (scrolled state) | `var(--sw-nav-link-scrolled)` | `#1a1a1a` light / `#f5f5f5` dark |
+| Brand/accent | `var(--sw-primary)` | same in both modes |
+| Sale/discount price | `var(--sw-price-discount)` | `var(--sw-primary)` light / `#ff3d3d` dark |
+| Success | `var(--sw-success)` | same in both modes |
+| Error | `var(--sw-error)` | same in both modes |
+
+## ⚠️ Common Pitfall: `--sw-text-inverse` in Dark Mode
+
+`--sw-text-inverse` is `#ffffff` in **light** mode but `#1a1a1a` in **dark** mode.
+Using it for text on dark backgrounds (e.g., nav links in dark scrolled topbar) will make text invisible.
+
+**Use `var(--sw-nav-link-scrolled)` or `var(--sw-topbar-icon-default)` instead** for elements that need to stay light in dark mode.
+
+## Scope
+
+This rule applies to:
+- `src/app/**/*.scss` (all Angular component SCSS)
+- `src/assets/scss/**/*.scss` (all shared/global SCSS)
+
+**Exception:** `src/assets/scss/_theme-variables.scss` is the **source of truth** — hex values are allowed there and only there.
